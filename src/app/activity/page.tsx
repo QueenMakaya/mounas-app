@@ -34,11 +34,16 @@ export default async function ActivityPage() {
   }
 
   const dayNumber = DAY_NUMBER[activity.day] ?? '—';
-  const steps = activity.activitySteps
-    ? activity.activitySteps.split('\n').filter((s) => s.trim())
-    : [];
-  const letters = activity.frenchWord.split('');
+  const letters = Array.from(activity.frenchWord);
   const syllabes = activity.syllables ? activity.syllables.split('-') : [];
+  const difficultyNum = parseInt(activity.difficulty, 10);
+  const showSpellingSteps = difficultyNum >= 4;
+  const activityStepsList = activity.activitySteps
+    ? activity.activitySteps
+        .split('\n')
+        .map((s) => s.replace(/^\d+\.\s*/, '').trim())
+        .filter(Boolean)
+    : [];
 
   return (
     <main
@@ -80,28 +85,19 @@ export default async function ActivityPage() {
         </p>
       </div>
 
-      {/* ── ÉTAPES 1–4 ── */}
-      <div className="flex flex-col gap-6 mt-12">
+      {/* ── 8 ÉTAPES ── */}
+      <div className="flex flex-col gap-6">
 
         {/* ÉTAPE 1 — DÉCOUVERTE */}
         <section className="rounded-3xl p-6" style={{ backgroundColor: '#E63946' }}>
-          <p
-            className="text-xs font-bold uppercase tracking-widest mb-4"
-            style={{ color: '#FDF6EC', opacity: 0.85 }}
-          >
+          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#FDF6EC', opacity: 0.85 }}>
             ✨ ÉTAPE 1 · DÉCOUVERTE · 1 min
           </p>
-          <h2
-            className="text-2xl font-bold mb-6"
-            style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}
-          >
+          <h2 className="text-2xl font-bold mb-6" style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}>
             On découvre un nouveau mot
           </h2>
           <div className="text-center mb-6">
-            <span
-              className="text-8xl font-bold leading-none"
-              style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}
-            >
+            <span className="text-8xl font-bold leading-none" style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}>
               {activity.frenchWord}
             </span>
           </div>
@@ -112,25 +108,15 @@ export default async function ActivityPage() {
 
         {/* ÉTAPE 2 — LIRE */}
         <section className="rounded-3xl p-6" style={{ backgroundColor: '#F4A340' }}>
-          <p
-            className="text-xs font-bold uppercase tracking-widest mb-4"
-            style={{ color: '#1A1A1A', opacity: 0.7 }}
-          >
+          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#1A1A1A', opacity: 0.7 }}>
             📖 ÉTAPE 2 · LIRE LE MOT · 1 min
           </p>
-          <h2
-            className="text-2xl font-bold mb-6"
-            style={{ color: '#1A1A1A', fontFamily: 'var(--font-fraunces)' }}
-          >
+          <h2 className="text-2xl font-bold mb-6" style={{ color: '#1A1A1A', fontFamily: 'var(--font-fraunces)' }}>
             On essaie de lire ensemble
           </h2>
           <div className="flex flex-wrap justify-center gap-3 mb-6">
             {letters.map((letter, i) => (
-              <span
-                key={i}
-                className="text-5xl font-bold"
-                style={{ fontFamily: 'var(--font-fraunces)', color: '#1A1A1A' }}
-              >
+              <span key={i} className="text-5xl font-bold" style={{ fontFamily: 'var(--font-fraunces)', color: '#1A1A1A' }}>
                 {letter}
               </span>
             ))}
@@ -145,35 +131,19 @@ export default async function ActivityPage() {
 
         {/* ÉTAPE 3 — SYLLABES */}
         <section className="rounded-3xl p-6" style={{ backgroundColor: '#2EC4B6' }}>
-          <p
-            className="text-xs font-bold uppercase tracking-widest mb-4"
-            style={{ color: '#1A1A1A', opacity: 0.7 }}
-          >
+          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#1A1A1A', opacity: 0.7 }}>
             🔢 ÉTAPE 3 · COMPTER LES SYLLABES · 1 min
           </p>
-          <h2
-            className="text-2xl font-bold mb-6"
-            style={{ color: '#1A1A1A', fontFamily: 'var(--font-fraunces)' }}
-          >
+          <h2 className="text-2xl font-bold mb-6" style={{ color: '#1A1A1A', fontFamily: 'var(--font-fraunces)' }}>
             On compte les syllabes !
           </h2>
           <div className="flex flex-wrap justify-center gap-3 mb-5">
             {syllabes.map((syl, i) => (
-              <div
-                key={i}
-                className="rounded-2xl px-5 py-4 flex flex-col items-center gap-2 min-w-[80px]"
-                style={{ backgroundColor: '#FDF6EC' }}
-              >
-                <span
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-                  style={{ backgroundColor: '#1A8C83', color: '#FDF6EC' }}
-                >
+              <div key={i} className="rounded-2xl px-5 py-4 flex flex-col items-center gap-2 min-w-[80px]" style={{ backgroundColor: '#FDF6EC' }}>
+                <span className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ backgroundColor: '#1A8C83', color: '#FDF6EC' }}>
                   {i + 1}
                 </span>
-                <span
-                  className="text-3xl font-bold"
-                  style={{ fontFamily: 'var(--font-fraunces)', color: '#1A1A1A' }}
-                >
+                <span className="text-3xl font-bold" style={{ fontFamily: 'var(--font-fraunces)', color: '#1A1A1A' }}>
                   {syl}
                 </span>
               </div>
@@ -189,22 +159,13 @@ export default async function ActivityPage() {
 
         {/* ÉTAPE 4 — PHONÉTIQUE */}
         <section className="rounded-3xl p-6" style={{ backgroundColor: '#5B1F8C' }}>
-          <p
-            className="text-xs font-bold uppercase tracking-widest mb-4"
-            style={{ color: '#FDF6EC', opacity: 0.7 }}
-          >
+          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#FDF6EC', opacity: 0.7 }}>
             🔊 ÉTAPE 4 · LA PHONÉTIQUE · 1 min
           </p>
-          <h2
-            className="text-2xl font-bold mb-6"
-            style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}
-          >
+          <h2 className="text-2xl font-bold mb-6" style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}>
             Comment ça se prononce
           </h2>
-          <p
-            className="text-5xl italic text-center mb-6"
-            style={{ fontFamily: 'var(--font-fraunces)', color: '#FDF6EC', opacity: 0.9 }}
-          >
+          <p className="text-5xl italic text-center mb-6" style={{ fontFamily: 'var(--font-fraunces)', color: '#FDF6EC', opacity: 0.9 }}>
             {activity.pronunciation}
           </p>
           <p className="text-base mb-5" style={{ color: '#FDF6EC' }}>
@@ -218,111 +179,173 @@ export default async function ActivityPage() {
           </p>
         </section>
 
+        {/* ÉTAPE 5 — ÉPELER (difficulty >= 4) */}
+        {showSpellingSteps && (
+          <section className="rounded-3xl p-6" style={{ backgroundColor: '#993556' }}>
+            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#FDF6EC', opacity: 0.85 }}>
+              🔤 ÉTAPE 5 · ÉPELER · 1 min
+            </p>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}>
+              On nomme chaque lettre
+            </h2>
+            <div className="flex flex-wrap justify-center gap-2 mb-6">
+              {letters.map((letter, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl flex items-center justify-center"
+                  style={{
+                    backgroundColor: '#FDF6EC',
+                    width: '64px',
+                    height: '80px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                  }}
+                >
+                  <span className="text-4xl font-bold" style={{ fontFamily: 'var(--font-fraunces)', color: '#1A1A1A' }}>
+                    {letter.toUpperCase()}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="text-base italic" style={{ color: '#FDF6EC', opacity: 0.9 }}>
+              Pointe chaque lettre avec ton enfant. Nomme-les ensemble : M, A, M, A, N…
+            </p>
+          </section>
+        )}
+
+        {/* ÉTAPE 6 — ÉCRIRE (difficulty >= 4) */}
+        {showSpellingSteps && (
+          <section className="rounded-3xl p-6" style={{ backgroundColor: '#2D9B6F' }}>
+            <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#FDF6EC', opacity: 0.85 }}>
+              ✍️ ÉTAPE 6 · ÉCRIRE · 2 min
+            </p>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}>
+              On écrit le mot ensemble
+            </h2>
+            <div
+              className="flex items-center justify-center rounded-2xl p-6 mb-5"
+              style={{
+                backgroundColor: '#FDF6EC',
+                border: '2px dashed rgba(26,26,26,0.25)',
+              }}
+            >
+              <span className="text-7xl font-bold" style={{ fontFamily: 'var(--font-nunito)', color: '#1A1A1A' }}>
+                {activity.frenchWord}
+              </span>
+            </div>
+            <div
+              className="rounded-xl p-4 mb-4"
+              style={{ backgroundColor: '#FDF6EC', borderLeft: '4px solid #1A1A1A' }}
+            >
+              <p className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: '#1A1A1A' }}>
+                📋 Matériel
+              </p>
+              <p className="text-sm" style={{ color: '#1A1A1A' }}>
+                Une feuille blanche, un crayon ou un feutre
+              </p>
+            </div>
+            <p className="text-base mb-3" style={{ color: '#FDF6EC' }}>
+              Prends une feuille et un crayon. Essaye d'écrire{' '}
+              <strong>{activity.frenchWord}</strong> en regardant le modèle.
+            </p>
+            <p className="text-sm italic" style={{ color: '#FDF6EC', opacity: 0.75 }}>
+              💡 Encourage chaque tentative. Une lettre bien faite mérite des bravos. Le but c'est l'effort, pas la perfection.
+            </p>
+          </section>
+        )}
+
+        {/* ÉTAPE 7 — L'ACTIVITÉ */}
+        <section className="rounded-3xl p-6" style={{ backgroundColor: '#1D6FA4' }}>
+          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#FDF6EC', opacity: 0.85 }}>
+            🎯 ÉTAPE 7 · L'ACTIVITÉ · 5 min
+          </p>
+          <h2 className="text-2xl font-bold mb-5" style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}>
+            {activity.activityTitle}
+          </h2>
+          {activity.materials && (
+            <div className="rounded-xl p-4 mb-5" style={{ backgroundColor: '#FDF6EC' }}>
+              <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: '#1A1A1A' }}>
+                📋 Matériel
+              </p>
+              <p className="text-sm leading-relaxed" style={{ color: '#1A1A1A' }}>
+                {activity.materials}
+              </p>
+            </div>
+          )}
+          {activityStepsList.length > 0 && (
+            <ol className="flex flex-col gap-3">
+              {activityStepsList.map((step, i) => (
+                <li key={i} className="rounded-2xl p-4 flex gap-4 items-start" style={{ backgroundColor: '#FDF6EC' }}>
+                  <span
+                    className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
+                    style={{ backgroundColor: '#1A8C83', color: '#FDF6EC' }}
+                  >
+                    {i + 1}
+                  </span>
+                  <p className="text-sm leading-relaxed" style={{ color: '#1A1A1A' }}>
+                    {step}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
+
+        {/* ÉTAPE 8 — LA CHANSON */}
+        <section className="rounded-3xl p-6" style={{ backgroundColor: '#D4530C' }}>
+          <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#FDF6EC', opacity: 0.7 }}>
+            🎵 ÉTAPE 8 · LA CHANSON · 2 min
+          </p>
+          <h2 className="text-2xl font-bold mb-5" style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}>
+            {activity.songTitle}
+          </h2>
+          {activity.songLyrics && (
+            <pre
+              className="text-base italic leading-loose whitespace-pre-wrap mb-6 pl-4"
+              style={{ color: '#FDF6EC', fontFamily: 'var(--font-nunito)', opacity: 0.9 }}
+            >
+              {activity.songLyrics}
+            </pre>
+          )}
+          <div className="flex justify-center">
+            <button
+              className="rounded-full px-6 py-3 text-sm font-semibold cursor-default"
+              style={{ backgroundColor: '#FDF6EC', color: '#5B1F8C' }}
+              disabled
+            >
+              🎵 Chanter ensemble
+            </button>
+          </div>
+        </section>
+
       </div>
 
-      {/* ── SECTIONS CONSERVÉES — Phase 3 les remplacera ── */}
-
-      {/* PRATIQUE */}
-      <section className="rounded-3xl p-7 mt-6 mb-6" style={{ backgroundColor: '#2EC4B6' }}>
-        <p
-          className="text-xs font-bold uppercase tracking-widest mb-5"
-          style={{ color: '#1A1A1A', opacity: 0.7 }}
-        >
-          Pratique · 5 min
-        </p>
-        <h2
-          className="text-2xl font-bold mb-5"
-          style={{ color: '#1A1A1A', fontFamily: 'var(--font-fraunces)' }}
-        >
-          {activity.activityTitle}
-        </h2>
-        {activity.materials && (
-          <div className="rounded-2xl p-4 mb-5" style={{ backgroundColor: '#FDF6EC' }}>
-            <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: '#1A1A1A' }}>
-              Matériel
-            </p>
-            <p className="text-sm leading-relaxed" style={{ color: '#1A1A1A' }}>
-              {activity.materials}
-            </p>
-          </div>
-        )}
-        {steps.length > 0 && (
-          <ol className="flex flex-col gap-3">
-            {steps.map((step, i) => (
-              <li
-                key={i}
-                className="rounded-2xl p-4 flex gap-4 items-start"
-                style={{ backgroundColor: '#FDF6EC' }}
-              >
-                <span
-                  className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold"
-                  style={{ backgroundColor: '#1A8C83', color: '#FDF6EC' }}
-                >
-                  {i + 1}
-                </span>
-                <p className="text-sm leading-relaxed" style={{ color: '#1A1A1A' }}>
-                  {step}
-                </p>
-              </li>
-            ))}
-          </ol>
-        )}
-      </section>
-
-      {/* CONSOLIDATION */}
-      <section className="rounded-3xl p-7 mb-6" style={{ backgroundColor: '#5B1F8C' }}>
-        <p
-          className="text-xs font-bold uppercase tracking-widest mb-5"
-          style={{ color: '#FDF6EC', opacity: 0.7 }}
-        >
-          Consolidation · 2 min
-        </p>
-        <h2
-          className="text-2xl font-bold mb-5"
-          style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}
-        >
-          {activity.songTitle}
-        </h2>
-        {activity.songLyrics && (
-          <pre
-            className="text-sm leading-loose whitespace-pre-wrap mb-6"
-            style={{ color: '#FDF6EC', fontFamily: 'var(--font-nunito)', opacity: 0.9 }}
-          >
-            {activity.songLyrics}
-          </pre>
-        )}
-        <button
-          className="rounded-full px-5 py-2 text-sm font-semibold cursor-default"
-          style={{ backgroundColor: '#FDF6EC', color: '#5B1F8C' }}
-          disabled
-        >
-          ▶ Chanter ensemble
-        </button>
-      </section>
-
       {/* BOUTON COMPLÉTION */}
-      <div className="mt-6 mb-6 flex justify-center">
+      <div className="mt-8 mb-6 flex justify-center">
         <CompleteButton activityId={activity.id} />
       </div>
 
       {/* BADGE */}
       {activity.badgeName && (
-        <section className="rounded-3xl p-7 text-center" style={{ backgroundColor: '#F4A340' }}>
+        <section className="rounded-3xl p-7 text-center mb-10" style={{ backgroundColor: '#F4A340' }}>
           <div className="text-5xl mb-3">⭐</div>
-          <p
-            className="text-xs font-bold uppercase tracking-widest mb-2"
-            style={{ color: '#1A1A1A', opacity: 0.7 }}
-          >
+          <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#1A1A1A', opacity: 0.7 }}>
             Badge débloqué
           </p>
-          <h2
-            className="text-2xl font-bold"
-            style={{ color: '#1A1A1A', fontFamily: 'var(--font-fraunces)' }}
-          >
+          <h2 className="text-xl font-bold" style={{ color: '#1A1A1A', fontFamily: 'var(--font-fraunces)' }}>
             {activity.badgeName}
           </h2>
         </section>
       )}
+
+      {/* FOOTER */}
+      <footer className="text-center pb-8">
+        <a href="/" className="text-sm underline" style={{ color: '#5B1F8C' }}>
+          ← Retour à l'accueil
+        </a>
+        <p className="text-xs mt-2" style={{ color: '#888' }}>
+          Les Mounas · v0.1
+        </p>
+      </footer>
     </main>
   );
 }
