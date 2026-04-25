@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -23,17 +24,20 @@ export default function Home() {
         10 minutes par jour pour faire grandir ton enfant
       </p>
 
-      <button
-        className="rounded-full px-8 py-4 text-base font-semibold transition-opacity hover:opacity-90 cursor-default"
+      <Link
+        href="/activity"
+        className="rounded-full px-8 py-4 text-base font-semibold transition-colors duration-200 bg-[#E63946] hover:bg-[#c1121f]"
         style={{
-          backgroundColor: "#E63946",
           color: "#FDF6EC",
           fontFamily: "var(--font-nunito)",
         }}
-        disabled
       >
-        Bientôt disponible
-      </button>
+        Voir l'activité du jour →
+      </Link>
+
+      <p className="mt-4 text-sm" style={{ color: "#5F5E5A" }}>
+        10 minutes de qualité · en français + culture afro
+      </p>
     </main>
   );
 }
