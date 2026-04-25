@@ -10,8 +10,9 @@ export default function Home() {
         src="/logo-mounas.png"
         alt="Logo Les Mounas"
         width={400}
-        height={200}
-        className="w-[280px] sm:w-[400px] h-auto mb-6"
+        height={400}
+        style={{ mixBlendMode: "multiply", height: "auto" }}
+        className="w-[280px] sm:w-[400px] mb-6"
         priority
       />
 
