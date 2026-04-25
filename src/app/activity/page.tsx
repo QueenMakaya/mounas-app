@@ -1,4 +1,5 @@
 import { getTodayActivity } from '@/lib/airtable';
+import CompleteButton from '@/components/CompleteButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -183,6 +184,11 @@ export default async function ActivityPage() {
           ▶ Chanter ensemble
         </button>
       </section>
+
+      {/* BOUTON COMPLÉTION */}
+      <div className="mt-6 mb-6 flex justify-center">
+        <CompleteButton activityId={activity.id} />
+      </div>
 
       {/* BADGE */}
       {activity.badgeName && (
