@@ -1,15 +1,24 @@
+import Image from "next/image";
+
 export default function Home() {
   return (
     <main
       className="flex min-h-screen flex-col items-center justify-center px-6 text-center"
       style={{ backgroundColor: "#FDF6EC" }}
     >
-      <h1
-        className="text-8xl font-black tracking-tight leading-none mb-4"
-        style={{ color: "#1A1A1A", fontFamily: "var(--font-fraunces)" }}
+      <div
+        className="flex items-center justify-center mb-6 px-8 py-6 rounded-2xl"
+        style={{ backgroundColor: "#FFFFFF" }}
       >
-        MOUNAS
-      </h1>
+        <Image
+          src="/logo-mounas.png"
+          alt="Logo Les Mounas"
+          width={400}
+          height={200}
+          className="w-[280px] sm:w-[400px] h-auto"
+          priority
+        />
+      </div>
 
       <p
         className="text-lg mb-10 max-w-sm"
