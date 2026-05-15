@@ -100,3 +100,59 @@ export const getActivityByDay = async (day: string, week: number = 1): Promise<A
     return null;
   }
 };
+
+// Récupère tous les thèmes uniques disponibles dans la base
+export const getAllThemes = async (): Promise<string[]> => {
+  try {
+    const records = await base(tableId)
+      .select({ fields: ['Theme'] })
+      .all();
+
+    const themesSet = new Set<string>();
+    records.forEach((record) => {
+      const theme = record.get('Theme') as string;
+      if (theme) themesSet.add(theme);
+    });
+
+    return Array.from(themesSet).sort();
+  } catch (error) {
+    console.error('Error fetching themes:', error);
+    return [];
+  }
+};
+
+// Récupère toutes les activités filtrées par thème et difficulté
+export const getActivitiesByFilters = async (
+  theme?: string,
+  difficulty?: string
+): Promise<Activity[]> => {
+  try {
+    const filterParts: string[] = [];
+    if (theme) filterParts.push(`{Theme} = '${theme}'`);
+    if (difficulty) filterParts.push(`{Difficulty} = '${difficulty}'`);
+
+    const filterByFormula = filterParts.length > 0
+      ? `AND(${filterParts.join(', ')})`
+      : '';
+
+    const records = await base(tableId)
+      .select(filterByFormula ? { filterByFormula } : {})
+      .all();
+
+    return records.map(recordToActivity);
+  } catch (error) {
+    console.error('Error fetching activities by filters:', error);
+    return [];
+  }
+};
+
+// Récupère une activité par son ID Airtable
+export const getActivityById = async (id: string): Promise<Activity | null> => {
+  try {
+    const record = await base(tableId).find(id);
+    return recordToActivity(record);
+  } catch (error) {
+    console.error('Error fetching activity by id:', error);
+    return null;
+  }
+};
