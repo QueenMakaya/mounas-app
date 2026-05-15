@@ -1,4 +1,4 @@
-import { getTodayActivity } from '@/lib/airtable';
+import { getTodayActivity, getActivityById } from '@/lib/airtable';
 import CompleteButton from '@/components/CompleteButton';
 
 export const dynamic = 'force-dynamic';
@@ -13,8 +13,13 @@ const DAY_NUMBER: Record<string, number> = {
   Dimanche: 7,
 };
 
-export default async function ActivityPage() {
-  const activity = await getTodayActivity();
+export default async function ActivityPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ id?: string }>;
+}) {
+  const { id } = await searchParams;
+  const activity = id ? await getActivityById(id) : await getTodayActivity();
 
   if (!activity) {
     return (
