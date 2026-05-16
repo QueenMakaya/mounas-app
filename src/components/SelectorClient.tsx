@@ -10,11 +10,10 @@ type Props = {
 };
 
 const DIFFICULTY_OPTIONS = [
-  { value: '1', label: '1 · Bébé (0-1 an)' },
-  { value: '2', label: '2 · Tout-petit (1-2 ans)' },
-  { value: '3', label: '3 · Petit (2-3 ans)' },
-  { value: '4', label: '4 · Grand (3-4 ans)' },
-  { value: '5', label: '5 · Pré-scolaire (4-5 ans)' },
+  { value: '1', label: '1 · Tout-petit (1-3 ans)' },
+  { value: '2', label: '2 · Petit (3-4 ans)' },
+  { value: '3', label: '3 · Grand (4-5 ans)' },
+  { value: '4', label: '4 · Pré-scolaire (5+ ans)' },
 ];
 
 const LS_SEEN = 'mounas_seen_words';
