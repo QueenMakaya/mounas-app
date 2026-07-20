@@ -24,3 +24,62 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Rendered Markdown for blog articles */
+.blog-content {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+.blog-content h2 {
+  font-family: var(--font-fraunces);
+  font-weight: 700;
+  font-size: 1.6rem;
+  color: #1a1a1a;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+.blog-content h3 {
+  font-family: var(--font-fraunces);
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: #1a1a1a;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+.blog-content p {
+  margin-bottom: 1.1rem;
+}
+.blog-content a {
+  color: #5b1f8c;
+  text-decoration: underline;
+}
+.blog-content strong {
+  color: #1a1a1a;
+  font-weight: 700;
+}
+.blog-content ul,
+.blog-content ol {
+  margin: 0 0 1.1rem 1.25rem;
+  list-style-position: outside;
+}
+.blog-content ul {
+  list-style-type: disc;
+}
+.blog-content ol {
+  list-style-type: decimal;
+}
+.blog-content li {
+  margin-bottom: 0.4rem;
+}
+.blog-content blockquote {
+  border-left: 4px solid #f4a340;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  font-style: italic;
+  color: rgba(26, 26, 26, 0.7);
+}
+.blog-content hr {
+  border: none;
+  border-top: 1px solid rgba(26, 26, 26, 0.15);
+  margin: 2rem 0;
+}
