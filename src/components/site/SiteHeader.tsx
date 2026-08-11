@@ -17,7 +17,7 @@ export default function SiteHeader() {
       style={{ backgroundColor: 'rgba(253,246,236,0.85)', borderBottom: '1px solid rgba(26,26,26,0.08)' }}
     >
       <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-        <MounasLogo href="/" size={24} />
+        <MounasLogo href="/" variant="wordmark" height={30} />
 
         <nav className="flex flex-wrap items-center gap-x-5 gap-y-1">
           {NAV.map((item) => (
