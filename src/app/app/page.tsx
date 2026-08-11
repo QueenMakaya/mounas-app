@@ -74,7 +74,7 @@ export default async function HomePage() {
               </span>
               <div className="flex justify-center">
                 <Link
-                  href="/activity"
+                  href="/app/activity"
                   className="rounded-full py-4 px-8 text-lg font-bold shadow-md transition-colors duration-200 bg-[#E63946] hover:bg-red-700"
                   style={{ color: '#FDF6EC' }}
                 >
@@ -123,7 +123,7 @@ export default async function HomePage() {
               </p>
               <div className="flex justify-center">
                 <Link
-                  href="/select"
+                  href="/app/select"
                   className="rounded-full py-3 px-6 font-bold shadow-sm transition-colors duration-200 bg-[#F4A340] hover:bg-yellow-500"
                   style={{ color: '#1A1A1A' }}
                 >
@@ -155,7 +155,7 @@ export default async function HomePage() {
             </p>
             <div className="flex justify-center">
               <Link
-                href="/select"
+                href="/app/select"
                 className="rounded-full py-4 px-8 text-lg font-bold shadow-md transition-colors duration-200 bg-[#F4A340] hover:bg-yellow-500"
                 style={{ color: '#1A1A1A' }}
               >

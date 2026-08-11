@@ -31,7 +31,7 @@ export default async function ActivityPage({
           Aucune activité aujourd'hui.
         </p>
         <p style={{ color: '#888' }}>Reviens demain — les Mounas seront là !</p>
-        <a href="/" className="mt-8 text-sm underline" style={{ color: '#5B1F8C' }}>
+        <a href="/app" className="mt-8 text-sm underline" style={{ color: '#5B1F8C' }}>
           ← Retour à l'accueil
         </a>
       </main>
@@ -57,7 +57,7 @@ export default async function ActivityPage({
     >
       {/* HEADER */}
       <div className="flex items-center justify-between mb-10">
-        <a href="/" className="text-sm font-semibold" style={{ color: '#1A1A1A' }}>
+        <a href="/app" className="text-sm font-semibold" style={{ color: '#1A1A1A' }}>
           ← Retour
         </a>
         <span
@@ -344,7 +344,7 @@ export default async function ActivityPage({
 
       {/* FOOTER */}
       <footer className="text-center pb-8">
-        <a href="/" className="text-sm underline" style={{ color: '#5B1F8C' }}>
+        <a href="/app" className="text-sm underline" style={{ color: '#5B1F8C' }}>
           ← Retour à l'accueil
         </a>
         <p className="text-xs mt-2" style={{ color: '#888' }}>

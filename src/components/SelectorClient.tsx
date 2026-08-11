@@ -83,7 +83,7 @@ export default function SelectorClient({ themes, allActivities }: Props) {
       : [...seenIds, activityId];
     setSeenIds(newSeenIds);
     localStorage.setItem(LS_SEEN, JSON.stringify(newSeenIds));
-    router.push(`/activity?id=${activityId}`);
+    router.push(`/app/activity?id=${activityId}`);
   };
 
   return (
@@ -95,7 +95,7 @@ export default function SelectorClient({ themes, allActivities }: Props) {
         {/* A. HEADER */}
         <div className="mb-8">
           <a
-            href="/"
+            href="/app"
             className="text-sm font-semibold"
             style={{ color: '#1A1A1A' }}
           >
@@ -253,7 +253,7 @@ export default function SelectorClient({ themes, allActivities }: Props) {
         {/* E. FOOTER */}
         <footer className="mt-16 text-center">
           <a
-            href="/"
+            href="/app"
             className="text-sm underline"
             style={{ color: '#5B1F8C' }}
           >
