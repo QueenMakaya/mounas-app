@@ -1,58 +1,66 @@
 import Link from 'next/link';
-import DiamondIcon from './DiamondIcon';
-import { COLORS } from '@/lib/config';
+import Image from 'next/image';
 
-// Per-letter colours echoing the MOUNAS wordmark in the logo artwork.
-const LETTERS: { char: string; color: string }[] = [
-  { char: 'M', color: COLORS.amber },
-  { char: 'O', color: COLORS.teal },
-  { char: 'U', color: COLORS.amber },
-  { char: 'N', color: COLORS.pink },
-  { char: 'A', color: COLORS.purple },
-  { char: 'S', color: COLORS.red },
-];
+/**
+ * The real Mounas logo artwork (public/logo-mounas.png), pre-trimmed into two
+ * transparent variants so it stays crisp at small sizes:
+ *
+ *  - `wordmark` — the "MOUNAS" lettering only. Best in the compact site header.
+ *  - `lockup`   — lettering + the four-glyph frieze. Best where there's room
+ *                 to breathe (e.g. the footer).
+ *
+ * Trimmed from the 3000×3000 source with scripts/… (see PR); ratios below match
+ * the exported PNGs so `next/image` reserves the right box and never distorts.
+ */
+const VARIANTS = {
+  wordmark: { src: '/logo-mounas-wordmark.png', ratio: 1823 / 404 },
+  lockup: { src: '/logo-mounas-lockup.png', ratio: 1839 / 650 },
+} as const;
 
 type Props = {
-  /** Where the logo links to. Pass null to render a non-linked mark. */
+  /** Where the logo links to. Pass null to render a non-linked image. */
   href?: string | null;
-  /** Wordmark font size in px. Icon scales with it. */
+  /** Which artwork to show. */
+  variant?: keyof typeof VARIANTS;
+  /** Rendered height in px; width scales with the artwork ratio. */
+  height?: number;
+  /** Legacy alias for `height` (older callers passed `size`). */
   size?: number;
-  /** Render the wordmark in a single flat colour instead of multicolour. */
-  monoColor?: string;
   className?: string;
 };
 
 /**
- * Full Mounas logo: the geometric diamond mark next to the "MOUNAS" wordmark.
- * Used in the site header and footer so the logo always reads as a complete
- * lockup (icon + text), not an icon on its own.
+ * Renders the actual brand logo image (not a font recreation), so the header
+ * and footer always show the true Mounas artwork and colours.
  */
-export default function MounasLogo({ href = '/', size = 26, monoColor, className }: Props) {
-  const wordmark = (
-    <span
-      className="inline-flex items-baseline font-bold leading-none tracking-tight"
-      style={{ fontFamily: 'var(--font-fraunces)', fontSize: size }}
-    >
-      {LETTERS.map((l, i) => (
-        <span key={i} style={{ color: monoColor ?? l.color }}>
-          {l.char}
-        </span>
-      ))}
-    </span>
+export default function MounasLogo({
+  href = '/',
+  variant = 'wordmark',
+  height,
+  size,
+  className,
+}: Props) {
+  const h = height ?? size ?? 28;
+  const { src, ratio } = VARIANTS[variant];
+  const w = Math.round(h * ratio);
+
+  const img = (
+    <Image
+      src={src}
+      alt="Les Mounas"
+      width={w}
+      height={h}
+      priority
+      className={className}
+      style={{ height: h, width: 'auto' }}
+    />
   );
 
-  const content = (
-    <span className={`inline-flex items-center gap-2 ${className ?? ''}`}>
-      <DiamondIcon size={Math.round(size * 0.85)} title="Les Mounas" />
-      {wordmark}
-    </span>
-  );
-
-  if (href === null) return content;
+  if (href === null) return img;
 
   return (
-    <Link href={href} aria-label="Les Mounas — accueil" className="inline-flex">
-      {content}
+    <Link href={href} aria-label="Les Mounas — accueil" className="inline-flex items-center">
+      {img}
     </Link>
   );
 }

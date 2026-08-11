@@ -11,8 +11,8 @@ export default function SiteFooter() {
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
           <div className="max-w-sm">
-            {/* Logo lockup: diamond + MOUNAS wordmark, on dark it stays multicolour */}
-            <MounasLogo href="/" size={26} />
+            {/* Real logo lockup: MOUNAS wordmark + glyph frieze, transparent on the dark footer */}
+            <MounasLogo href="/" variant="lockup" height={52} />
             <p className="mt-4 text-sm" style={{ color: 'rgba(253,246,236,0.7)' }}>
               Le français en s&apos;amusant, pour les familles de la diaspora et leurs enfants de 0 à
               6 ans. Directement sur WhatsApp.
