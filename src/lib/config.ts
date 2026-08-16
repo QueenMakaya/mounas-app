@@ -29,6 +29,15 @@ export const WHATSAPP_NUMBER = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '').r
 // https://cal.com/les-mounas/20min). Works with either tool.
 export const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL || '';
 
+// Social profiles — optional. Each one only shows up on /connect when its
+// NEXT_PUBLIC_* variable is set, so the page never links to an empty profile.
+export const SOCIAL_LINKS = [
+  { key: 'instagram', label: 'Instagram', handle: '@lesmounas', url: process.env.NEXT_PUBLIC_INSTAGRAM_URL || '' },
+  { key: 'tiktok', label: 'TikTok', handle: '@lesmounas', url: process.env.NEXT_PUBLIC_TIKTOK_URL || '' },
+  { key: 'youtube', label: 'YouTube', handle: 'Les Mounas', url: process.env.NEXT_PUBLIC_YOUTUBE_URL || '' },
+  { key: 'facebook', label: 'Facebook', handle: 'Les Mounas', url: process.env.NEXT_PUBLIC_FACEBOOK_URL || '' },
+].filter((s) => s.url.length > 0);
+
 /** Build a wa.me link, optionally pre-filling the first message. */
 export function whatsappLink(message?: string): string {
   const base = WHATSAPP_NUMBER ? `https://wa.me/${WHATSAPP_NUMBER}` : 'https://wa.me/';
