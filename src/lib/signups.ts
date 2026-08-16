@@ -20,7 +20,11 @@
 
 import { airtableToken } from '@/lib/airtable-token';
 
-const DEFAULT_SIGNUPS_TABLE = 'Signups';
+// The "Signups" table, addressed by id rather than name: Airtable answers a
+// missing table and a missing permission with the same 403
+// (INVALID_PERMISSIONS_OR_MODEL_NOT_FOUND), so pinning the id takes the
+// "wrong table" half of that message off the table — and survives a rename.
+const DEFAULT_SIGNUPS_TABLE = 'tblbBiOrYGDRd6hO3';
 
 export type SignupSource = 'newsletter' | 'ebook';
 
