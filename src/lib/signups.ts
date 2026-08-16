@@ -58,7 +58,14 @@ export async function saveSignup(email: string, source: SignupSource): Promise<S
 
     if (!res.ok) {
       const detail = await res.text().catch(() => '');
-      console.error(`[signups] Airtable responded ${res.status}: ${detail}`);
+      // Say exactly which credential and target were used. The part of a
+      // personal access token before the "." is its public token id — the same
+      // id Airtable shows in the tokens list — so this identifies the token
+      // without printing the secret half.
+      console.error(
+        `[signups] Airtable responded ${res.status}: ${detail} ` +
+          `| token=${apiKey.split('.')[0]} (len ${apiKey.length}) base=${baseId} table=${table}`,
+      );
       return { ok: false, error: 'airtable_error' };
     }
 
