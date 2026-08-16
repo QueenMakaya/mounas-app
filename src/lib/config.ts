@@ -19,10 +19,14 @@ export const COLORS = {
   pink: '#E6197A',
 } as const;
 
-// WhatsApp — set NEXT_PUBLIC_WHATSAPP_NUMBER to your number in international
-// format, digits only (e.g. 33612345678). Leave empty to fall back to a plain
-// wa.me link the visitor can address themselves.
-export const WHATSAPP_NUMBER = (process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '').replace(/[^0-9]/g, '');
+// WhatsApp — the business number every "Rejoindre" button opens, in
+// international format, digits only. NEXT_PUBLIC_WHATSAPP_NUMBER overrides it
+// (handy to point staging at a test number); the default keeps the buttons
+// working even when that variable isn't set on the deployment.
+const DEFAULT_WHATSAPP_NUMBER = '15145528184'; // +1 514 552-8184
+export const WHATSAPP_NUMBER = (
+  process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || DEFAULT_WHATSAPP_NUMBER
+).replace(/[^0-9]/g, '');
 
 // Scheduling — paste your Calendly OR Cal.com booking link here via
 // NEXT_PUBLIC_BOOKING_URL (e.g. https://calendly.com/les-mounas/20min or

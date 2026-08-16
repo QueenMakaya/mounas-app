@@ -5,12 +5,20 @@
  * still builds/renders if signups aren't configured yet:
  *   - AIRTABLE_API_KEY          personal access token (Bearer)
  *   - AIRTABLE_BASE_ID          base id, e.g. appXXXXXXXXXXXXXX
- *   - AIRTABLE_SIGNUPS_TABLE    table name OR id that stores the emails
+ *   - AIRTABLE_SIGNUPS_TABLE    optional — overrides the table below
  *
- * Expected columns in that table: "Email" (single line text) and
+ * The table lives in the same base as the activities, so only the table name
+ * differs from the app's own config; defaulting it here means signups keep
+ * working without a separate deployment variable.
+ *
+ * Expected columns in that table: "Email" (email or single line text) and
  * "Source" (single select or single line text). typecast lets Airtable create
  * the Source option automatically.
+ *
+ * The token needs data.records:write on that base, not just read.
  */
+
+const DEFAULT_SIGNUPS_TABLE = 'Signups';
 
 export type SignupSource = 'newsletter' | 'ebook';
 
@@ -19,10 +27,10 @@ export type SignupResult = { ok: true } | { ok: false; error: 'not_configured' |
 export async function saveSignup(email: string, source: SignupSource): Promise<SignupResult> {
   const apiKey = process.env.AIRTABLE_API_KEY;
   const baseId = process.env.AIRTABLE_BASE_ID;
-  const table = process.env.AIRTABLE_SIGNUPS_TABLE;
+  const table = process.env.AIRTABLE_SIGNUPS_TABLE || DEFAULT_SIGNUPS_TABLE;
 
-  if (!apiKey || !baseId || !table) {
-    console.error('[signups] Missing Airtable env (AIRTABLE_API_KEY / AIRTABLE_BASE_ID / AIRTABLE_SIGNUPS_TABLE)');
+  if (!apiKey || !baseId) {
+    console.error('[signups] Missing Airtable env (AIRTABLE_API_KEY / AIRTABLE_BASE_ID)');
     return { ok: false, error: 'not_configured' };
   }
 
