@@ -1,7 +1,8 @@
 'use client';
 
 import { useActionState } from 'react';
-import { subscribeNewsletter, initialFormState } from '@/app/actions';
+import { subscribeNewsletter } from '@/app/actions';
+import { initialFormState } from '@/lib/form-state';
 import { COLORS } from '@/lib/config';
 
 export default function NewsletterSignup() {

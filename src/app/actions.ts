@@ -1,13 +1,10 @@
 'use server';
 
 import { saveSignup, type SignupSource } from '@/lib/signups';
+import type { FormState } from '@/lib/form-state';
 
-export type FormState = {
-  status: 'idle' | 'success' | 'error';
-  message: string;
-};
-
-export const initialFormState: FormState = { status: 'idle', message: '' };
+// NOTE: this file is 'use server' — it may only export async functions.
+// FormState and initialFormState therefore live in @/lib/form-state.
 
 // Simple, permissive email check — enough to catch typos without rejecting
 // valid addresses.

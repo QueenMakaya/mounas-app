@@ -1,7 +1,8 @@
 'use client';
 
 import { useActionState, useState } from 'react';
-import { requestEbookByEmail, initialFormState } from '@/app/actions';
+import { requestEbookByEmail } from '@/app/actions';
+import { initialFormState } from '@/lib/form-state';
 import { COLORS, whatsappLink } from '@/lib/config';
 
 const WHATSAPP_MESSAGE =
