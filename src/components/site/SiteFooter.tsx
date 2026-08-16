@@ -32,6 +32,9 @@ export default function SiteFooter() {
             <Link href="/#consultation" className="hover:opacity-70" style={{ color: COLORS.cream }}>
               Consultation gratuite
             </Link>
+            <Link href="/connect" className="hover:opacity-70" style={{ color: COLORS.cream }}>
+              Restons connectés
+            </Link>
             <Link href="/#english" className="hover:opacity-70" style={{ color: COLORS.cream }}>
               In English
             </Link>

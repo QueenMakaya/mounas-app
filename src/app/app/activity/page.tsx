@@ -28,11 +28,11 @@ export default async function ActivityPage({
         style={{ backgroundColor: '#FDF6EC', fontFamily: 'var(--font-nunito)' }}
       >
         <p className="text-2xl font-semibold mb-2" style={{ color: '#1A1A1A' }}>
-          Aucune activité aujourd'hui.
+          Aucune activité aujourd’hui.
         </p>
         <p style={{ color: '#888' }}>Reviens demain — les Mounas seront là !</p>
         <a href="/app" className="mt-8 text-sm underline" style={{ color: '#5B1F8C' }}>
-          ← Retour à l'accueil
+          ← Retour à l’accueil
         </a>
       </main>
     );
@@ -107,7 +107,7 @@ export default async function ActivityPage({
             </span>
           </div>
           <p className="text-base italic" style={{ color: '#FDF6EC', opacity: 0.9 }}>
-            Aujourd'hui, montre ce mot à ton enfant. Pointe-le, dis-le avec joie.
+            Aujourd’hui, montre ce mot à ton enfant. Pointe-le, dis-le avec joie.
           </p>
         </section>
 
@@ -249,11 +249,11 @@ export default async function ActivityPage({
               </p>
             </div>
             <p className="text-base mb-3" style={{ color: '#FDF6EC' }}>
-              Prends une feuille et un crayon. Essaye d'écrire{' '}
+              Prends une feuille et un crayon. Essaye d’écrire{' '}
               <strong>{activity.frenchWord}</strong> en regardant le modèle.
             </p>
             <p className="text-sm italic" style={{ color: '#FDF6EC', opacity: 0.75 }}>
-              💡 Encourage chaque tentative. Une lettre bien faite mérite des bravos. Le but c'est l'effort, pas la perfection.
+              💡 Encourage chaque tentative. Une lettre bien faite mérite des bravos. Le but c’est l’effort, pas la perfection.
             </p>
           </section>
         )}
@@ -261,7 +261,7 @@ export default async function ActivityPage({
         {/* ÉTAPE 7 — L'ACTIVITÉ */}
         <section className="rounded-3xl p-6" style={{ backgroundColor: '#1D6FA4' }}>
           <p className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: '#FDF6EC', opacity: 0.85 }}>
-            🎯 ÉTAPE 7 · L'ACTIVITÉ · 5 min
+            🎯 ÉTAPE 7 · L’ACTIVITÉ · 5 min
           </p>
           <h2 className="text-2xl font-bold mb-5" style={{ color: '#FDF6EC', fontFamily: 'var(--font-fraunces)' }}>
             {activity.activityTitle}
@@ -345,7 +345,7 @@ export default async function ActivityPage({
       {/* FOOTER */}
       <footer className="text-center pb-8">
         <a href="/app" className="text-sm underline" style={{ color: '#5B1F8C' }}>
-          ← Retour à l'accueil
+          ← Retour à l’accueil
         </a>
         <p className="text-xs mt-2" style={{ color: '#888' }}>
           Les Mounas · v0.1

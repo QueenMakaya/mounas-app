@@ -226,7 +226,7 @@ export default function SelectorClient({ themes, allActivities }: Props) {
                 className="rounded-full py-3 px-6 font-bold shadow-md transition-colors duration-200 bg-[#E63946] hover:bg-red-700"
                 style={{ color: '#FDF6EC' }}
               >
-                Commencer l'activité →
+                Commencer l’activité →
               </button>
               <button
                 onClick={generateWord}

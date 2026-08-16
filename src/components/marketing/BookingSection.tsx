@@ -1,4 +1,7 @@
-import { BOOKING_URL, COLORS } from '@/lib/config';
+import { BOOKING_URL, COLORS, whatsappLink } from '@/lib/config';
+
+const WHATSAPP_MESSAGE =
+  'Bonjour Les Mounas ! Je souhaite réserver l’appel gratuit de 20 minutes. 🗓️';
 
 /**
  * Free 20-minute consultation booking.
@@ -8,8 +11,9 @@ import { BOOKING_URL, COLORS } from '@/lib/config';
  *   - Cal.com:  https://cal.com/<you>/20min
  *
  * When set, we embed the scheduler inline (both tools allow iframe embedding of
- * their scheduling pages) with a button fallback. When not set, we show the
- * button pointing at a placeholder so the section still renders during setup.
+ * their scheduling pages) with a button fallback. When it isn't set we fall back
+ * to booking over WhatsApp — visitors always get a working way to reach us,
+ * never a dead link or a setup note meant for us.
  */
 export default function BookingSection() {
   const configured = BOOKING_URL.length > 0;
@@ -64,17 +68,16 @@ export default function BookingSection() {
       ) : (
         <div className="mt-8 text-center">
           <a
-            href={BOOKING_URL || '#'}
-            target={BOOKING_URL ? '_blank' : undefined}
+            href={whatsappLink(WHATSAPP_MESSAGE)}
+            target="_blank"
             rel="noopener noreferrer"
             className="inline-block rounded-full px-8 py-4 text-lg font-bold shadow-md transition-opacity duration-200 hover:opacity-90"
             style={{ backgroundColor: COLORS.tealDark, color: COLORS.cream }}
           >
-            Réserver mon appel →
+            💬 Réserver mon appel sur WhatsApp
           </a>
-          <p className="mt-3 text-sm italic" style={{ color: 'rgba(26,26,26,0.6)' }}>
-            (Ajoute ton lien Calendly ou Cal.com via NEXT_PUBLIC_BOOKING_URL pour activer la
-            réservation.)
+          <p className="mt-3 text-sm" style={{ color: 'rgba(26,26,26,0.6)' }}>
+            On convient ensemble d&apos;un créneau qui t&apos;arrange.
           </p>
         </div>
       )}

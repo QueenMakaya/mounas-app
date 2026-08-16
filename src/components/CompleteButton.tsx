@@ -36,7 +36,7 @@ export default function CompleteButton({ activityId }: Props) {
           className="rounded-full px-8 py-4 font-bold text-base cursor-not-allowed"
           style={{ backgroundColor: '#D3D1C7', color: '#5F5E5A' }}
         >
-          ✓ Activité terminée aujourd'hui
+          ✓ Activité terminée aujourd’hui
         </button>
       ) : (
         <button
@@ -44,7 +44,7 @@ export default function CompleteButton({ activityId }: Props) {
           className="rounded-full px-8 py-4 font-bold text-base shadow-lg transition-colors duration-200 bg-[#E63946] hover:bg-red-700"
           style={{ color: '#FDF6EC' }}
         >
-          ✓ J'ai fait l'activité avec mon enfant
+          ✓ J’ai fait l’activité avec mon enfant
         </button>
       )}
 
