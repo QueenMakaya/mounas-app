@@ -18,6 +18,8 @@
  * The token needs data.records:write on that base, not just read.
  */
 
+import { airtableToken } from '@/lib/airtable-token';
+
 const DEFAULT_SIGNUPS_TABLE = 'Signups';
 
 export type SignupSource = 'newsletter' | 'ebook';
@@ -25,7 +27,7 @@ export type SignupSource = 'newsletter' | 'ebook';
 export type SignupResult = { ok: true } | { ok: false; error: 'not_configured' | 'airtable_error' };
 
 export async function saveSignup(email: string, source: SignupSource): Promise<SignupResult> {
-  const apiKey = process.env.AIRTABLE_API_KEY;
+  const apiKey = airtableToken();
   const baseId = process.env.AIRTABLE_BASE_ID;
   const table = process.env.AIRTABLE_SIGNUPS_TABLE || DEFAULT_SIGNUPS_TABLE;
 

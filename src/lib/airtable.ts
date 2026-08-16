@@ -1,11 +1,22 @@
 import Airtable, { FieldSet, Records } from 'airtable';
+import { airtableToken, looksLikeAirtableToken } from '@/lib/airtable-token';
 
-const apiKey = process.env.AIRTABLE_API_KEY;
+const apiKey = airtableToken();
 const baseId = process.env.AIRTABLE_BASE_ID;
 const tableId = process.env.AIRTABLE_TABLE_ID;
 
 if (!apiKey || !baseId || !tableId) {
   throw new Error('Missing Airtable environment variables');
+}
+
+// A malformed token surfaces as empty pages (every read is caught and returns
+// []), so say it out loud once at startup instead.
+if (!looksLikeAirtableToken(apiKey)) {
+  console.error(
+    `[airtable] AIRTABLE_API_KEY does not look like a personal access token ` +
+      `(expected it to start with "pat"; got ${apiKey.length} chars starting "${apiKey.slice(0, 4)}"). ` +
+      `Airtable will answer 401 and every activity page will render empty.`,
+  );
 }
 
 const base = new Airtable({ apiKey }).base(baseId);
