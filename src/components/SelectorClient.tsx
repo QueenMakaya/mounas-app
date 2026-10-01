@@ -83,7 +83,7 @@ export default function SelectorClient({ themes, allActivities }: Props) {
       : [...seenIds, activityId];
     setSeenIds(newSeenIds);
     localStorage.setItem(LS_SEEN, JSON.stringify(newSeenIds));
-    router.push(`/app/activity?id=${activityId}`);
+    router.push(`/app/lecon?id=${activityId}`);
   };
 
   return (

@@ -83,3 +83,42 @@ body {
   border-top: 1px solid rgba(26, 26, 26, 0.15);
   margin: 2rem 0;
 }
+
+/* ── Kids' app animations ── */
+@keyframes mounas-spin {
+  0%, 100% { transform: rotate(-15deg) scale(1); }
+  50% { transform: rotate(15deg) scale(1.25); }
+}
+@keyframes mounas-wiggle {
+  0%, 100% { transform: rotate(-4deg) translateY(0); }
+  50% { transform: rotate(4deg) translateY(-4px); }
+}
+@keyframes mounas-pop {
+  0% { transform: scale(0.4); opacity: 0; }
+  70% { transform: scale(1.12); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes mounas-bounce {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-18px) scale(1.08); }
+}
+@keyframes mounas-shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-10px); }
+  40%, 80% { transform: translateX(10px); }
+}
+@keyframes mounas-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+@keyframes mounas-confetti {
+  0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0.8; }
+}
+.mounas-pop { animation: mounas-pop 0.45s cubic-bezier(.2,.9,.3,1.3) both; }
+.mounas-bounce { animation: mounas-bounce 0.5s ease-out; }
+.mounas-shake { animation: mounas-shake 0.4s ease-in-out; }
+.mounas-float { animation: mounas-float 3s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .mounas-pop, .mounas-bounce, .mounas-shake, .mounas-float { animation: none; }
+}
