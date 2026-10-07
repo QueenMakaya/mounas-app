@@ -8,15 +8,18 @@ import SiteHeader from '@/components/site/SiteHeader';
  * section of the site, not a dead end. The header is `sticky`, so it stays put
  * while the activity scrolls.
  *
+ * The cream wrapper fills the viewport so short screens never show the
+ * default body background underneath.
+ *
  * If you ever want the app to run standalone (opened in its own browser tab,
  * no site chrome), link to it with target="_blank" from the marketing header —
  * that "forced" tab gets the full-screen app without this menu.
  */
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <div className="flex min-h-screen flex-1 flex-col bg-cream text-ink">
       <SiteHeader />
       {children}
-    </>
+    </div>
   );
 }
