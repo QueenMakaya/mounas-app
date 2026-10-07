@@ -40,7 +40,7 @@ function buildSteps(a: Activity): StepDef[] {
     { key: 'lire', emoji: '📖', name: 'Lire', heading: 'On lit les sons ensemble', minutes: 1, accent: '#E08A1E', tint: '#FEF3E2' },
     { key: 'syllabes', emoji: '👏', name: 'Syllabes', heading: 'On tape les syllabes', minutes: 1, accent: '#0E8C80', tint: '#E3F8F5' },
     { key: 'prononcer', emoji: '🗣️', name: 'Prononcer', heading: 'On le dit à voix haute', minutes: 1, accent: '#5B1F8C', tint: '#F1E9F8' },
-    spelling && { key: 'epeler', emoji: '🔤', name: 'Épeler', heading: 'On nomme chaque lettre', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
+    spelling && { key: 'epeler', emoji: '🔤', name: 'Sons → lettres', heading: 'Chaque son s’écrit avec des lettres', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
     spelling && { key: 'ecrire', emoji: '✍️', name: 'Écrire', heading: 'On écrit le mot', minutes: 2, accent: '#2D9B6F', tint: '#E5F4EC' },
     Boolean(a.activityTitle || a.activitySteps) && { key: 'activite', emoji: '🎯', name: 'Activité', heading: a.activityTitle || 'L’activité', minutes: 5, accent: '#1D6FA4', tint: '#E4F0F8' },
     Boolean(a.songTitle || a.songLyrics) && { key: 'chanson', emoji: '🎵', name: 'Chanson', heading: a.songTitle || 'La chanson', minutes: 2, accent: '#D4530C', tint: '#FCEBDD' },
@@ -270,25 +270,7 @@ function StepBody({ step, activity: a, canSpeak, speak, speakSeries }: BodyProps
       return <SayItThree step={step} activity={a} canSpeak={canSpeak} speak={speak} />;
 
     case 'epeler':
-      return (
-        <>
-          <Stage tint={step.tint}>
-            <div className="flex flex-wrap justify-center gap-2">
-              {Array.from(a.frenchWord).map((letter, i) =>
-                letter.trim() ? (
-                  <LetterTile key={i} letter={letter.toUpperCase()} onTap={() => speak(letter.toLowerCase(), 0.7)} big />
-                ) : (
-                  <span key={i} className="w-4" />
-                ),
-              )}
-            </div>
-          </Stage>
-          <ParentTip>
-            Touchez chaque lettre ensemble et nommez-la à voix haute
-            {canSpeak ? ' — la lettre se dit toute seule quand on la touche.' : '.'}
-          </ParentTip>
-        </>
-      );
+      return <SoundsToLetters step={step} activity={a} canSpeak={canSpeak} speak={speak} />;
 
     case 'ecrire':
       return (
@@ -356,25 +338,6 @@ function Materials({ items }: { items: string[] }) {
         ))}
       </ul>
     </div>
-  );
-}
-
-function LetterTile({ letter, onTap, lit = false, big = false }: { letter: string; onTap: () => void; lit?: boolean; big?: boolean }) {
-  const [pulse, setPulse] = useState(0);
-  return (
-    <button
-      type="button"
-      onClick={() => {
-        setPulse((p) => p + 1);
-        onTap();
-      }}
-      aria-label={`Lettre ${letter}`}
-      className={`flex items-center justify-center rounded-2xl bg-white font-display font-bold text-ink shadow-[0_3px_0_rgba(26,26,26,0.15)] ring-1 ring-ink/10 transition-all active:translate-y-0.5 active:shadow-none ${
-        big ? 'h-20 w-16 text-4xl' : 'h-16 w-12 text-3xl sm:h-20 sm:w-14 sm:text-4xl'
-      } ${lit ? '-translate-y-1 ring-4 ring-mamber' : ''}`}
-    >
-      <span key={pulse} className={pulse ? 'animate-pop' : ''}>{letter}</span>
-    </button>
   );
 }
 
@@ -449,6 +412,44 @@ function ReadAlong({ step, activity: a, canSpeak, speakSeries }: { step: StepDef
       <ParentTip>
         On lit les <strong>sons</strong>, pas le nom des lettres : on dit « mmm », pas « èm ». Glisse ton doigt sous chaque son,
         puis colle-les ensemble pour dire le mot.
+        {canSpeak && ' Touche un son pour l’entendre.'}
+      </ParentTip>
+    </>
+  );
+}
+
+/**
+ * Level 4, before writing: for each sound the child hears, which letters
+ * write it — and the silent letters we write but never hear.
+ */
+function SoundsToLetters({ step, activity: a, canSpeak, speak }: { step: StepDef; activity: Activity; canSpeak: boolean; speak: BodyProps['speak'] }) {
+  const sounds = wordSounds(a.frenchWord, a.graphemes).filter((s) => s.kind !== 'separator');
+  return (
+    <>
+      <Stage tint={step.tint}>
+        <div className="flex flex-wrap justify-center gap-2">
+          {sounds.map((s, i) => {
+            const silent = s.kind === 'silent' || !s.key;
+            return (
+              <button
+                key={i}
+                type="button"
+                onClick={() => !silent && speak(SOUNDS[s.key].say, 0.7)}
+                aria-label={silent ? `${s.text} : lettre muette, on l'écrit mais on ne l'entend pas` : `On entend ${SOUNDS[s.key].hint}, on écrit ${s.text}`}
+                className={`flex min-w-16 flex-col items-center rounded-2xl px-3 py-2 ring-1 transition-transform active:scale-95 ${silent ? 'bg-white/60 ring-ink/5' : 'bg-white shadow-[0_3px_0_rgba(26,26,26,0.12)] ring-ink/10'}`}
+              >
+                <span className={`text-sm font-extrabold ${silent ? 'text-ink/30' : 'text-mpurple'}`}>{silent ? 'chut' : `« ${SOUNDS[s.key].hint} »`}</span>
+                <span aria-hidden="true" className="text-xs text-ink/30">↓</span>
+                <span className={`font-display text-4xl font-bold leading-none ${silent ? 'text-ink/25' : s.kind === 'vowel' ? 'text-mred' : 'text-ink'}`}>
+                  {s.text.toLocaleLowerCase('fr')}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </Stage>
+      <ParentTip>
+        Dis un son (« mmm »), ton enfant montre les lettres qui l’écrivent. Les lettres grises sont muettes : on les écrit, mais on ne les entend pas.
         {canSpeak && ' Touche un son pour l’entendre.'}
       </ParentTip>
     </>
