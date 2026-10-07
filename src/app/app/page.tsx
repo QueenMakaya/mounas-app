@@ -95,7 +95,7 @@ export default async function HomePage() {
             </span>
             <span className="flex-1">
               <span className="block font-extrabold text-ink">Envie d’un autre mot ?</span>
-              <span className="block text-sm text-ink-soft">Choisis par âge et par thème</span>
+              <span className="block text-sm text-ink-soft">Choisis par niveau et par thème</span>
             </span>
             <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
           </Link>

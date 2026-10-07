@@ -77,15 +77,15 @@ export default function SelectorClient({ themes, allActivities }: Props) {
           <span aria-hidden="true">←</span> Accueil
         </Link>
         <h1 className="mt-3 font-display text-3xl font-bold text-ink sm:text-4xl">Choisis un mot</h1>
-        <p className="mt-1 text-ink-soft">Pour quel âge, et sur quel thème ?</p>
+        <p className="mt-1 text-ink-soft">Quel niveau, et quel thème ?</p>
 
         {/* ── Filters ── */}
         <section className="mt-6 rounded-[28px] bg-white p-5 ring-1 ring-ink/5 sm:p-6">
           <fieldset>
-            <legend className="mb-3 text-xs font-extrabold uppercase tracking-[0.14em] text-ink-soft">Âge de l’enfant</legend>
+            <legend className="mb-3 text-xs font-extrabold uppercase tracking-[0.14em] text-ink-soft">Niveau</legend>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
               <Chip on={difficulty === ''} onClick={() => choose(setDifficulty, LS_LAST_DIFFICULTY, '')} className="col-span-2 sm:col-span-1">
-                Tous les âges
+                Tous les niveaux
               </Chip>
               {LEVELS.map((l) => (
                 <Chip key={l.value} on={difficulty === l.value} onClick={() => choose(setDifficulty, LS_LAST_DIFFICULTY, l.value)}>
