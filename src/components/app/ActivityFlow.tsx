@@ -532,7 +532,11 @@ function SayItThree({ step, activity: a, canSpeak, speak }: BodyProps) {
 
 function ActivitySteps({ activity: a, accent }: { activity: Activity; accent: string }) {
   const steps = a.activitySteps
-    ? a.activitySteps.split('\n').map((s) => s.replace(/^\d+[.)]\s*/, '').trim()).filter(Boolean)
+    ? a.activitySteps
+        // Steps come one per line, or on one line separated by " | ".
+        .split(/\n|\s\|\s/)
+        .map((s) => s.replace(/^\d+[.)]\s*/, '').trim())
+        .filter(Boolean)
     : [];
   const materials = a.materials
     ? a.materials.split(/\n|,|;|•/).map((m) => m.replace(/^[-–]\s*/, '').trim()).filter(Boolean)

@@ -55,7 +55,7 @@ export default async function HomePage() {
                 <li className="rounded-full bg-sand px-3 py-1.5 text-ink">⏱ 10 min</li>
               </ul>
               <Link
-                href="/app/activity"
+                href={`/app/activity?id=${todayActivity.id}`}
                 className="mt-7 flex min-h-14 items-center justify-center rounded-full bg-mred px-6 text-lg font-extrabold text-cream shadow-lg transition-transform hover:bg-mred-dark active:scale-[0.98]"
               >
                 Commencer avec mon enfant <span aria-hidden="true" className="ml-2">→</span>

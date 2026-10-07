@@ -72,27 +72,26 @@ const recordToActivity = (record: Records<FieldSet>[number]): Activity => ({
 const VISIBLE_STATUSES = ['Prêt', 'Publié', 'Ready', '🟢 Ready ', '✓ Published '];
 const IS_VISIBLE = `OR(${VISIBLE_STATUSES.map((st) => `{Status} = '${st}'`).join(', ')})`;
 
-const getDayName = (): string => {
-  const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-  return days[new Date().getDay()];
-};
-
+/**
+ * The word of the day: one finished activity per calendar day, cycling
+ * through every word marked Prêt/Publié so the whole library gets used.
+ * Records are ordered by id, which is stable and mixes levels and themes
+ * from one day to the next. The day count is taken in UTC so every visitor
+ * sees the same word on a given date.
+ */
 export const getTodayActivity = async (): Promise<Activity | null> => {
-  const today = getDayName();
-
   try {
     const records = await base(tableId!)
-      .select({
-        filterByFormula: `AND({Day} = '${today}', {Week} = 1, ${IS_VISIBLE})`,
-        maxRecords: 1,
-      })
-      .firstPage();
+      .select({ filterByFormula: IS_VISIBLE })
+      .all();
 
     if (records.length === 0) {
       return null;
     }
 
-    return recordToActivity(records[0]);
+    const ordered = [...records].sort((a, b) => a.id.localeCompare(b.id));
+    const dayNumber = Math.floor(Date.now() / 86_400_000);
+    return recordToActivity(ordered[dayNumber % ordered.length]);
   } catch (error) {
     console.error('Error fetching today activity:', error);
     return null;
