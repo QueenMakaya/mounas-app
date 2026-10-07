@@ -83,3 +83,24 @@ body {
   border-top: 1px solid rgba(26, 26, 26, 0.15);
   margin: 2rem 0;
 }
+.blog-content table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+.blog-content th,
+.blog-content td {
+  border: 1px solid rgba(26, 26, 26, 0.12);
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+.blog-content th {
+  background: rgba(244, 163, 64, 0.15);
+  font-weight: 700;
+  color: #1a1a1a;
+}
