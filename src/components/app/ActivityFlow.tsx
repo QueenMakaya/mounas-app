@@ -9,6 +9,7 @@ import { useSpeech } from '@/lib/useSpeech';
 import { SOUNDS, wordSounds, type Sound } from '@/lib/phonics';
 import SyllableWord, { SYLLABLE_COLORS, syllableParts } from '@/components/app/SyllableWord';
 import SpeakButton from '@/components/app/SpeakButton';
+import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/DrawingCanvas';
 
 /*
  * The daily activity as a guided flow: one step per screen, a progress bar,
@@ -273,16 +274,7 @@ function StepBody({ step, activity: a, canSpeak, speak, speakSeries }: BodyProps
       return <SoundsToLetters step={step} activity={a} canSpeak={canSpeak} speak={speak} />;
 
     case 'ecrire':
-      return (
-        <>
-          <Stage tint={step.tint}>
-            <p className="trace-word break-words font-body text-6xl font-extrabold leading-tight sm:text-8xl">{a.frenchWord}</p>
-            <p className="mt-2 text-sm text-ink-soft">Suis les lettres avec le doigt, puis au crayon.</p>
-          </Stage>
-          <Materials items={['Une feuille blanche', 'Un crayon ou un feutre']} />
-          <ParentTip>Encourage chaque essai : une lettre bien faite mérite un bravo. Le but, c’est l’effort, pas la perfection.</ParentTip>
-        </>
-      );
+      return <TraceWord step={step} activity={a} />;
 
     case 'activite':
       return <ActivitySteps activity={a} accent={step.accent} />;
@@ -451,6 +443,64 @@ function SoundsToLetters({ step, activity: a, canSpeak, speak }: { step: StepDef
       <ParentTip>
         Dis un son (« mmm »), ton enfant montre les lettres qui l’écrivent. Les lettres grises sont muettes : on les écrit, mais on ne les entend pas.
         {canSpeak && ' Touche un son pour l’entendre.'}
+      </ParentTip>
+    </>
+  );
+}
+
+/**
+ * Writing: the word in dotted school cursive on Seyès paper; the child goes
+ * over it with a finger or stylus, then copies it on real paper.
+ */
+function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity }) {
+  const canvas = useRef<DrawingCanvasHandle>(null);
+  const [strokes, setStrokes] = useState(0);
+  const [bravo, setBravo] = useState(false);
+  // Cursive is taught in lowercase; capitals in the base would read oddly.
+  const word = a.frenchWord.toLocaleLowerCase('fr');
+  return (
+    <>
+      <div className="overflow-hidden rounded-3xl ring-1 ring-ink/10" style={{ backgroundColor: step.tint }}>
+        <DrawingCanvas ref={canvas} height={260} paper="seyes" lineGap={16} guideText={word} size={9} onChange={setStrokes} />
+      </div>
+      <div className="mt-3 flex flex-wrap justify-center gap-2">
+        <button
+          type="button"
+          onClick={() => canvas.current?.undo()}
+          disabled={strokes === 0}
+          className="min-h-11 rounded-full bg-white px-4 font-bold text-ink ring-1 ring-ink/15 disabled:opacity-40"
+        >
+          ↶ Annuler
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            canvas.current?.clear();
+            setBravo(false);
+          }}
+          disabled={strokes === 0}
+          className="min-h-11 rounded-full bg-white px-4 font-bold text-ink ring-1 ring-ink/15 disabled:opacity-40"
+        >
+          🗑️ Recommencer
+        </button>
+        <button
+          type="button"
+          onClick={() => setBravo(true)}
+          disabled={strokes === 0}
+          className="min-h-11 rounded-full bg-[#2D9B6F] px-5 font-extrabold text-cream shadow-md disabled:opacity-40"
+        >
+          ✓ J’ai fini
+        </button>
+      </div>
+      {bravo && (
+        <p className="animate-rise mt-3 text-center font-display text-xl font-bold text-[#2D9B6F]" aria-live="polite">
+          Bravo, quel bel effort ! ✨
+        </p>
+      )}
+      <Materials items={['Une feuille blanche', 'Un crayon ou un feutre']} />
+      <ParentTip>
+        D’abord avec le doigt sur l’écran, en suivant les pointillés, puis au crayon sur une vraie feuille.
+        Encourage chaque essai : le but, c’est l’effort, pas la perfection.
       </ParentTip>
     </>
   );
@@ -732,6 +782,12 @@ function FinishCard({ activity: a, headingRef }: { activity: Activity; headingRe
                 className="flex min-h-14 items-center justify-center rounded-full bg-ink px-6 text-lg font-extrabold text-cream shadow-md active:scale-[0.98]"
               >
                 🎲 Encore un mot
+              </Link>
+              <Link
+                href="/app/dictee"
+                className="flex min-h-12 items-center justify-center rounded-full bg-mteal-light px-6 font-bold text-[#115E59] hover:bg-mteal/30"
+              >
+                📒 Faire une petite dictée
               </Link>
               <Link
                 href="/app"

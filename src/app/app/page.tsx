@@ -100,6 +100,54 @@ export default async function HomePage() {
             <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
           </Link>
         )}
+
+        <h2 className="mb-3 mt-8 font-display text-xl font-bold text-ink">Encore plus</h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Link
+            href="/app/dictee"
+            className="group flex items-center gap-4 rounded-3xl bg-white p-4 ring-1 ring-ink/5 transition-colors hover:bg-sand"
+          >
+            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-mteal-light text-2xl" aria-hidden="true">
+              📒
+            </span>
+            <span className="flex-1">
+              <span className="block font-extrabold text-ink">Mon cahier de dictée</span>
+              <span className="block text-sm text-ink-soft">Écrire avec le doigt, sur papier Seyès</span>
+            </span>
+            <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
+          </Link>
+          <div className="flex items-center gap-4 rounded-3xl border-2 border-dashed border-ink/10 p-4" aria-label="Mes dessins prennent vie : bientôt disponible">
+            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-sand text-2xl opacity-70" aria-hidden="true">
+              🎨
+            </span>
+            <span className="flex-1">
+              <span className="flex items-center gap-2 font-extrabold text-ink/70">
+                Mes dessins prennent vie
+                <span className="rounded-full bg-mpurple px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-wide text-cream">Bientôt</span>
+              </span>
+              <span className="block text-sm text-ink-soft">Le dessin de ton enfant devient un personnage animé</span>
+            </span>
+          </div>
+        </div>
+
+        <details className="group mt-8 rounded-3xl bg-white p-4 ring-1 ring-ink/5">
+          <summary className="flex cursor-pointer list-none items-center gap-3 font-extrabold text-ink">
+            <span aria-hidden="true" className="text-2xl">📲</span>
+            <span className="flex-1">Mettre l’app sur l’écran de ton téléphone</span>
+            <span aria-hidden="true" className="transition-transform group-open:rotate-180">⌄</span>
+          </summary>
+          <div className="mt-3 space-y-2 text-sm leading-relaxed text-ink-soft">
+            <p>
+              <strong className="text-ink">iPhone (Safari) :</strong> touche le bouton Partager <span aria-hidden="true">⬆️</span>, puis
+              « Sur l’écran d’accueil ».
+            </p>
+            <p>
+              <strong className="text-ink">Android (Chrome) :</strong> touche le menu <span aria-hidden="true">⋮</span>, puis « Ajouter à
+              l’écran d’accueil » ou « Installer l’application ».
+            </p>
+            <p>L’icône Les Mounas apparaît alors avec tes autres applis, et l’app s’ouvre en plein écran.</p>
+          </div>
+        </details>
       </div>
     </main>
   );
