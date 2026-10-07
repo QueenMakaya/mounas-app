@@ -56,5 +56,32 @@ export function useSpeech() {
     [supported, voice],
   );
 
-  return { supported, speak, speaking };
+  /**
+   * Speak several pieces one after the other (sound by sound, then the whole
+   * word). `onStep(i)` fires as piece i starts, and `onStep(null)` at the end,
+   * so the screen can highlight exactly what is being heard.
+   */
+  const speakSeries = useCallback(
+    (pieces: { text: string; rate?: number }[], onStep: (i: number | null) => void) => {
+      if (!supported || pieces.length === 0) return;
+      const synth = window.speechSynthesis;
+      synth.cancel();
+      pieces.forEach((p, i) => {
+        const u = new SpeechSynthesisUtterance(p.text);
+        u.lang = 'fr-FR';
+        if (voice) u.voice = voice;
+        u.rate = p.rate ?? 0.7;
+        u.pitch = 1.1;
+        u.onstart = () => onStep(i);
+        if (i === pieces.length - 1) {
+          u.onend = () => onStep(null);
+          u.onerror = () => onStep(null);
+        }
+        synth.speak(u);
+      });
+    },
+    [supported, voice],
+  );
+
+  return { supported, speak, speakSeries, speaking };
 }

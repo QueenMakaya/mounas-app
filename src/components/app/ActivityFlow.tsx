@@ -6,6 +6,7 @@ import type { Activity } from '@/lib/airtable';
 import { levelLabel } from '@/lib/levels';
 import { currentStreak, isCompletedToday, markCompleted } from '@/lib/progress';
 import { useSpeech } from '@/lib/useSpeech';
+import { SOUNDS, wordSounds, type Sound } from '@/lib/phonics';
 import SyllableWord, { SYLLABLE_COLORS, splitSyllables } from '@/components/app/SyllableWord';
 import SpeakButton from '@/components/app/SpeakButton';
 
@@ -36,7 +37,7 @@ function buildSteps(a: Activity): StepDef[] {
   const spelling = parseInt(a.difficulty, 10) >= 4;
   const steps: (StepDef | false)[] = [
     { key: 'decouvrir', emoji: '✨', name: 'Découvrir', heading: 'On découvre un nouveau mot', minutes: 1, accent: '#E63946', tint: '#FDECEE' },
-    { key: 'lire', emoji: '📖', name: 'Lire', heading: 'On lit ensemble', minutes: 1, accent: '#E08A1E', tint: '#FEF3E2' },
+    { key: 'lire', emoji: '📖', name: 'Lire', heading: 'On lit les sons ensemble', minutes: 1, accent: '#E08A1E', tint: '#FEF3E2' },
     { key: 'syllabes', emoji: '👏', name: 'Syllabes', heading: 'On tape les syllabes', minutes: 1, accent: '#0E8C80', tint: '#E3F8F5' },
     { key: 'prononcer', emoji: '🗣️', name: 'Prononcer', heading: 'On le dit à voix haute', minutes: 1, accent: '#5B1F8C', tint: '#F1E9F8' },
     spelling && { key: 'epeler', emoji: '🔤', name: 'Épeler', heading: 'On nomme chaque lettre', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
@@ -54,7 +55,7 @@ export default function ActivityFlow({ activity }: { activity: Activity }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
-  const { supported: canSpeak, speak } = useSpeech();
+  const { supported: canSpeak, speak, speakSeries } = useSpeech();
 
   const step = steps[index];
   const isLast = index === steps.length - 1;
@@ -186,6 +187,7 @@ export default function ActivityFlow({ activity }: { activity: Activity }) {
               activity={activity}
               canSpeak={canSpeak}
               speak={speak}
+              speakSeries={speakSeries}
             />
           </div>
         </section>
@@ -229,9 +231,10 @@ type BodyProps = {
   activity: Activity;
   canSpeak: boolean;
   speak: (text: string, rate?: number) => void;
+  speakSeries: (pieces: { text: string; rate?: number }[], onStep: (i: number | null) => void) => void;
 };
 
-function StepBody({ step, activity: a, canSpeak, speak }: BodyProps) {
+function StepBody({ step, activity: a, canSpeak, speak, speakSeries }: BodyProps) {
   switch (step.key) {
     case 'decouvrir':
       return (
@@ -258,7 +261,7 @@ function StepBody({ step, activity: a, canSpeak, speak }: BodyProps) {
       );
 
     case 'lire':
-      return <ReadAlong step={step} activity={a} canSpeak={canSpeak} speak={speak} />;
+      return <ReadAlong step={step} activity={a} canSpeak={canSpeak} speakSeries={speakSeries} />;
 
     case 'syllabes':
       return <SyllableClap step={step} activity={a} speak={speak} />;
@@ -375,56 +378,112 @@ function LetterTile({ letter, onTap, lit = false, big = false }: { letter: strin
   );
 }
 
-function ReadAlong({ step, activity: a, canSpeak, speak }: { step: StepDef; activity: Activity; canSpeak: boolean; speak: BodyProps['speak'] }) {
-  const letters = Array.from(a.frenchWord);
+function ReadAlong({ step, activity: a, canSpeak, speakSeries }: { step: StepDef; activity: Activity; canSpeak: boolean; speakSeries: BodyProps['speakSeries'] }) {
+  const sounds = wordSounds(a.frenchWord, a.graphemes);
   const [lit, setLit] = useState<number | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
 
+  const playOne = (i: number) => {
+    const s = sounds[i];
+    if (s.kind === 'silent' || !s.key) {
+      setLit(i);
+      return;
+    }
+    speakSeries([{ text: SOUNDS[s.key].say }], (step) => setLit(step === null ? null : i));
+  };
+
+  // Sound by sound, then the whole word: the child hears the sounds blend.
   const readWithMe = () => {
+    const heard = sounds.map((s, i) => ({ s, i })).filter(({ s }) => s.kind !== 'silent' && s.kind !== 'separator' && s.key);
+    if (canSpeak) {
+      speakSeries(
+        [...heard.map(({ s }) => ({ text: SOUNDS[s.key].say, rate: 0.6 })), { text: a.frenchWord, rate: 0.8 }],
+        (step) => setLit(step === null ? null : step < heard.length ? heard[step].i : -1),
+      );
+      return;
+    }
+    // No voice: still walk through the sounds so the parent can say them.
     if (timer.current) clearInterval(timer.current);
-    let i = 0;
-    setLit(0);
+    let k = 0;
+    setLit(heard[0]?.i ?? null);
     timer.current = setInterval(() => {
-      i += 1;
-      if (i >= letters.length) {
+      k += 1;
+      if (k > heard.length) {
         if (timer.current) clearInterval(timer.current);
         setLit(null);
-        speak(a.frenchWord);
       } else {
-        setLit(i);
+        setLit(k === heard.length ? -1 : heard[k].i);
       }
-    }, 550);
+    }, 900);
   };
 
   return (
     <>
       <Stage tint={step.tint}>
-        <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2">
-          {letters.map((letter, i) =>
-            letter.trim() ? (
-              <LetterTile key={i} letter={letter} lit={lit === i} onTap={() => speak(letter, 0.7)} />
+        <div className="flex flex-wrap items-end justify-center gap-1.5 sm:gap-2" aria-label={`Les sons du mot ${a.frenchWord}`}>
+          {sounds.map((s, i) =>
+            s.kind === 'separator' ? (
+              <span key={i} className="w-3" aria-hidden="true" />
             ) : (
-              <span key={i} className="w-3" />
+              <SoundTile key={i} sound={s} lit={lit === i || lit === -1} onTap={() => playOne(i)} />
             ),
           )}
         </div>
+        <p className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs font-bold text-ink-soft">
+          <span><span className="text-mred">■</span> voyelle</span>
+          <span><span className="text-ink">■</span> consonne</span>
+          {sounds.some((s) => s.kind === 'silent') && <span><span className="text-ink/30">■</span> lettre muette, on ne la lit pas</span>}
+        </p>
         <div className="mt-6 flex justify-center">
           <button
             type="button"
             onClick={readWithMe}
             className="inline-flex min-h-12 items-center gap-2 rounded-full bg-ink px-5 py-2.5 font-bold text-cream shadow-md active:scale-95"
           >
-            <span aria-hidden="true">👉</span> Lire avec moi
+            <span aria-hidden="true">👉</span> Lire avec moi, son par son
           </button>
         </div>
       </Stage>
       <ParentTip>
-        Glisse ton doigt sous chaque lettre, lentement. Pour les tout-petits, pointer suffit ; les plus grands peuvent essayer de lire.
-        {canSpeak && ' Touche une lettre pour l’entendre.'}
+        On lit les <strong>sons</strong>, pas le nom des lettres : on dit « mmm », pas « èm ». Glisse ton doigt sous chaque son,
+        puis colle-les ensemble pour dire le mot.
+        {canSpeak && ' Touche un son pour l’entendre.'}
       </ParentTip>
     </>
+  );
+}
+
+/** One sound of the word: the letters on top, what to say underneath. */
+function SoundTile({ sound, lit, onTap }: { sound: Sound; lit: boolean; onTap: () => void }) {
+  const [pulse, setPulse] = useState(0);
+  const silent = sound.kind === 'silent';
+  const hint = !silent && sound.key ? SOUNDS[sound.key].hint : '';
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        setPulse((p) => p + 1);
+        onTap();
+      }}
+      aria-label={silent ? `${sound.text} : lettre muette` : `Son ${hint}, écrit ${sound.text}`}
+      className={`flex min-w-12 flex-col items-center rounded-2xl px-2.5 pb-1.5 pt-2 shadow-[0_3px_0_rgba(26,26,26,0.15)] ring-1 transition-all active:translate-y-0.5 active:shadow-none sm:min-w-14 sm:px-3 ${
+        silent ? 'bg-white/60 ring-ink/5 shadow-none' : 'bg-white ring-ink/10'
+      } ${lit ? '-translate-y-1 ring-4 ring-mamber' : ''}`}
+    >
+      <span
+        key={pulse}
+        className={`font-display text-3xl font-bold leading-none sm:text-4xl ${pulse ? 'animate-pop' : ''} ${
+          silent ? 'text-ink/25' : sound.kind === 'vowel' ? 'text-mred' : 'text-ink'
+        }`}
+      >
+        {sound.text.toLocaleLowerCase('fr')}
+      </span>
+      <span className={`mt-1 text-[11px] font-extrabold ${silent ? 'text-ink/30' : 'text-ink-soft'}`}>
+        {silent ? 'muette' : hint}
+      </span>
+    </button>
   );
 }
 
@@ -481,7 +540,7 @@ function SyllableClap({ step, activity: a, speak }: { step: StepDef; activity: A
   );
 }
 
-function SayItThree({ step, activity: a, canSpeak, speak }: BodyProps) {
+function SayItThree({ step, activity: a, canSpeak, speak }: Omit<BodyProps, 'speakSeries'>) {
   const [said, setSaid] = useState(0);
   return (
     <>

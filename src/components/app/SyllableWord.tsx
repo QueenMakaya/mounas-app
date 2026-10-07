@@ -29,16 +29,26 @@ type Props = {
 
 export default function SyllableWord({ word, syllables, className, dots = false }: Props) {
   const parts = splitSyllables(word, syllables);
-  // Display the word's own spelling/casing, sliced to the syllable lengths.
-  let cursor = 0;
-  const slices = parts.length > 1
-    ? parts.map((p) => {
-        const s = word.slice(cursor, cursor + p.length);
-        cursor += p.length;
-        return s;
-      })
-    : [word];
-  const sliced = slices.join('') === word ? slices : parts;
+  // Display the word's own spelling/casing, cut where the syllables are.
+  // Hyphens and apostrophes ride along with the syllable they precede.
+  const sliced: string[] = [];
+  if (parts.length > 1) {
+    let at = 0;
+    for (const p of parts) {
+      let slice = '';
+      let letters = 0;
+      while (at < word.length && letters < p.length) {
+        const ch = word[at];
+        slice += ch;
+        if (!/[\s'’-]/.test(ch)) letters += 1;
+        at += 1;
+      }
+      sliced.push(slice);
+    }
+    if (at < word.length) sliced[sliced.length - 1] += word.slice(at);
+  } else {
+    sliced.push(word);
+  }
 
   return (
     <span className={className}>

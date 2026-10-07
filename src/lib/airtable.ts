@@ -41,6 +41,8 @@ export type Activity = {
   songLyrics: string;
   badgeName: string;
   status: string;
+  /** Optional hand-written sound split, e.g. "ch|a|t." (see src/lib/phonics.ts). */
+  graphemes: string;
 };
 
 const recordToActivity = (record: Records<FieldSet>[number]): Activity => ({
@@ -63,6 +65,7 @@ const recordToActivity = (record: Records<FieldSet>[number]): Activity => ({
   songLyrics: (record.get('Song lyrics') as string) || '',
   badgeName: (record.get('Badge name') as string) || '',
   status: (record.get('Status') as string) || '',
+  graphemes: (record.get('Graphèmes') as string) || '',
 });
 
 // Only finished activities reach parents. Rows still being written
