@@ -9,11 +9,16 @@ export const SYLLABLE_COLORS = ['#E63946', '#5B1F8C', '#0E8C80', '#C7600A'];
  * Splits "ma-man" into ["ma", "man"]. Only trusts the syllables when they
  * spell the word, so a typo in Airtable never shows the wrong word.
  */
-export function splitSyllables(word: string, syllables: string): string[] {
-  const parts = syllables
-    .split(/[-·•\s]+/)
+/** The syllables exactly as written in Airtable ("sou - ri - re" → 3 parts). */
+export function syllableParts(syllables: string): string[] {
+  return syllables
+    .split(/[-–—·•/|\s]+/)
     .map((s) => s.trim())
     .filter(Boolean);
+}
+
+export function splitSyllables(word: string, syllables: string): string[] {
+  const parts = syllableParts(syllables);
   const norm = (s: string) => s.toLocaleLowerCase('fr').replace(/[\s'’-]/g, '');
   if (parts.length > 0 && norm(parts.join('')) === norm(word)) return parts;
   return [word];

@@ -7,7 +7,7 @@ import { levelLabel } from '@/lib/levels';
 import { currentStreak, isCompletedToday, markCompleted } from '@/lib/progress';
 import { useSpeech } from '@/lib/useSpeech';
 import { SOUNDS, wordSounds, type Sound } from '@/lib/phonics';
-import SyllableWord, { SYLLABLE_COLORS, splitSyllables } from '@/components/app/SyllableWord';
+import SyllableWord, { SYLLABLE_COLORS, syllableParts } from '@/components/app/SyllableWord';
 import SpeakButton from '@/components/app/SpeakButton';
 
 /*
@@ -489,7 +489,10 @@ function SoundTile({ sound, lit, onTap }: { sound: Sound; lit: boolean; onTap: (
 }
 
 function SyllableClap({ step, activity: a, speak }: { step: StepDef; activity: Activity; speak: BodyProps['speak'] }) {
-  const parts = splitSyllables(a.frenchWord, a.syllables);
+  // Clap the syllables as they are written in Airtable, even when they are
+  // spelled differently from the word — never silently collapse to one.
+  const written = syllableParts(a.syllables);
+  const parts = written.length > 0 ? written : [a.frenchWord];
   const [claps, setClaps] = useState<number[]>([]);
   const count = claps.length;
   const total = parts.length;
