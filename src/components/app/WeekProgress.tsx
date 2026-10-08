@@ -1,7 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useSyncExternalStore } from 'react';
-import { completedDays, currentStreak, localDate } from '@/lib/progress';
+import { completedDays, currentStreak, learnedWords, localDate } from '@/lib/progress';
 
 const LABELS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
 const NAMES = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
@@ -16,7 +17,7 @@ function subscribe(onChange: () => void) {
 }
 
 // Snapshot as a string so React can compare it cheaply between renders.
-const snapshot = () => [...completedDays()].sort().join(',');
+const snapshot = () => `${learnedWords().length}|${[...completedDays()].sort().join(',')}`;
 
 /**
  * This week at a glance (Mon → Sun) plus the current streak. A small,
@@ -24,9 +25,11 @@ const snapshot = () => [...completedDays()].sort().join(',');
  */
 export default function WeekProgress() {
   const raw = useSyncExternalStore(subscribe, snapshot, () => null);
-  if (raw === null) return <div className="h-[92px]" aria-hidden="true" />;
+  if (raw === null) return <div className="h-[150px]" aria-hidden="true" />;
 
-  const days = new Set(raw ? raw.split(',') : []);
+  const [count, dayList] = raw.split('|');
+  const learnedCount = Number(count) || 0;
+  const days = new Set(dayList ? dayList.split(',') : []);
   const streak = currentStreak(days);
   const today = new Date();
   const monday = new Date(today);
@@ -73,6 +76,16 @@ export default function WeekProgress() {
           </li>
         ))}
       </ol>
+      <Link
+        href="/app/progres"
+        className="mt-4 flex items-center justify-between rounded-2xl bg-cream px-4 py-2.5 text-sm font-extrabold text-ink transition-colors hover:bg-sand"
+      >
+        <span>
+          <span aria-hidden="true">📊 </span>
+          {learnedCount > 0 ? `${learnedCount} mot${learnedCount > 1 ? 's' : ''} appris · voir nos progrès` : 'Voir nos progrès'}
+        </span>
+        <span aria-hidden="true">→</span>
+      </Link>
     </section>
   );
 }

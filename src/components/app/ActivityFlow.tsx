@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useEffectEvent, useRef, useState } from 'react';
+import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react';
 import type { Activity } from '@/lib/airtable';
 import { levelLabel } from '@/lib/levels';
 import { currentStreak, isCompletedToday, markCompleted } from '@/lib/progress';
@@ -10,6 +10,7 @@ import { SOUNDS, wordSounds, type Sound } from '@/lib/phonics';
 import SyllableWord, { SYLLABLE_COLORS, syllableParts } from '@/components/app/SyllableWord';
 import SpeakButton from '@/components/app/SpeakButton';
 import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/DrawingCanvas';
+import { nextWords, trickySounds, wordsWithSound, type WordCard } from '@/lib/related';
 
 /*
  * The daily activity as a guided flow: one step per screen, a progress bar,
@@ -28,31 +29,54 @@ type StepDef = {
   minutes: number;
   accent: string;
   tint: string;
+  /** Shown as "Facultatif": the family can skip it. */
+  optional?: boolean;
 };
 
-const DAY_NUMBER: Record<string, number> = {
-  Lundi: 1, Mardi: 2, Mercredi: 3, Jeudi: 4, Vendredi: 5, Samedi: 6, Dimanche: 7,
-};
-
+/*
+ * The order follows how a parent actually teaches the word (tested with a
+ * child): see it, count its syllables, read its sounds, say it; then an
+ * optional chat/activity and the song; then spell it with sounds and write
+ * it. Spelling and writing start at level 2 — level 1 is for the youngest.
+ */
 function buildSteps(a: Activity): StepDef[] {
-  const spelling = parseInt(a.difficulty, 10) >= 4;
+  const level = parseInt(a.difficulty, 10) || 1;
+  const writing = level >= 2;
   const steps: (StepDef | false)[] = [
-    { key: 'decouvrir', emoji: '✨', name: 'Découvrir', heading: 'On découvre un nouveau mot', minutes: 1, accent: '#E63946', tint: '#FDECEE' },
-    { key: 'lire', emoji: '📖', name: 'Lire', heading: 'On lit les sons ensemble', minutes: 1, accent: '#E08A1E', tint: '#FEF3E2' },
-    { key: 'syllabes', emoji: '👏', name: 'Syllabes', heading: 'On tape les syllabes', minutes: 1, accent: '#0E8C80', tint: '#E3F8F5' },
-    { key: 'prononcer', emoji: '🗣️', name: 'Prononcer', heading: 'On le dit à voix haute', minutes: 1, accent: '#5B1F8C', tint: '#F1E9F8' },
-    spelling && { key: 'epeler', emoji: '🔤', name: 'Sons → lettres', heading: 'Chaque son s’écrit avec des lettres', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
-    spelling && { key: 'ecrire', emoji: '✍️', name: 'Écrire', heading: 'On écrit le mot', minutes: 2, accent: '#2D9B6F', tint: '#E5F4EC' },
-    Boolean(a.activityTitle || a.activitySteps) && { key: 'activite', emoji: '🎯', name: 'Activité', heading: a.activityTitle || 'L’activité', minutes: 5, accent: '#1D6FA4', tint: '#E4F0F8' },
+    { key: 'decouvrir', emoji: '✨', name: 'Lire seul', heading: 'Le mot du jour : qui peut le lire ?', minutes: 1, accent: '#E63946', tint: '#FDECEE' },
+    { key: 'syllabes', emoji: '👏', name: 'Syllabes', heading: 'On compte les syllabes', minutes: 1, accent: '#0E8C80', tint: '#E3F8F5' },
+    { key: 'lire', emoji: '📖', name: 'Les sons', heading: 'On lit les sons ensemble', minutes: 2, accent: '#E08A1E', tint: '#FEF3E2' },
+    { key: 'prononcer', emoji: '🗣️', name: 'Le dire', heading: 'On le dit à voix haute', minutes: 1, accent: '#5B1F8C', tint: '#F1E9F8' },
+    { key: 'activite', emoji: '💬', name: 'On en parle', heading: a.activityTitle ? `On en parle · ${a.activityTitle}` : 'On en parle', minutes: 3, accent: '#1D6FA4', tint: '#E4F0F8', optional: true },
     Boolean(a.songTitle || a.songLyrics) && { key: 'chanson', emoji: '🎵', name: 'Chanson', heading: a.songTitle || 'La chanson', minutes: 2, accent: '#D4530C', tint: '#FCEBDD' },
+    writing && { key: 'epeler', emoji: '🔤', name: 'Épeler', heading: 'On épelle avec les sons', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
+    writing && { key: 'ecrire', emoji: '✍️', name: 'Écrire', heading: 'On écrit le mot', minutes: 2, accent: '#2D9B6F', tint: '#E5F4EC' },
   ];
-  return steps.filter((s): s is StepDef => Boolean(s));
+  return steps.filter((x): x is StepDef => Boolean(x));
 }
 
-export default function ActivityFlow({ activity }: { activity: Activity }) {
+const subscribeNoop = () => () => {};
+const todayLabel = () =>
+  new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
+
+/** "Aujourd'hui · mercredi 8 octobre", in the parent's own time zone. */
+function TodayChip() {
+  const label = useSyncExternalStore(subscribeNoop, todayLabel, () => null);
+  if (!label) return null;
+  return (
+    <span className="rounded-full bg-white px-3 py-1.5 text-ink ring-1 ring-ink/10">
+      <span className="hidden sm:inline">Aujourd’hui · </span>
+      {label.charAt(0).toUpperCase() + label.slice(1)}
+    </span>
+  );
+}
+
+export default function ActivityFlow({ activity, library }: { activity: Activity; library: WordCard[] }) {
   const steps = buildSteps(activity);
   const [index, setIndex] = useState(0);
   const [finished, setFinished] = useState(false);
+  // Step 1: did the child read the word alone before hearing it?
+  const [attempt, setAttempt] = useState<Attempt>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
@@ -92,8 +116,6 @@ export default function ActivityFlow({ activity }: { activity: Activity }) {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  const dayNumber = DAY_NUMBER[activity.day];
-
   return (
     <div ref={containerRef} className="scroll-mt-24">
       {/* ── Top bar: context + progress ── */}
@@ -105,11 +127,7 @@ export default function ActivityFlow({ activity }: { activity: Activity }) {
           <span aria-hidden="true">←</span> Accueil
         </Link>
         <div className="flex items-center gap-2 text-xs font-bold">
-          {dayNumber && (
-            <span className="rounded-full bg-white px-3 py-1.5 text-ink ring-1 ring-ink/10">
-              Semaine {activity.week} · Jour {dayNumber}
-            </span>
-          )}
+          <TodayChip />
           {activity.difficulty && (
             <span className="rounded-full bg-mteal-light px-3 py-1.5 text-[#115E59]">
               {levelLabel(activity.difficulty)}
@@ -155,7 +173,7 @@ export default function ActivityFlow({ activity }: { activity: Activity }) {
 
       {/* ── Step card ── */}
       {finished ? (
-        <FinishCard activity={activity} headingRef={headingRef} />
+        <FinishCard activity={activity} library={library} readAlone={attempt === 'alone'} headingRef={headingRef} />
       ) : (
         <section
           key={step.key}
@@ -173,6 +191,9 @@ export default function ActivityFlow({ activity }: { activity: Activity }) {
                 {step.emoji}
               </span>
               Étape {index + 1} · {step.name} · {step.minutes} min
+              {step.optional && (
+                <span className="rounded-full bg-sand px-2 py-0.5 text-[10px] tracking-wider text-ink-soft">Facultatif</span>
+              )}
             </p>
             <h2
               id="step-heading"
@@ -189,6 +210,9 @@ export default function ActivityFlow({ activity }: { activity: Activity }) {
               canSpeak={canSpeak}
               speak={speak}
               speakSeries={speakSeries}
+              library={library}
+              attempt={attempt}
+              setAttempt={setAttempt}
             />
           </div>
         </section>
@@ -233,36 +257,20 @@ type BodyProps = {
   canSpeak: boolean;
   speak: (text: string, rate?: number) => void;
   speakSeries: (pieces: { text: string; rate?: number }[], onStep: (i: number | null) => void) => void;
+  library: WordCard[];
+  attempt: Attempt;
+  setAttempt: (a: Attempt) => void;
 };
 
-function StepBody({ step, activity: a, canSpeak, speak, speakSeries }: BodyProps) {
+type Attempt = 'alone' | 'together' | null;
+
+function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt }: BodyProps) {
   switch (step.key) {
     case 'decouvrir':
-      return (
-        <>
-          <Stage tint={step.tint}>
-            <SyllableWord
-              word={a.frenchWord}
-              syllables={a.syllables}
-              className="block break-words font-display text-6xl font-bold leading-none sm:text-8xl"
-            />
-            {a.pronunciation && <p className="mt-3 text-lg italic text-mpurple">{a.pronunciation}</p>}
-            <div className="mt-5 flex justify-center">
-              <SpeakButton text={a.frenchWord} label="Écouter le mot" />
-            </div>
-          </Stage>
-          <ParentTip>Montre le mot à ton enfant. Pointe-le du doigt et dis-le avec joie, comme une surprise !</ParentTip>
-          {a.culturalNote && (
-            <aside className="mt-4 rounded-2xl border-2 border-dashed border-mamber/70 bg-[#FFF8EC] p-4">
-              <p className="mb-1 text-xs font-extrabold uppercase tracking-widest text-morange-ink">🌍 Le savais-tu ?</p>
-              <p className="leading-relaxed text-ink">{a.culturalNote}</p>
-            </aside>
-          )}
-        </>
-      );
+      return <ReadItAlone step={step} activity={a} attempt={attempt} setAttempt={setAttempt} speak={speak} canSpeak={canSpeak} />;
 
     case 'lire':
-      return <ReadAlong step={step} activity={a} canSpeak={canSpeak} speakSeries={speakSeries} />;
+      return <ReadAlong step={step} activity={a} canSpeak={canSpeak} speak={speak} speakSeries={speakSeries} library={library} />;
 
     case 'syllabes':
       return <SyllableClap step={step} activity={a} speak={speak} />;
@@ -277,7 +285,7 @@ function StepBody({ step, activity: a, canSpeak, speak, speakSeries }: BodyProps
       return <TraceWord step={step} activity={a} />;
 
     case 'activite':
-      return <ActivitySteps activity={a} accent={step.accent} />;
+      return <TalkAndDo activity={a} accent={step.accent} />;
 
     case 'chanson':
       return (
@@ -333,7 +341,7 @@ function Materials({ items }: { items: string[] }) {
   );
 }
 
-function ReadAlong({ step, activity: a, canSpeak, speakSeries }: { step: StepDef; activity: Activity; canSpeak: boolean; speakSeries: BodyProps['speakSeries'] }) {
+function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library }: Pick<BodyProps, 'step' | 'activity' | 'canSpeak' | 'speak' | 'speakSeries' | 'library'>) {
   const sounds = wordSounds(a.frenchWord, a.graphemes);
   const [lit, setLit] = useState<number | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -401,6 +409,7 @@ function ReadAlong({ step, activity: a, canSpeak, speakSeries }: { step: StepDef
           </button>
         </div>
       </Stage>
+      <SoundReminders activity={a} library={library} canSpeak={canSpeak} speak={speak} />
       <ParentTip>
         On lit les <strong>sons</strong>, pas le nom des lettres : on dit « mmm », pas « èm ». Glisse ton doigt sous chaque son,
         puis colle-les ensemble pour dire le mot.
@@ -506,6 +515,71 @@ function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity })
   );
 }
 
+/**
+ * "Rappel des sons": for each sound written with several letters (eil, ou,
+ * ch…) or not read the usual way (c → k), a reminder with other words of the
+ * app that have it — the child recognises the sound before reading the word.
+ */
+function SoundReminders({ activity: a, library, canSpeak, speak }: { activity: Activity; library: WordCard[]; canSpeak: boolean; speak: BodyProps['speak'] }) {
+  const tricky = trickySounds(a.frenchWord, a.graphemes);
+  if (tricky.length === 0) return null;
+  return (
+    <section aria-labelledby="reminders-title" className="mt-5">
+      <h3 id="reminders-title" className="mb-2 flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.14em] text-ink-soft">
+        <span aria-hidden="true">🔁</span> Rappel des sons
+      </h3>
+      <ul className="flex flex-col gap-2">
+        {tricky.map((s) => {
+          const text = s.text.toLocaleLowerCase('fr');
+          const examples = wordsWithSound(s, library, a.id);
+          return (
+            <li key={`${text}-${s.key}`} className="flex items-center gap-3 rounded-2xl bg-white p-3 ring-1 ring-ink/10">
+              <button
+                type="button"
+                onClick={() => canSpeak && speak(SOUNDS[s.key].say, 0.7)}
+                aria-label={`Écouter le son ${SOUNDS[s.key].hint}`}
+                className="flex h-14 min-w-14 flex-col items-center justify-center rounded-xl bg-[#FEF3E2] px-2 active:scale-95"
+              >
+                <span className={`font-display text-2xl font-bold leading-none ${s.kind === 'vowel' ? 'text-mred' : 'text-ink'}`}>{text}</span>
+                <span className="text-[11px] font-extrabold text-ink-soft">« {SOUNDS[s.key].hint} »</span>
+              </button>
+              <p className="flex-1 text-sm leading-snug text-ink">
+                <strong>{text}</strong> se lit « {SOUNDS[s.key].hint} »
+                {examples.length > 0 && (
+                  <>
+                    , comme dans{' '}
+                    {examples.map(({ card, text: spelled }, i) => (
+                      <span key={card.id}>
+                        {i > 0 && (i === examples.length - 1 ? ' et ' : ', ')}
+                        <HighlightSound word={card.word} text={spelled} />
+                      </span>
+                    ))}
+                  </>
+                )}
+                .
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+/** The word in lowercase with the reminded letters in bold colour. */
+function HighlightSound({ word, text }: { word: string; text: string }) {
+  const w = word.toLocaleLowerCase('fr');
+  const at = w.indexOf(text);
+  if (at < 0) return <strong>{w}</strong>;
+  return (
+    <strong>
+      {w.slice(0, at)}
+      <span className="text-morange-ink underline decoration-2 underline-offset-2">{w.slice(at, at + text.length)}</span>
+      {w.slice(at + text.length)}
+    </strong>
+  );
+}
+
 /** One sound of the word: the letters on top, what to say underneath. */
 function SoundTile({ sound, lit, onTap }: { sound: Sound; lit: boolean; onTap: () => void }) {
   const [pulse, setPulse] = useState(0);
@@ -594,7 +668,7 @@ function SyllableClap({ step, activity: a, speak }: { step: StepDef; activity: A
   );
 }
 
-function SayItThree({ step, activity: a, canSpeak, speak }: Omit<BodyProps, 'speakSeries'>) {
+function SayItThree({ step, activity: a, canSpeak, speak }: Pick<BodyProps, 'step' | 'activity' | 'canSpeak' | 'speak'>) {
   const [said, setSaid] = useState(0);
   return (
     <>
@@ -638,6 +712,117 @@ function SayItThree({ step, activity: a, canSpeak, speak }: Omit<BodyProps, 'spe
           <p className="font-display text-lg italic text-ink">« {a.exampleSentence} »</p>
           <SpeakButton text={a.exampleSentence} label="Écouter la phrase" tone="soft" className="mt-3" />
         </div>
+      )}
+    </>
+  );
+}
+
+/**
+ * Step 1, as it works best with children: show the word without saying it
+ * and let the child try to read it alone. The parent then marks "read alone"
+ * (counted in the progress page) or reads it together — only then do the
+ * pronunciation and the listen button appear.
+ */
+function ReadItAlone({
+  step,
+  activity: a,
+  attempt,
+  setAttempt,
+  speak,
+  canSpeak,
+}: Pick<BodyProps, 'step' | 'activity' | 'attempt' | 'setAttempt' | 'speak' | 'canSpeak'>) {
+  return (
+    <>
+      <Stage tint={step.tint}>
+        {attempt === null && (
+          <p className="mb-4 text-sm font-extrabold uppercase tracking-[0.14em] text-mred">👀 Lis-le tout seul !</p>
+        )}
+        <SyllableWord
+          word={a.frenchWord}
+          syllables={a.syllables}
+          className="block break-words font-display text-6xl font-bold leading-none sm:text-8xl"
+        />
+        {attempt === null ? (
+          <div className="mx-auto mt-7 flex max-w-sm flex-col gap-2 sm:flex-row">
+            <button
+              type="button"
+              onClick={() => setAttempt('alone')}
+              className="min-h-14 flex-1 rounded-full bg-[#2D9B6F] px-4 font-extrabold text-cream shadow-md active:scale-95"
+            >
+              🎉 Lu tout seul !
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setAttempt('together');
+                if (canSpeak) speak(a.frenchWord);
+              }}
+              className="min-h-14 flex-1 rounded-full bg-white px-4 font-extrabold text-ink ring-1 ring-ink/15 active:scale-95"
+            >
+              🤝 On le lit ensemble
+            </button>
+          </div>
+        ) : (
+          <div className="animate-rise">
+            {attempt === 'alone' && (
+              <p className="mt-4 font-display text-xl font-bold text-[#2D9B6F]" aria-live="polite">
+                Bravo, tu l’as lu tout seul ! 🌟
+              </p>
+            )}
+            {a.pronunciation && <p className="mt-3 text-lg italic text-mpurple">{a.pronunciation}</p>}
+            <div className="mt-4 flex justify-center">
+              <SpeakButton text={a.frenchWord} label="Écouter le mot" tone={attempt === 'alone' ? 'soft' : 'solid'} />
+            </div>
+          </div>
+        )}
+      </Stage>
+      <ParentTip>
+        Montre le mot <strong>sans le dire</strong> et laisse ton enfant essayer de le lire tout seul. S’il bloque, pas de souci :
+        lisez-le ensemble, les syllabes et les sons viennent juste après.
+      </ParentTip>
+      {a.culturalNote && (
+        <aside className="mt-4 rounded-2xl border-2 border-dashed border-mamber/70 bg-[#FFF8EC] p-4">
+          <p className="mb-1 text-xs font-extrabold uppercase tracking-widest text-morange-ink">🌍 Le savais-tu ?</p>
+          <p className="leading-relaxed text-ink">{a.culturalNote}</p>
+        </aside>
+      )}
+    </>
+  );
+}
+
+/** Optional step: talk about the word with the child, and/or do the activity. */
+function TalkAndDo({ activity: a, accent }: { activity: Activity; accent: string }) {
+  const written = a.questions
+    .split('\n')
+    .map((q) => q.replace(/^[-•\d.)\s]+/, '').trim())
+    .filter(Boolean);
+  const word = a.frenchWord.toLocaleLowerCase('fr');
+  const questions = written.length
+    ? written
+    : [
+        `Est-ce que tu as déjà vu « ${word} » ? Où ça ?`,
+        `Qu’est-ce que tu sais sur « ${word} » ?`,
+        `Invente une petite phrase avec le mot « ${word} ».`,
+      ];
+  const hasActivity = Boolean(a.activityTitle || a.activitySteps || a.materials);
+  return (
+    <>
+      <p className="mb-4 rounded-2xl bg-sand/60 px-4 py-3 text-sm font-bold text-ink-soft">
+        Étape facultative : on discute, on fait l’activité… ou on passe directement à la chanson. C’est ton enfant qui choisit !
+      </p>
+      <section aria-labelledby="talk-title" className="rounded-3xl p-4 sm:p-5" style={{ backgroundColor: '#E4F0F8' }}>
+        <h3 id="talk-title" className="mb-3 font-display text-lg font-bold text-ink">💬 Des questions pour en parler</h3>
+        <ul className="flex flex-col gap-2">
+          {questions.map((q) => (
+            <li key={q} className="rounded-2xl bg-white px-4 py-3 leading-relaxed text-ink">{q}</li>
+          ))}
+        </ul>
+      </section>
+      {hasActivity && (
+        <section className="mt-5">
+          <h3 className="font-display text-lg font-bold text-ink">🎯 {a.activityTitle || 'Une petite activité'}</h3>
+          <ActivitySteps activity={a} accent={accent} />
+        </section>
       )}
     </>
   );
@@ -699,14 +884,21 @@ const CONFETTI_COLORS = ['#E63946', '#F4A340', '#2EC4B6', '#5B1F8C', '#E6197A'];
 
 type Piece = { left: number; delay: number; duration: number; color: string; drift: number; size: number };
 
-function FinishCard({ activity: a, headingRef }: { activity: Activity; headingRef: React.RefObject<HTMLHeadingElement | null> }) {
+function FinishCard({ activity: a, library, readAlone, headingRef }: { activity: Activity; library: WordCard[]; readAlone: boolean; headingRef: React.RefObject<HTMLHeadingElement | null> }) {
   // Read once when this card mounts (client only — it only renders after a click).
   const [done, setDone] = useState(() => isCompletedToday(a.id));
   const [streak, setStreak] = useState(() => currentStreak());
   const [confetti, setConfetti] = useState<Piece[]>([]);
 
   const complete = () => {
-    markCompleted(a.id);
+    markCompleted({
+      id: a.id,
+      word: a.frenchWord,
+      level: a.difficulty,
+      theme: a.theme,
+      sounds: [...new Set(wordSounds(a.frenchWord, a.graphemes).filter((x) => x.key).map((x) => x.key))],
+      readAlone,
+    });
     setDone(true);
     setStreak(currentStreak());
     setConfetti(
@@ -776,12 +968,19 @@ function FinishCard({ activity: a, headingRef }: { activity: Activity; headingRe
                 {streak === 1 ? 'Premier jour ! Reviens demain pour continuer.' : `${streak} jours de suite — bravo !`}
               </p>
             )}
+            <NextWords activity={a} library={library} />
             <div className="mx-auto mt-8 flex max-w-sm flex-col gap-3">
+              <Link
+                href="/app/progres"
+                className="flex min-h-12 items-center justify-center rounded-full bg-[#FFF1E0] px-6 font-bold text-morange-ink hover:bg-mamber/30"
+              >
+                📊 Voir nos progrès
+              </Link>
               <Link
                 href="/app/select"
                 className="flex min-h-14 items-center justify-center rounded-full bg-ink px-6 text-lg font-extrabold text-cream shadow-md active:scale-[0.98]"
               >
-                🎲 Encore un mot
+                🎲 Choisir un autre mot
               </Link>
               <Link
                 href="/app/dictee"
@@ -799,6 +998,46 @@ function FinishCard({ activity: a, headingRef }: { activity: Activity; headingRe
           </>
         )}
       </div>
+    </section>
+  );
+}
+
+/** "Et maintenant ?" — words with the same sound, then words of the same theme. */
+function NextWords({ activity: a, library }: { activity: Activity; library: WordCard[] }) {
+  const current: WordCard = { id: a.id, word: a.frenchWord, level: a.difficulty, theme: a.theme, syllables: a.syllables, graphemes: a.graphemes };
+  const { sameSound, sameTheme } = nextWords(current, library);
+  if (sameSound.length === 0 && sameTheme.length === 0) return null;
+  const card = (w: WordCard, note: React.ReactNode) => (
+    <li key={w.id}>
+      <Link
+        href={`/app/activity?id=${w.id}`}
+        className="flex items-center justify-between gap-3 rounded-2xl bg-cream px-4 py-3 text-left ring-1 ring-ink/5 transition-colors hover:bg-sand"
+      >
+        <span>
+          <SyllableWord word={w.word} syllables={w.syllables} className="font-display text-xl font-bold" />
+          <span className="block text-xs font-bold text-ink-soft">{note}</span>
+        </span>
+        <span aria-hidden="true" className="text-ink">→</span>
+      </Link>
+    </li>
+  );
+  return (
+    <section aria-labelledby="next-title" className="mx-auto mt-8 max-w-sm text-left">
+      <h3 id="next-title" className="mb-3 text-center font-display text-xl font-bold text-ink">Et maintenant ?</h3>
+      {sameSound.length > 0 && (
+        <>
+          <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-ink-soft">Avec le même son</p>
+          <ul className="mb-4 flex flex-col gap-2">
+            {sameSound.map(({ word, sound }) => card(word, <>le son « {SOUNDS[sound.key].hint} » · {levelLabel(word.level)}</>))}
+          </ul>
+        </>
+      )}
+      {sameTheme.length > 0 && (
+        <>
+          <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-ink-soft">Dans la même famille · {a.theme}</p>
+          <ul className="flex flex-col gap-2">{sameTheme.map((w) => card(w, levelLabel(w.level)))}</ul>
+        </>
+      )}
     </section>
   );
 }

@@ -6,6 +6,8 @@
  * - `mounas_days`  — sorted list of local dates (YYYY-MM-DD) with at least one
  *   finished activity; drives the streak and the week dots.
  * - `mounas_seen_words` — activity ids the family has started (selector).
+ * - `mounas_learned` — one entry per word finished (first time only): the
+ *   word, its level, theme and sounds, and the date. Drives the stats page.
  *
  * Every access is wrapped: storage can be missing or throw (private mode,
  * blocked cookies) and the app must still work without it.
@@ -55,12 +57,50 @@ export function isCompletedToday(activityId: string): boolean {
   return read(completedKey(activityId, localDate())) === 'true';
 }
 
-export function markCompleted(activityId: string): void {
+export type LearnedWord = {
+  id: string;
+  word: string;
+  level: string;
+  theme: string;
+  /** Sound keys heard in the word (see src/lib/phonics.ts). */
+  sounds: string[];
+  /** First day it was finished (YYYY-MM-DD). */
+  date: string;
+  /** How many times it has been done in total. */
+  times: number;
+  /** The child read it alone at least once, before hearing it. */
+  readAlone?: boolean;
+};
+
+const LS_LEARNED = 'mounas_learned';
+
+export function learnedWords(): LearnedWord[] {
+  const raw = read(LS_LEARNED);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((x) => x && typeof x.id === 'string' && typeof x.word === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+export function markCompleted(entry: Omit<LearnedWord, 'date' | 'times'>): void {
   const today = localDate();
-  write(completedKey(activityId, today), 'true');
+  write(completedKey(entry.id, today), 'true');
   const days = new Set(readList(LS_DAYS));
   days.add(today);
   write(LS_DAYS, JSON.stringify([...days].sort()));
+
+  const learned = learnedWords();
+  const existing = learned.find((l) => l.id === entry.id);
+  if (existing) {
+    existing.times += 1;
+    existing.readAlone = Boolean(existing.readAlone || entry.readAlone);
+  } else {
+    learned.push({ ...entry, date: today, times: 1 });
+  }
+  write(LS_LEARNED, JSON.stringify(learned));
 }
 
 export function completedDays(): Set<string> {
