@@ -1,8 +1,8 @@
 import Link from 'next/link';
 import { getTodayActivity } from '@/lib/airtable';
 import { levelLabel } from '@/lib/levels';
-import SyllableWord from '@/components/app/SyllableWord';
-import SpeakButton from '@/components/app/SpeakButton';
+import MysteryTiles, { letterCount } from '@/components/app/MysteryTiles';
+import { themeEmoji } from '@/lib/themes';
 import WeekProgress from '@/components/app/WeekProgress';
 
 export const dynamic = 'force-dynamic';
@@ -22,48 +22,47 @@ export default async function HomePage() {
         <header className="mb-6">
           <p className="text-sm font-bold text-ink-soft">Bonjour 👋</p>
           <h1 className="mt-1 font-display text-3xl font-bold leading-tight text-ink sm:text-4xl">
-            Le mot du jour, en 10&nbsp;minutes
+            Prêts pour le mot du jour&nbsp;?
           </h1>
         </header>
-
-        <WeekProgress />
 
         {todayActivity ? (
           <section
             aria-labelledby="today-word"
-            className="mt-5 overflow-hidden rounded-[28px] bg-white shadow-[0_10px_40px_-12px_rgba(26,26,26,0.2)] ring-1 ring-ink/5"
+            className="overflow-hidden rounded-[28px] bg-white shadow-[0_14px_44px_-14px_rgba(91,31,140,0.35)] ring-1 ring-ink/5"
           >
             <div className="h-2 bg-gradient-to-r from-mred via-mamber to-mteal" />
-            <div className="p-6 text-center sm:p-8">
-              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-mred">Aujourd’hui on apprend</p>
-              <h2 id="today-word" className="mt-4 break-words font-display text-6xl font-bold leading-none sm:text-7xl">
-                <SyllableWord word={todayActivity.frenchWord} syllables={todayActivity.syllables} />
+            <Link href={`/app/activity?id=${todayActivity.id}`} className="block p-6 text-center sm:p-8">
+              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-mpurple">✨ Le mot mystère du jour</p>
+              <h2 id="today-word" className="sr-only">
+                Un mot mystère de {letterCount(todayActivity.frenchWord)} lettres à découvrir
               </h2>
-              {todayActivity.pronunciation && (
-                <p className="mt-3 text-lg italic text-mpurple">{todayActivity.pronunciation}</p>
-              )}
-              <div className="mt-4 flex justify-center">
-                <SpeakButton text={todayActivity.frenchWord} tone="soft" />
-              </div>
-              <ul className="mt-5 flex flex-wrap justify-center gap-2 text-sm font-bold">
+              <MysteryTiles
+                className="mx-auto mt-5 max-w-md"
+                invite
+                letters={Array.from(todayActivity.frenchWord).map((c) => ({ char: /[\s'’-]/.test(c) ? c : '?', color: '#1A1A1A' }))}
+              />
+              <p className="mt-5 font-display text-lg font-bold text-ink">
+                {letterCount(todayActivity.frenchWord)} lettres… qui sera le plus rapide à le lire ?
+              </p>
+              <ul className="mt-4 flex flex-wrap justify-center gap-2 text-sm font-bold">
                 {todayActivity.theme && (
-                  <li className="rounded-full bg-mteal-light px-3 py-1.5 text-[#115E59]">{todayActivity.theme}</li>
+                  <li className="rounded-full bg-mteal-light px-3 py-1.5 text-[#115E59]">
+                    {themeEmoji(todayActivity.theme)} {todayActivity.theme}
+                  </li>
                 )}
                 {todayActivity.difficulty && (
                   <li className="rounded-full bg-sand px-3 py-1.5 text-ink">{levelLabel(todayActivity.difficulty)}</li>
                 )}
                 <li className="rounded-full bg-sand px-3 py-1.5 text-ink">⏱ 10 min</li>
               </ul>
-              <Link
-                href={`/app/activity?id=${todayActivity.id}`}
-                className="mt-7 flex min-h-14 items-center justify-center rounded-full bg-mred px-6 text-lg font-extrabold text-cream shadow-lg transition-transform hover:bg-mred-dark active:scale-[0.98]"
-              >
-                Commencer avec mon enfant <span aria-hidden="true" className="ml-2">→</span>
-              </Link>
-            </div>
+              <span className="mt-7 flex min-h-14 items-center justify-center rounded-full bg-mred px-6 text-lg font-extrabold text-cream shadow-lg transition-transform hover:bg-mred-dark active:scale-[0.98]">
+                Découvrir le mot <span aria-hidden="true" className="ml-2">→</span>
+              </span>
+            </Link>
           </section>
         ) : (
-          <section className="mt-5 rounded-[28px] bg-white p-8 text-center ring-1 ring-ink/5">
+          <section className="rounded-[28px] bg-white p-8 text-center ring-1 ring-ink/5">
             <p className="text-5xl" aria-hidden="true">🌙</p>
             <h2 className="mt-3 font-display text-2xl font-bold text-ink">Pas de mot prévu aujourd’hui</h2>
             <p className="mt-2 text-ink-soft">Pioche un mot parmi tous ceux déjà prêts.</p>
@@ -75,6 +74,10 @@ export default async function HomePage() {
             </Link>
           </section>
         )}
+
+        <div className="mt-5">
+          <WeekProgress />
+        </div>
 
         <ol className="mt-6 grid grid-cols-3 gap-2 text-center">
           {HOW_IT_WORKS.map((s) => (

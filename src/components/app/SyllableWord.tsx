@@ -32,28 +32,40 @@ type Props = {
   dots?: boolean;
 };
 
-export default function SyllableWord({ word, syllables, className, dots = false }: Props) {
+/**
+ * The word's own spelling/casing, cut where the syllables are ("SOLEIL" →
+ * ["SO", "LEIL"]). Hyphens and apostrophes ride along with the syllable
+ * they precede.
+ */
+export function syllableSlices(word: string, syllables: string): string[] {
   const parts = splitSyllables(word, syllables);
-  // Display the word's own spelling/casing, cut where the syllables are.
-  // Hyphens and apostrophes ride along with the syllable they precede.
+  if (parts.length <= 1) return [word];
   const sliced: string[] = [];
-  if (parts.length > 1) {
-    let at = 0;
-    for (const p of parts) {
-      let slice = '';
-      let letters = 0;
-      while (at < word.length && letters < p.length) {
-        const ch = word[at];
-        slice += ch;
-        if (!/[\s'’-]/.test(ch)) letters += 1;
-        at += 1;
-      }
-      sliced.push(slice);
+  let at = 0;
+  for (const p of parts) {
+    let slice = '';
+    let letters = 0;
+    while (at < word.length && letters < p.length) {
+      const ch = word[at];
+      slice += ch;
+      if (!/[\s'’-]/.test(ch)) letters += 1;
+      at += 1;
     }
-    if (at < word.length) sliced[sliced.length - 1] += word.slice(at);
-  } else {
-    sliced.push(word);
+    sliced.push(slice);
   }
+  if (at < word.length) sliced[sliced.length - 1] += word.slice(at);
+  return sliced;
+}
+
+/** Each character of the word with the colour of its syllable. */
+export function coloredLetters(word: string, syllables: string): { char: string; color: string }[] {
+  return syllableSlices(word, syllables).flatMap((slice, i) =>
+    Array.from(slice).map((char) => ({ char, color: SYLLABLE_COLORS[i % SYLLABLE_COLORS.length] })),
+  );
+}
+
+export default function SyllableWord({ word, syllables, className, dots = false }: Props) {
+  const sliced = syllableSlices(word, syllables);
 
   return (
     <span className={className}>

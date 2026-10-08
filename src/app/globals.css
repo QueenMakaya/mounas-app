@@ -66,13 +66,73 @@ body {
 .animate-rise { animation: mounas-rise 0.35s ease-out both; }
 .animate-badge { animation: mounas-badge 0.7s cubic-bezier(0.2, 0.8, 0.3, 1.2) both; }
 
+/* ── Mystery word: face-down cards that flip one by one ── */
+.flip-card { perspective: 700px; }
+.flip-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.3, 1.25);
+}
+.flip-inner.is-flipped { transform: rotateY(180deg); }
+.flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 0.9rem;
+}
+.flip-front { transform: rotateY(180deg); }
+/* Wax-print inspired card backs in the four brand colours. */
+.mystery-back {
+  background-color: var(--back, #5b1f8c);
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(253, 246, 236, 0.9) 0 2.5px, transparent 3px),
+    radial-gradient(circle at 0 0, rgba(253, 246, 236, 0.35) 0 6px, transparent 6.5px),
+    radial-gradient(circle at 100% 100%, rgba(253, 246, 236, 0.35) 0 6px, transparent 6.5px),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(0, 0, 0, 0.08));
+  background-size: 14px 14px, 14px 14px, 14px 14px, 100% 100%;
+  box-shadow: inset 0 0 0 3px rgba(253, 246, 236, 0.55);
+}
+@keyframes mounas-sheen {
+  0% { transform: translateX(-120%) skewX(-18deg); }
+  60%, 100% { transform: translateX(220%) skewX(-18deg); }
+}
+/* Needs a positioned element (the card faces are absolute). */
+.sheen { overflow: hidden; }
+.sheen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 45%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  animation: mounas-sheen 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes mounas-invite {
+  0%, 70%, 100% { transform: translateY(0) rotate(0); }
+  78% { transform: translateY(-6px) rotate(-3deg); }
+  86% { transform: translateY(0) rotate(2deg); }
+}
+.animate-invite { animation: mounas-invite 2.4s ease-in-out infinite; animation-delay: var(--delay, 0s); }
+@keyframes mounas-spark {
+  0% { transform: translate(0, 0) scale(0.4); opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(1); opacity: 0; }
+}
+.spark { animation: mounas-spark 0.9s ease-out forwards; }
+
 @media (prefers-reduced-motion: reduce) {
   .animate-pop,
   .animate-rise,
   .animate-badge,
+  .animate-invite,
+  .sheen::after,
+  .spark,
   .confetti-piece {
     animation: none !important;
   }
+  .flip-inner { transition: none; }
   .confetti-piece { display: none; }
 }
 
