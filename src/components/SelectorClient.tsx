@@ -1,8 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import BackButton from '@/components/app/BackButton';
 import type { Activity } from '@/lib/airtable';
 import { LEVELS, levelLabel } from '@/lib/levels';
 import { markSeen, readPref, seenWords, writePref } from '@/lib/progress';
@@ -78,12 +78,7 @@ export default function SelectorClient({ themes, allActivities }: Props) {
   return (
     <main className="flex-1 bg-cream font-body">
       <div className="mx-auto max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pt-10">
-        <Link
-          href="/app"
-          className="inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-bold text-ink hover:bg-ink/5"
-        >
-          <span aria-hidden="true">←</span> Accueil
-        </Link>
+        <BackButton />
         <h1 className="mt-3 font-display text-3xl font-bold text-ink sm:text-4xl">Choisis un mot</h1>
         <p className="mt-1 text-ink-soft">Commence par le niveau de ton enfant.</p>
 
