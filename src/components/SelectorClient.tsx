@@ -2,265 +2,244 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import BackButton from '@/components/app/BackButton';
 import type { Activity } from '@/lib/airtable';
+import { LEVELS, levelLabel } from '@/lib/levels';
+import { markSeen, readPref, seenWords, writePref } from '@/lib/progress';
+import SyllableWord from '@/components/app/SyllableWord';
+import SpeakButton from '@/components/app/SpeakButton';
 
 type Props = {
   themes: string[];
   allActivities: Activity[];
 };
 
-const DIFFICULTY_OPTIONS = [
-  { value: '1', label: '1 · Tout-petit (1-3 ans)' },
-  { value: '2', label: '2 · Petit (3-4 ans)' },
-  { value: '3', label: '3 · Grand (4-5 ans)' },
-  { value: '4', label: '4 · Pré-scolaire (5+ ans)' },
-];
-
-const LS_SEEN = 'mounas_seen_words';
 const LS_LAST_THEME = 'mounas_last_theme';
+
+const pickRandom = <T,>(list: T[]): T => list[Math.floor(Math.random() * list.length)];
 const LS_LAST_DIFFICULTY = 'mounas_last_difficulty';
 
+/**
+ * Word picker. The parent picks the child's level first; only then do the
+ * words of that level (and the themes they cover) appear, so nobody starts
+ * in front of the whole library. Filters are tap-friendly chips, the count
+ * updates live, and "Surprends-moi" picks a word the child hasn't seen yet.
+ */
 export default function SelectorClient({ themes, allActivities }: Props) {
   const router = useRouter();
-  const [selectedTheme, setSelectedTheme] = useState('');
-  const [selectedDifficulty, setSelectedDifficulty] = useState('');
-  const [currentActivity, setCurrentActivity] = useState<Activity | null>(null);
+  const [theme, setTheme] = useState('');
+  const [difficulty, setDifficulty] = useState('');
   const [seenIds, setSeenIds] = useState<string[]>([]);
-  const [noMatchFound, setNoMatchFound] = useState(false);
-  const resultRef = useRef<HTMLDivElement>(null);
+  const [surprise, setSurprise] = useState<Activity | null>(null);
+  const surpriseRef = useRef<HTMLDivElement>(null);
 
+  // Restore the family's last filters and seen words (browser-only storage).
   useEffect(() => {
-    const rawSeen = localStorage.getItem(LS_SEEN);
-    if (rawSeen) {
-      try {
-        const parsed = JSON.parse(rawSeen);
-        if (Array.isArray(parsed)) {
-          setSeenIds(parsed.filter((x): x is string => typeof x === 'string'));
-        }
-      } catch {
-        // corrupt entry — ignore
-      }
-    }
-    const lastTheme = localStorage.getItem(LS_LAST_THEME);
-    if (lastTheme !== null) setSelectedTheme(lastTheme);
-    const lastDifficulty = localStorage.getItem(LS_LAST_DIFFICULTY);
-    if (lastDifficulty !== null) setSelectedDifficulty(lastDifficulty);
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time sync from localStorage after hydration */
+    setSeenIds(seenWords());
+    setTheme(readPref(LS_LAST_THEME) ?? '');
+    // Only restore a real level — older visits could have saved "all levels".
+    const lastLevel = readPref(LS_LAST_DIFFICULTY) ?? '';
+    setDifficulty(LEVELS.some((l) => l.value === lastLevel) ? lastLevel : '');
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, []);
 
   useEffect(() => {
-    if (currentActivity && resultRef.current) {
-      resultRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }, [currentActivity]);
+    if (surprise) surpriseRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [surprise]);
 
-  const generateWord = () => {
-    const filtered = allActivities.filter((a) => {
-      if (selectedTheme && a.theme !== selectedTheme) return false;
-      if (selectedDifficulty && a.difficulty !== selectedDifficulty) return false;
-      return true;
-    });
+  const atLevel = difficulty ? allActivities.filter((a) => a.difficulty === difficulty) : [];
+  const levelThemes = themes.filter((t) => atLevel.some((a) => a.theme === t));
+  // A theme remembered from another level may not exist here — ignore it.
+  const activeTheme = levelThemes.includes(theme) ? theme : '';
+  const filtered = atLevel.filter((a) => !activeTheme || a.theme === activeTheme);
+  const countAt = (level: string) => allActivities.filter((a) => a.difficulty === level).length;
+  const unseenCount = filtered.filter((a) => !seenIds.includes(a.id)).length;
 
-    if (filtered.length === 0) {
-      setCurrentActivity(null);
-      setNoMatchFound(true);
-      return;
-    }
-
-    const unseen = filtered.filter((a) => !seenIds.includes(a.id));
-    const pool = unseen.length > 0 ? unseen : filtered;
-    const picked = pool[Math.floor(Math.random() * pool.length)];
-
-    setCurrentActivity(picked);
-    setNoMatchFound(false);
-
-    localStorage.setItem(LS_LAST_THEME, selectedTheme);
-    localStorage.setItem(LS_LAST_DIFFICULTY, selectedDifficulty);
+  const choose = (setter: (v: string) => void, key: string, value: string) => {
+    setter(value);
+    writePref(key, value);
+    setSurprise(null);
   };
 
-  const handleStartActivity = (activityId: string) => {
-    const newSeenIds = seenIds.includes(activityId)
-      ? seenIds
-      : [...seenIds, activityId];
-    setSeenIds(newSeenIds);
-    localStorage.setItem(LS_SEEN, JSON.stringify(newSeenIds));
-    router.push(`/app/activity?id=${activityId}`);
+  const surpriseMe = () => {
+    if (filtered.length === 0) return;
+    const unseen = filtered.filter((a) => !seenIds.includes(a.id) && a.id !== surprise?.id);
+    const pool = unseen.length > 0 ? unseen : filtered.filter((a) => a.id !== surprise?.id);
+    const list = pool.length > 0 ? pool : filtered;
+    setSurprise(pickRandom(list));
+  };
+
+  const start = (id: string) => {
+    setSeenIds(markSeen(id));
+    router.push(`/app/activity?id=${id}`);
   };
 
   return (
-    <main
-      className="min-h-screen"
-      style={{ backgroundColor: '#FDF6EC', fontFamily: 'var(--font-nunito)' }}
-    >
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-12 pb-16">
-        {/* A. HEADER */}
-        <div className="mb-8">
-          <a
-            href="/app"
-            className="text-sm font-semibold"
-            style={{ color: '#1A1A1A' }}
-          >
-            ← Retour
-          </a>
-          <h1
-            className="text-4xl font-bold text-center mt-6"
-            style={{ fontFamily: 'var(--font-fraunces)', color: '#1A1A1A' }}
-          >
-            Choisis un nouveau mot
-          </h1>
-          <p className="text-center mt-3" style={{ color: '#5F5E5A' }}>
-            Sélectionne thème + niveau de difficulté
-          </p>
-        </div>
+    <main className="flex-1 bg-cream font-body">
+      <div className="mx-auto max-w-3xl px-4 pb-16 pt-6 sm:px-6 sm:pt-10">
+        <BackButton />
+        <h1 className="mt-3 font-display text-3xl font-bold text-ink sm:text-4xl">Choisis un mot</h1>
+        <p className="mt-1 text-ink-soft">Commence par le niveau de ton enfant.</p>
 
-        {/* B. FILTER CARD */}
-        <div
-          className="rounded-3xl p-8"
-          style={{
-            backgroundColor: '#FDF6EC',
-            border: '1px solid rgba(26,26,26,0.15)',
-          }}
-        >
-          <label
-            htmlFor="theme-select"
-            className="block text-xs uppercase tracking-widest mb-2 font-bold"
-            style={{ fontFamily: 'var(--font-fraunces)', color: '#1A1A1A' }}
-          >
-            Thème
-          </label>
-          <select
-            id="theme-select"
-            value={selectedTheme}
-            onChange={(e) => setSelectedTheme(e.target.value)}
-            className="w-full rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#E63946]"
-            style={{
-              backgroundColor: '#FFFFFF',
-              color: '#1A1A1A',
-              border: '1px solid rgba(26,26,26,0.2)',
-            }}
-          >
-            <option value="">Tous les thèmes</option>
-            {themes.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
+        {/* ── Filters ── */}
+        <section className="mt-6 rounded-[28px] bg-white p-5 ring-1 ring-ink/5 sm:p-6">
+          <fieldset>
+            <legend className="mb-3 text-xs font-extrabold uppercase tracking-[0.14em] text-ink-soft">1 · Le niveau</legend>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {LEVELS.map((l) => (
+                <Chip key={l.value} on={difficulty === l.value} onClick={() => choose(setDifficulty, LS_LAST_DIFFICULTY, l.value)}>
+                  <span aria-hidden="true">{l.emoji}</span> {l.short}
+                  <span className="block text-[11px] font-semibold opacity-70">{l.label}</span>
+                  <span className="block text-[11px] font-semibold opacity-50">{countAt(l.value)} mot{countAt(l.value) > 1 ? 's' : ''}</span>
+                </Chip>
+              ))}
+            </div>
+          </fieldset>
 
-          <label
-            htmlFor="difficulty-select"
-            className="block text-xs uppercase tracking-widest mb-2 mt-6 font-bold"
-            style={{ fontFamily: 'var(--font-fraunces)', color: '#1A1A1A' }}
-          >
-            Difficulté
-          </label>
-          <select
-            id="difficulty-select"
-            value={selectedDifficulty}
-            onChange={(e) => setSelectedDifficulty(e.target.value)}
-            className="w-full rounded-xl py-3 px-4 focus:outline-none focus:ring-2 focus:ring-[#E63946]"
-            style={{
-              backgroundColor: '#FFFFFF',
-              color: '#1A1A1A',
-              border: '1px solid rgba(26,26,26,0.2)',
-            }}
-          >
-            <option value="">Toutes les difficultés</option>
-            {DIFFICULTY_OPTIONS.map((d) => (
-              <option key={d.value} value={d.value}>
-                {d.label}
-              </option>
-            ))}
-          </select>
+          {!difficulty && (
+            <p className="mt-5 rounded-2xl bg-cream p-4 text-center font-bold text-ink-soft">
+              <span aria-hidden="true">👆 </span>Choisis un niveau pour voir ses mots.
+            </p>
+          )}
 
-          <div className="mt-8 flex justify-center">
+          {difficulty && levelThemes.length > 1 && (
+            <fieldset className="mt-6">
+              <legend className="mb-3 text-xs font-extrabold uppercase tracking-[0.14em] text-ink-soft">2 · Le thème (si tu veux)</legend>
+              <div className="flex flex-wrap gap-2">
+                <Chip on={activeTheme === ''} onClick={() => choose(setTheme, LS_LAST_THEME, '')} pill>
+                  Tous
+                </Chip>
+                {levelThemes.map((t) => (
+                  <Chip key={t} on={activeTheme === t} onClick={() => choose(setTheme, LS_LAST_THEME, t)} pill>
+                    {t}
+                  </Chip>
+                ))}
+              </div>
+            </fieldset>
+          )}
+
+          {difficulty && (
+          <div className="mt-6 flex flex-col items-center gap-3 border-t border-ink/5 pt-5 sm:flex-row sm:justify-between">
+            <p className="text-sm font-bold text-ink-soft" aria-live="polite">
+              {filtered.length === 0
+                ? 'Aucun mot avec ces choix'
+                : `${filtered.length} mot${filtered.length > 1 ? 's' : ''}${unseenCount < filtered.length ? ` · ${unseenCount} jamais vu${unseenCount > 1 ? 's' : ''}` : ''}`}
+            </p>
             <button
-              onClick={generateWord}
-              className="rounded-full py-4 px-8 text-lg font-bold shadow-lg transition-colors duration-200 bg-[#E63946] hover:bg-red-700"
-              style={{ color: '#FDF6EC' }}
+              type="button"
+              onClick={surpriseMe}
+              disabled={filtered.length === 0}
+              className="min-h-14 w-full rounded-full bg-mred px-7 text-lg font-extrabold text-cream shadow-lg transition-transform hover:bg-mred-dark active:scale-[0.98] disabled:opacity-40 sm:w-auto"
             >
-              ✨ Générer un mot
+              🎲 Surprends-moi
             </button>
           </div>
-        </div>
+          )}
+        </section>
 
-        {/* C. RESULT CARD */}
-        {currentActivity && (
+        {/* ── Surprise result ── */}
+        {surprise && (
           <div
-            ref={resultRef}
-            className="mt-8 rounded-3xl p-8 text-center"
-            style={{
-              backgroundColor: '#FDF6EC',
-              border: '2px dashed #F4A340',
-            }}
+            ref={surpriseRef}
+            key={surprise.id}
+            className="animate-rise mt-6 overflow-hidden rounded-[28px] bg-white text-center shadow-[0_10px_40px_-12px_rgba(26,26,26,0.2)] ring-1 ring-ink/5"
           >
-            <p
-              className="text-xs uppercase tracking-widest mb-4"
-              style={{ color: 'rgba(26,26,26,0.6)' }}
-            >
-              Mot proposé
-            </p>
-            <h2
-              className="text-7xl sm:text-8xl font-bold mb-4 leading-none"
-              style={{ fontFamily: 'var(--font-fraunces)', color: '#1A1A1A' }}
-            >
-              {currentActivity.frenchWord}
-            </h2>
-            <span
-              className="inline-block rounded-full px-4 py-2 text-sm mb-2"
-              style={{ backgroundColor: '#CCFBF1', color: '#115E59' }}
-            >
-              {currentActivity.theme} · Niveau {currentActivity.difficulty}
-            </span>
-            {seenIds.includes(currentActivity.id) && (
-              <p
-                className="text-xs italic mt-2"
-                style={{ color: '#6B7280' }}
-              >
-                ✓ déjà découvert
+            <div className="h-2 bg-gradient-to-r from-mred via-mamber to-mteal" />
+            <div className="p-6 sm:p-8">
+              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-mred">Et le mot est…</p>
+              <p className="mt-3 break-words font-display text-6xl font-bold leading-none sm:text-7xl">
+                <SyllableWord word={surprise.frenchWord} syllables={surprise.syllables} />
               </p>
-            )}
-
-            <div className="flex flex-wrap gap-3 justify-center mt-8">
-              <button
-                onClick={() => handleStartActivity(currentActivity.id)}
-                className="rounded-full py-3 px-6 font-bold shadow-md transition-colors duration-200 bg-[#E63946] hover:bg-red-700"
-                style={{ color: '#FDF6EC' }}
-              >
-                Commencer l’activité →
-              </button>
-              <button
-                onClick={generateWord}
-                className="rounded-full py-3 px-6 font-bold shadow-md transition-colors duration-200 bg-[#F4A340] hover:bg-yellow-500"
-                style={{ color: '#1A1A1A' }}
-              >
-                🎲 Un autre mot
-              </button>
+              <div className="mt-4 flex justify-center">
+                <SpeakButton text={surprise.frenchWord} tone="soft" />
+              </div>
+              <p className="mt-4 text-sm font-bold text-ink-soft">
+                {[surprise.theme, levelLabel(surprise.difficulty)].filter(Boolean).join(' · ')}
+                {seenIds.includes(surprise.id) && ' · ✓ déjà vu'}
+              </p>
+              <div className="mx-auto mt-6 flex max-w-sm flex-col gap-3">
+                <button
+                  type="button"
+                  onClick={() => start(surprise.id)}
+                  className="min-h-14 rounded-full bg-ink px-6 text-lg font-extrabold text-cream shadow-md active:scale-[0.98]"
+                >
+                  C’est parti <span aria-hidden="true">→</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={surpriseMe}
+                  className="min-h-12 rounded-full px-6 font-bold text-ink ring-1 ring-ink/15 hover:bg-sand"
+                >
+                  🎲 Un autre
+                </button>
+              </div>
             </div>
           </div>
         )}
 
-        {/* D. NO MATCH */}
-        {noMatchFound && !currentActivity && (
-          <div
-            className="mt-8 text-center italic"
-            style={{ color: '#6B7280' }}
-          >
-            <p>Aucun mot trouvé avec ces filtres.</p>
-            <p className="text-sm mt-1">Essaie d&apos;autres combinaisons !</p>
+        {/* ── All matching words ── */}
+        {!difficulty ? null : filtered.length > 0 ? (
+          <section className="mt-8" aria-labelledby="all-words">
+            <h2 id="all-words" className="mb-3 font-display text-xl font-bold text-ink">
+              Les mots du {LEVELS.find((l) => l.value === difficulty)?.short}
+            </h2>
+            <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {filtered.map((a) => {
+                const seen = seenIds.includes(a.id);
+                return (
+                  <li key={a.id}>
+                    <button
+                      type="button"
+                      onClick={() => start(a.id)}
+                      className="relative flex h-full w-full flex-col items-center rounded-3xl bg-white px-3 pb-4 pt-6 text-center ring-1 ring-ink/5 transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-[0.98]"
+                    >
+                      {seen && (
+                        <span className="absolute right-3 top-3 rounded-full bg-mteal-light px-2 py-0.5 text-[11px] font-extrabold text-[#115E59]">
+                          ✓ vu
+                        </span>
+                      )}
+                      <span className={`max-w-full break-words font-display font-bold leading-tight ${a.frenchWord.length > 7 ? 'text-xl sm:text-2xl' : 'text-3xl'}`}>
+                        <SyllableWord word={a.frenchWord} syllables={a.syllables} />
+                      </span>
+                      <span className="mt-2 text-xs font-bold text-ink-soft">
+                        {[a.theme, levelLabel(a.difficulty)].filter(Boolean).join(' · ')}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ) : (
+          <div className="mt-8 rounded-3xl border-2 border-dashed border-ink/15 p-8 text-center">
+            <p className="text-4xl" aria-hidden="true">🔍</p>
+            <p className="mt-2 font-bold text-ink">Pas encore de mot prêt pour ce niveau.</p>
+            <button
+              type="button"
+              onClick={() => choose(setDifficulty, LS_LAST_DIFFICULTY, '')}
+              className="mt-3 font-bold text-mpurple underline underline-offset-4"
+            >
+              Choisir un autre niveau
+            </button>
           </div>
         )}
-
-        {/* E. FOOTER */}
-        <footer className="mt-16 text-center">
-          <a
-            href="/app"
-            className="text-sm underline"
-            style={{ color: '#5B1F8C' }}
-          >
-            ← Retour à l&apos;accueil
-          </a>
-        </footer>
       </div>
     </main>
+  );
+}
+
+function Chip({ on, onClick, pill = false, className = '', children }: { on: boolean; onClick: () => void; pill?: boolean; className?: string; children: React.ReactNode }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={on}
+      className={`min-h-12 px-4 py-2 text-sm font-extrabold transition-colors ${className} ${pill ? 'rounded-full' : 'rounded-2xl'} ${
+        on ? 'bg-ink text-cream shadow-md' : 'bg-cream text-ink ring-1 ring-ink/10 hover:bg-sand'
+      }`}
+    >
+      {children}
+    </button>
   );
 }
