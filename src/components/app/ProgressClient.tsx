@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useSyncExternalStore } from 'react';
+import BackButton from '@/components/app/BackButton';
 import { LEVELS, levelLabel } from '@/lib/levels';
 import { SOUNDS } from '@/lib/phonics';
 import { completedDays, currentStreak, learnedWords, localDate, type LearnedWord } from '@/lib/progress';
@@ -35,9 +36,7 @@ export default function ProgressClient({ levelTotals, allSounds }: { levelTotals
   return (
     <main className="flex-1 bg-cream font-body">
       <div className="mx-auto max-w-2xl px-4 pb-16 pt-6 sm:px-6 sm:pt-10">
-        <Link href="/app" className="inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-bold text-ink hover:bg-ink/5">
-          <span aria-hidden="true">←</span> Accueil
-        </Link>
+        <BackButton />
         <h1 className="mt-3 font-display text-3xl font-bold text-ink sm:text-4xl">📊 Nos progrès</h1>
         <p className="mt-1 text-ink-soft">Tout ce que vous avez appris ensemble, sur ce téléphone.</p>
         {raw === null ? <div className="h-96" aria-hidden="true" /> : <Stats raw={raw} levelTotals={levelTotals} allSounds={allSounds} />}

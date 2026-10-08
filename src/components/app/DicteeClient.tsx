@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import BackButton from '@/components/app/BackButton';
 import { LEVELS } from '@/lib/levels';
 import { SOUNDS, wordSounds } from '@/lib/phonics';
 import { readPref, writePref } from '@/lib/progress';
@@ -155,9 +155,7 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
     <main className="flex-1 bg-cream font-body">
       <div className="mx-auto w-full max-w-4xl px-4 pb-16 pt-6 sm:px-6">
         <div className="flex items-center justify-between gap-3">
-          <Link href="/app" className="inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-bold text-ink hover:bg-ink/5">
-            <span aria-hidden="true">←</span> Accueil
-          </Link>
+          <BackButton />
           {score > 0 && <span className="rounded-full bg-mamber px-3 py-1.5 text-sm font-extrabold text-ink">⭐ {score}</span>}
         </div>
         <h1 className="mt-3 font-display text-3xl font-bold text-ink sm:text-4xl">📒 Mon cahier de dictée</h1>
