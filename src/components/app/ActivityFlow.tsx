@@ -4,13 +4,13 @@ import Link from 'next/link';
 import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react';
 import type { Activity } from '@/lib/airtable';
 import { levelLabel } from '@/lib/levels';
-import { currentStreak, isCompletedToday, markCompleted } from '@/lib/progress';
+import { currentStreak, isCompletedToday, learnedWords, markCompleted } from '@/lib/progress';
 import { useSpeech } from '@/lib/useSpeech';
 import { SOUNDS, wordSounds, type Sound } from '@/lib/phonics';
 import { playChime } from '@/lib/chime';
 import SyllableWord, { SYLLABLE_COLORS, syllableParts } from '@/components/app/SyllableWord';
 import SpeakButton from '@/components/app/SpeakButton';
-import MysteryWord from '@/components/app/MysteryWord';
+import MysteryWord, { type DiscoverMode } from '@/components/app/MysteryWord';
 import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/DrawingCanvas';
 import { nextWords, trickySounds, wordsWithSound, type WordCard } from '@/lib/related';
 
@@ -80,6 +80,14 @@ export default function ActivityFlow({ activity, library }: { activity: Activity
   // Step 1: did the child read the word alone before hearing it?
   const [attempt, setAttempt] = useState<Attempt>(null);
   const [revealed, setRevealed] = useState(false);
+  // How the word is discovered: the child reads it (new word), or hears it and
+  // spells it before turning the cards (a word already learned). Level 1 only
+  // reads; from level 2 the parent can switch, and the choice is kept once the
+  // cards are turned so finishing the word doesn't change it.
+  const level = parseInt(activity.difficulty, 10) || 1;
+  const known = useSyncExternalStore(subscribeNoop, () => learnedWords().some((l) => l.id === activity.id), () => false);
+  const [chosenMode, setChosenMode] = useState<DiscoverMode | null>(null);
+  const mode: DiscoverMode = level < 2 ? 'lire' : (chosenMode ?? (known ? 'ecoute' : 'lire'));
   const containerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
@@ -176,7 +184,13 @@ export default function ActivityFlow({ activity, library }: { activity: Activity
 
       {/* ── Step card ── */}
       {finished ? (
-        <FinishCard activity={activity} library={library} readAlone={attempt === 'alone'} headingRef={headingRef} />
+        <FinishCard
+          activity={activity}
+          library={library}
+          readAlone={mode === 'lire' && attempt === 'alone'}
+          spelledAlone={mode === 'ecoute' && attempt === 'alone'}
+          headingRef={headingRef}
+        />
       ) : (
         <section
           key={step.key}
@@ -217,7 +231,12 @@ export default function ActivityFlow({ activity, library }: { activity: Activity
               attempt={attempt}
               setAttempt={setAttempt}
               revealed={revealed}
-              onReveal={() => setRevealed(true)}
+              onReveal={() => {
+                setChosenMode(mode);
+                setRevealed(true);
+              }}
+              mode={mode}
+              onModeChange={level < 2 ? undefined : setChosenMode}
             />
           </div>
         </section>
@@ -267,14 +286,29 @@ type BodyProps = {
   setAttempt: (a: Attempt) => void;
   revealed: boolean;
   onReveal: () => void;
+  mode: DiscoverMode;
+  onModeChange?: (mode: DiscoverMode) => void;
 };
 
 type Attempt = 'alone' | 'together' | null;
 
-function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal }: BodyProps) {
+function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal, mode, onModeChange }: BodyProps) {
   switch (step.key) {
     case 'decouvrir':
-      return <ReadItAlone step={step} activity={a} attempt={attempt} setAttempt={setAttempt} revealed={revealed} onReveal={onReveal} speak={speak} canSpeak={canSpeak} />;
+      return (
+        <ReadItAlone
+          step={step}
+          activity={a}
+          attempt={attempt}
+          setAttempt={setAttempt}
+          revealed={revealed}
+          onReveal={onReveal}
+          speak={speak}
+          canSpeak={canSpeak}
+          mode={mode}
+          onModeChange={onModeChange}
+        />
+      );
 
     case 'lire':
       return <ReadAlong step={step} activity={a} canSpeak={canSpeak} speak={speak} speakSeries={speakSeries} library={library} />;
@@ -441,7 +475,7 @@ function scramble<T>(items: T[], seed: string): T[] {
  * in the right order to rebuild the word (silent letters included — we write
  * them even if we don't hear them). A hint plays the next sound.
  */
-function BuildWord({ step, activity: a, canSpeak, speak }: { step: StepDef; activity: Activity; canSpeak: boolean; speak: BodyProps['speak'] }) {
+function BuildTiles({ activity: a, canSpeak, speak, onDone }: { activity: Activity; canSpeak: boolean; speak: BodyProps['speak']; onDone?: () => void }) {
   const sounds = wordSounds(a.frenchWord, a.graphemes).filter((x) => x.kind !== 'separator');
   const pool = scramble(sounds.map((sound, i) => ({ sound, i })), a.frenchWord);
   const [placed, setPlaced] = useState<number[]>([]); // pool indexes, in slot order
@@ -460,6 +494,7 @@ function BuildWord({ step, activity: a, canSpeak, speak }: { step: StepDef; acti
       if (nowPlaced.length === sounds.length) {
         if (canSpeak) speak(a.frenchWord);
         playChime();
+        onDone?.();
       } else if (tile.key && canSpeak) {
         speak(SOUNDS[tile.key].say, 0.7);
       }
@@ -476,73 +511,81 @@ function BuildWord({ step, activity: a, canSpeak, speak }: { step: StepDef; acti
 
   return (
     <>
-      <Stage tint={step.tint}>
-        <p className="mb-4 font-bold text-ink-soft">Remets les sons dans l’ordre pour écrire le mot.</p>
-        {/* Slots */}
-        <div className="flex flex-wrap justify-center gap-1.5" aria-live="polite">
-          {sounds.map((x, i) => {
-            const filled = i < placed.length;
-            return (
-              <span
-                key={i}
-                className={`flex h-16 min-w-12 items-center justify-center rounded-2xl px-2 font-display text-3xl font-bold ${
-                  filled
-                    ? `animate-pop bg-white ring-1 ring-ink/10 ${x.kind === 'silent' ? 'text-ink/30' : x.kind === 'vowel' ? 'text-mred' : 'text-ink'}`
-                    : i === placed.length
-                      ? 'border-2 border-dashed border-[#993556] bg-white/60'
-                      : 'border-2 border-dashed border-ink/15'
-                }`}
-              >
-                {filled ? label(x) : ''}
-              </span>
-            );
-          })}
-        </div>
+      <p className="mb-4 font-bold text-ink-soft">Remets les sons dans l’ordre pour écrire le mot.</p>
+      {/* Slots */}
+      <div className="flex flex-wrap justify-center gap-1.5" aria-live="polite">
+        {sounds.map((x, i) => {
+          const filled = i < placed.length;
+          return (
+            <span
+              key={i}
+              className={`flex h-16 min-w-12 items-center justify-center rounded-2xl px-2 font-display text-3xl font-bold ${
+                filled
+                  ? `animate-pop bg-white ring-1 ring-ink/10 ${x.kind === 'silent' ? 'text-ink/30' : x.kind === 'vowel' ? 'text-mred' : 'text-ink'}`
+                  : i === placed.length
+                    ? 'border-2 border-dashed border-[#993556] bg-white/60'
+                    : 'border-2 border-dashed border-ink/15'
+              }`}
+            >
+              {filled ? label(x) : ''}
+            </span>
+          );
+        })}
+      </div>
 
-        {done ? (
-          <p className="animate-rise mt-6 font-display text-2xl font-bold text-[#2D9B6F]">Bravo, tu as épelé « {a.frenchWord.toLocaleLowerCase('fr')} » ! 🎉</p>
-        ) : (
-          <>
-            {/* Mixed-up sounds */}
-            <div className="mt-6 flex flex-wrap justify-center gap-2">
-              {pool.map(({ sound: x }, p) =>
-                placed.includes(p) ? (
-                  <span key={p} className="h-16 min-w-12 rounded-2xl bg-ink/5" aria-hidden="true" />
-                ) : (
-                  <button
-                    key={p}
-                    type="button"
-                    onClick={() => tap(p)}
-                    aria-label={x.kind === 'silent' ? `${label(x)}, lettre muette` : `Son ${SOUNDS[x.key].hint}, écrit ${label(x)}`}
-                    className={`flex h-16 min-w-12 flex-col items-center justify-center rounded-2xl bg-white px-2 shadow-[0_4px_0_rgba(26,26,26,0.15)] ring-1 ring-ink/10 transition-transform active:translate-y-1 active:shadow-none ${
-                      wrong === p ? 'animate-[mounas-pop_0.35s] ring-2 ring-mred' : ''
-                    }`}
-                  >
-                    <span className={`font-display text-3xl font-bold leading-none ${x.kind === 'silent' ? 'text-ink/30' : x.kind === 'vowel' ? 'text-mred' : 'text-ink'}`}>
-                      {label(x)}
-                    </span>
-                    {x.kind === 'silent' && <span className="text-[10px] font-extrabold text-ink/30">muette</span>}
-                  </button>
-                ),
-              )}
-            </div>
-            {wrong !== null && (
-              <p className="mt-3 text-sm font-bold text-mred" aria-live="polite">
-                {wrong === -1 ? 'Celle-là ne s’entend pas : c’est la lettre muette !' : 'Pas encore celui-là… écoute bien le mot !'}
-              </p>
-            )}
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
-              {canSpeak && (
-                <button type="button" onClick={() => speak(a.frenchWord, 0.6)} className="min-h-11 rounded-full bg-white px-4 font-bold text-ink ring-1 ring-ink/15">
-                  🔈 Le mot
+      {done ? (
+        <p className="animate-rise mt-6 font-display text-2xl font-bold text-[#2D9B6F]">Bravo, tu as épelé « {a.frenchWord.toLocaleLowerCase('fr')} » ! 🎉</p>
+      ) : (
+        <>
+          {/* Mixed-up sounds */}
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            {pool.map(({ sound: x }, p) =>
+              placed.includes(p) ? (
+                <span key={p} className="h-16 min-w-12 rounded-2xl bg-ink/5" aria-hidden="true" />
+              ) : (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => tap(p)}
+                  aria-label={x.kind === 'silent' ? `${label(x)}, lettre muette` : `Son ${SOUNDS[x.key].hint}, écrit ${label(x)}`}
+                  className={`flex h-16 min-w-12 flex-col items-center justify-center rounded-2xl bg-white px-2 shadow-[0_4px_0_rgba(26,26,26,0.15)] ring-1 ring-ink/10 transition-transform active:translate-y-1 active:shadow-none ${
+                    wrong === p ? 'animate-[mounas-pop_0.35s] ring-2 ring-mred' : ''
+                  }`}
+                >
+                  <span className={`font-display text-3xl font-bold leading-none ${x.kind === 'silent' ? 'text-ink/30' : x.kind === 'vowel' ? 'text-mred' : 'text-ink'}`}>
+                    {label(x)}
+                  </span>
+                  {x.kind === 'silent' && <span className="text-[10px] font-extrabold text-ink/30">muette</span>}
                 </button>
-              )}
-              <button type="button" onClick={hint} className="min-h-11 rounded-full bg-mamber/90 px-4 font-extrabold text-ink">
-                💡 Quel son vient ensuite ?
+              ),
+            )}
+          </div>
+          {wrong !== null && (
+            <p className="mt-3 text-sm font-bold text-mred" aria-live="polite">
+              {wrong === -1 ? 'Celle-là ne s’entend pas : c’est la lettre muette !' : 'Pas encore celui-là… écoute bien le mot !'}
+            </p>
+          )}
+          <div className="mt-5 flex flex-wrap justify-center gap-2">
+            {canSpeak && (
+              <button type="button" onClick={() => speak(a.frenchWord, 0.6)} className="min-h-11 rounded-full bg-white px-4 font-bold text-ink ring-1 ring-ink/15">
+                🔈 Le mot
               </button>
-            </div>
-          </>
-        )}
+            )}
+            <button type="button" onClick={hint} className="min-h-11 rounded-full bg-mamber/90 px-4 font-extrabold text-ink">
+              💡 Quel son vient ensuite ?
+            </button>
+          </div>
+        </>
+      )}
+    </>
+  );
+}
+
+function BuildWord({ step, activity: a, canSpeak, speak }: { step: StepDef; activity: Activity; canSpeak: boolean; speak: BodyProps['speak'] }) {
+  return (
+    <>
+      <Stage tint={step.tint}>
+        <BuildTiles activity={a} canSpeak={canSpeak} speak={speak} />
       </Stage>
       <ParentTip>
         Ton enfant dit chaque son à voix haute en le touchant (« sss », « ooo »…). Les lettres muettes s’écrivent mais ne s’entendent pas : elles gardent quand même leur place dans le mot.
@@ -835,10 +878,12 @@ function SayItThree({ step, activity: a, canSpeak, speak }: Pick<BodyProps, 'ste
 }
 
 /**
- * Step 1, as it works best with children: show the word without saying it
- * and let the child try to read it alone. The parent then marks "read alone"
- * (counted in the progress page) or reads it together — only then do the
- * pronunciation and the listen button appear.
+ * Step 1, as it works best with children. "Je lis" (a new word): show the
+ * word without saying it and let the child try to read it alone. "J'écoute"
+ * (a word already met): the child hears the word, spells it with the sounds
+ * (aloud, with the tiles or on paper), then turns the cards to check. Either
+ * way the parent then marks "alone" (counted in the progress page) or does it
+ * together — only then do the pronunciation and the listen button appear.
  */
 function ReadItAlone({
   step,
@@ -849,7 +894,11 @@ function ReadItAlone({
   canSpeak,
   revealed,
   onReveal,
-}: Pick<BodyProps, 'step' | 'activity' | 'attempt' | 'setAttempt' | 'speak' | 'canSpeak' | 'revealed' | 'onReveal'>) {
+  mode,
+  onModeChange,
+}: Pick<BodyProps, 'step' | 'activity' | 'attempt' | 'setAttempt' | 'speak' | 'canSpeak' | 'revealed' | 'onReveal' | 'mode' | 'onModeChange'>) {
+  const [tiles, setTiles] = useState(false);
+  const listen = mode === 'ecoute';
   return (
     <>
       <Stage tint={step.tint}>
@@ -862,37 +911,66 @@ function ReadItAlone({
           onReveal={onReveal}
           canSpeak={canSpeak}
           speak={speak}
+          mode={mode}
+          onModeChange={onModeChange}
+          extra={
+            listen && (
+              <div className="mt-5">
+                {tiles ? (
+                  <div className="animate-rise rounded-3xl bg-white/70 p-4 ring-1 ring-ink/5">
+                    <BuildTiles
+                      activity={a}
+                      canSpeak={canSpeak}
+                      speak={speak}
+                      onDone={() => {
+                        setAttempt('alone');
+                        onReveal();
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setTiles(true)}
+                    className="min-h-11 rounded-full bg-white px-5 font-bold text-ink ring-1 ring-ink/15 active:scale-95"
+                  >
+                    🔤 Avec les étiquettes
+                  </button>
+                )}
+              </div>
+            )
+          }
         />
         {!revealed ? null : attempt === null ? (
           <>
-          <p className="animate-rise mt-6 text-sm font-extrabold uppercase tracking-[0.14em] text-mred" style={{ animationDelay: '0.6s' }}>
-            👀 Lis-le tout seul !
-          </p>
-          <div className="mx-auto mt-7 flex max-w-sm flex-col gap-2 sm:flex-row">
-            <button
-              type="button"
-              onClick={() => setAttempt('alone')}
-              className="min-h-14 flex-1 rounded-full bg-[#2D9B6F] px-4 font-extrabold text-cream shadow-md active:scale-95"
-            >
-              🎉 Lu tout seul !
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setAttempt('together');
-                if (canSpeak) speak(a.frenchWord);
-              }}
-              className="min-h-14 flex-1 rounded-full bg-white px-4 font-extrabold text-ink ring-1 ring-ink/15 active:scale-95"
-            >
-              🤝 On le lit ensemble
-            </button>
-          </div>
+            <p className="animate-rise mt-6 text-sm font-extrabold uppercase tracking-[0.14em] text-mred" style={{ animationDelay: '0.6s' }}>
+              {listen ? '🧐 Alors, c’était bien écrit ?' : '👀 Lis-le tout seul !'}
+            </p>
+            <div className="mx-auto mt-7 flex max-w-sm flex-col gap-2 sm:flex-row">
+              <button
+                type="button"
+                onClick={() => setAttempt('alone')}
+                className="min-h-14 flex-1 rounded-full bg-[#2D9B6F] px-4 font-extrabold text-cream shadow-md active:scale-95"
+              >
+                {listen ? '🎉 Bien écrit !' : '🎉 Lu tout seul !'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setAttempt('together');
+                  if (canSpeak) speak(a.frenchWord);
+                }}
+                className="min-h-14 flex-1 rounded-full bg-white px-4 font-extrabold text-ink ring-1 ring-ink/15 active:scale-95"
+              >
+                {listen ? '🤝 Presque ! On regarde ensemble' : '🤝 On le lit ensemble'}
+              </button>
+            </div>
           </>
         ) : (
           <div className="animate-rise">
             {attempt === 'alone' && (
               <p className="mt-4 font-display text-xl font-bold text-[#2D9B6F]" aria-live="polite">
-                Bravo, tu l’as lu tout seul ! 🌟
+                {listen ? 'Bravo, tu l’as écrit tout seul ! 🌟' : 'Bravo, tu l’as lu tout seul ! 🌟'}
               </p>
             )}
             {a.pronunciation && <p className="mt-3 text-lg italic text-mpurple">{a.pronunciation}</p>}
@@ -903,8 +981,17 @@ function ReadItAlone({
         )}
       </Stage>
       <ParentTip>
-        Laisse ton enfant toucher les cartes. Une fois le mot découvert, <strong>ne le dis pas</strong> : il essaie de le lire tout seul.
-        S’il bloque, les indices aident, ou lisez-le ensemble : les syllabes et les sons viennent juste après.
+        {listen ? (
+          <>
+            Ton enfant connaît déjà ce mot : cette fois, il l’<strong>écoute</strong> et l’épelle avec les sons (« sss », « ooo »…), à voix haute,
+            avec les étiquettes ou sur une feuille. Ensuite, il retourne les cartes pour vérifier tout seul.
+          </>
+        ) : (
+          <>
+            Laisse ton enfant toucher les cartes. Une fois le mot découvert, <strong>ne le dis pas</strong> : il essaie de le lire tout seul.
+            S’il bloque, les indices aident, ou lisez-le ensemble : les syllabes et les sons viennent juste après.
+          </>
+        )}
       </ParentTip>
       {a.culturalNote && (
         <aside className="mt-4 rounded-2xl border-2 border-dashed border-mamber/70 bg-[#FFF8EC] p-4">
@@ -1010,7 +1097,19 @@ const CONFETTI_COLORS = ['#E63946', '#F4A340', '#2EC4B6', '#5B1F8C', '#E6197A'];
 
 type Piece = { left: number; delay: number; duration: number; color: string; drift: number; size: number };
 
-function FinishCard({ activity: a, library, readAlone, headingRef }: { activity: Activity; library: WordCard[]; readAlone: boolean; headingRef: React.RefObject<HTMLHeadingElement | null> }) {
+function FinishCard({
+  activity: a,
+  library,
+  readAlone,
+  spelledAlone,
+  headingRef,
+}: {
+  activity: Activity;
+  library: WordCard[];
+  readAlone: boolean;
+  spelledAlone: boolean;
+  headingRef: React.RefObject<HTMLHeadingElement | null>;
+}) {
   // Read once when this card mounts (client only — it only renders after a click).
   const [done, setDone] = useState(() => isCompletedToday(a.id));
   const [streak, setStreak] = useState(() => currentStreak());
@@ -1024,6 +1123,7 @@ function FinishCard({ activity: a, library, readAlone, headingRef }: { activity:
       theme: a.theme,
       sounds: [...new Set(wordSounds(a.frenchWord, a.graphemes).filter((x) => x.key).map((x) => x.key))],
       readAlone,
+      spelledAlone,
     });
     setDone(true);
     setStreak(currentStreak());
