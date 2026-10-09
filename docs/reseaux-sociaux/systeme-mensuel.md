@@ -21,7 +21,7 @@ Deux routines Claude tournent automatiquement ; tu valides entre les deux.
 |---|---|
 | Calendrier éditorial | Airtable · base **LES MOUNAS Homeschool Content Manager** (`app7O1jzwEVSeDgrS`) · table **Calendrier Réseaux** (`tbl0HTkMgVT6w9hIo`) |
 | Mots du Jour (rotation hebdo) | même base · table **Mot du Jour** (`tblKjVt0SqVyr1QQU`) |
-| Assets finaux | Google Drive · `Les Mounas – Réseaux sociaux/AAAA-MM/<Plateforme>/` |
+| Assets finaux | Google Drive · `04_LES_MOUNAS/Les Mounas – Réseaux sociaux/AAAA-MM/S<n> · <thème> (dates)/` (un dossier par thème hebdo : un même reel sert IG, TikTok et YouTube) |
 | Récaps | e-mail à alfred.pam@gmail.com |
 
 ## Les statuts (colonne Status)
@@ -103,4 +103,9 @@ comptent dans ces volumes : le run du 20 les détecte et complète autour, sans 
 - **Facebook** n'est pas une option du champ Plateforme : une ligne *Instagram* = publication IG + FB.
 - La **publication** elle-même (Meta Business Suite, TikTok, YouTube Studio, Skool) reste manuelle
   ou passe par ton outil de programmation ; le système livre des assets prêts à programmer.
-- Les runs ont besoin des connecteurs **Airtable, Canva, Google Drive et Gmail**.
+- Les runs ont besoin des connecteurs **Airtable, Canva, Google Drive et Gmail**. Les routines créées
+  depuis une session n'en ont aucun : les ajouter dans l'écran Routines de claude.ai.
+- **Upload Drive** : le connecteur Google Drive exige le contenu du fichier dans l'appel, ce qui ne
+  marche pas pour les PNG/MP4. Les dossiers et docs texte se créent bien ; les médias sont livrés
+  dans la conversation (session interactive) ou sur une branche `contenu/AAAA-MM` du dépôt, à glisser dans Drive.
+- Les lignes « À FILMER PAR TOI » (face caméra, POV) sont tournées par toi : le script est dans `Body`.
