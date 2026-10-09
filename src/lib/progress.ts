@@ -70,6 +70,8 @@ export type LearnedWord = {
   times: number;
   /** The child read it alone at least once, before hearing it. */
   readAlone?: boolean;
+  /** The child spelled or wrote it alone at least once, from hearing it. */
+  spelledAlone?: boolean;
 };
 
 const LS_LEARNED = 'mounas_learned';
@@ -97,6 +99,7 @@ export function markCompleted(entry: Omit<LearnedWord, 'date' | 'times'>): void 
   if (existing) {
     existing.times += 1;
     existing.readAlone = Boolean(existing.readAlone || entry.readAlone);
+    existing.spelledAlone = Boolean(existing.spelledAlone || entry.spelledAlone);
   } else {
     learned.push({ ...entry, date: today, times: 1 });
   }

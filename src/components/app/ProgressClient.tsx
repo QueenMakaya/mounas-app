@@ -168,6 +168,9 @@ function Stats({ raw, levelTotals, allSounds }: { raw: string; levelTotals: Reco
                     {w.readAlone && (
                       <span className="ml-2 rounded-full bg-[#E5F4EC] px-2 py-0.5 text-[11px] font-extrabold text-[#2D9B6F]">lu seul</span>
                     )}
+                    {w.spelledAlone && (
+                      <span className="ml-2 rounded-full bg-[#F8E8EE] px-2 py-0.5 text-[11px] font-extrabold text-[#993556]">écrit seul</span>
+                    )}
                     {w.times > 1 && <span className="ml-2 text-xs font-bold text-ink-soft">×{w.times}</span>}
                   </td>
                   <td className="py-2.5 text-ink-soft">{levelLabel(w.level)}</td>
