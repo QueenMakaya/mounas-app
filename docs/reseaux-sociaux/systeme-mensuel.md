@@ -31,7 +31,7 @@ Deux routines Claude tournent automatiquement ; tu valides entre les deux.
 | **Idea** | Proposé par le run du 20. En attente de ta validation. |
 | **Draft** | Validé par toi → sera produit le 26. |
 | **Ready to Post** | Asset produit, dans Drive (`Lien Drive`) et en pièce jointe (`Images`). |
-| **Programmed** | Programmé dans Meta Business Suite / TikTok / YouTube Studio / Skool. |
+| **Programmed** | Programmé dans **Metricool** (IG, FB, TikTok, YouTube) ; Skool à la main. |
 | **Posted** | Publié. |
 
 Pour valider : filtre `Mois = AAAA-MM` et `Status = Idea`, puis passe en **Draft**
@@ -101,8 +101,13 @@ comptent dans ces volumes : le run du 20 les détecte et complète autour, sans 
 - **Vidéos longues YouTube** : le run produit le pack complet (script, storyboard, visuels de scènes,
   sous-titres .srt, plan de montage). Le rendu MP4 final se fait dans CapCut/Canva.
 - **Facebook** n'est pas une option du champ Plateforme : une ligne *Instagram* = publication IG + FB.
-- La **publication** elle-même (Meta Business Suite, TikTok, YouTube Studio, Skool) reste manuelle
-  ou passe par ton outil de programmation ; le système livre des assets prêts à programmer.
+- **Programmation via Metricool** (connecteur « Metricool Social Media Management ») : chaque ligne
+  *Ready to Post* dont les fichiers sont dans Drive est programmée à sa date/heure avec sa caption, en
+  mode **notification** (`autoPublish: false`) : Metricool envoie une notif sur ton téléphone et tu
+  publies d'un tap (et ajoutes un son tendance sur Reels/TikTok). La ligne passe alors en *Programmed*.
+  Prérequis : comptes Les Mounas (IG, FB, TikTok, YouTube) liés à la marque Metricool, et Google Drive
+  lié dans Metricool (les médias sont pris depuis les liens Drive).
+- **Skool** n'a pas d'API de publication : les posts Skool restent à copier-coller depuis `Body`.
 - Les runs ont besoin des connecteurs **Airtable, Canva, Google Drive et Gmail**. Les routines créées
   depuis une session n'en ont aucun : les ajouter dans l'écran Routines de claude.ai.
 - **Upload Drive** : le connecteur Google Drive exige le contenu du fichier dans l'appel, ce qui ne
