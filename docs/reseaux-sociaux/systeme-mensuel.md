@@ -103,8 +103,8 @@ comptent dans ces volumes : le run du 20 les détecte et complète autour, sans 
 - **Facebook** n'est pas une option du champ Plateforme : une ligne *Instagram* = publication IG + FB.
 - **Programmation via Metricool** (connecteur « Metricool Social Media Management ») : chaque ligne
   *Ready to Post* dont les fichiers sont dans Drive est programmée à sa date/heure avec sa caption, en
-  mode **notification** (`autoPublish: false`) : Metricool envoie une notif sur ton téléphone et tu
-  publies d'un tap (et ajoutes un son tendance sur Reels/TikTok). La ligne passe alors en *Programmed*.
+  **publication automatique** (`autoPublish: true`) : Metricool publie seul à l'heure prévue.
+  La ligne passe alors en *Programmed*.
   Prérequis : comptes Les Mounas (IG, FB, TikTok, YouTube) liés à la marque Metricool « LesMounas »
   (id 6134708), et dossier Drive partagé en **« Tous les utilisateurs disposant du lien » (lecteur)** :
   Metricool télécharge les médias depuis les liens `drive.google.com/file/d/<id>/view` (la liaison
