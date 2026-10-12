@@ -105,8 +105,11 @@ comptent dans ces volumes : le run du 20 les détecte et complète autour, sans 
   *Ready to Post* dont les fichiers sont dans Drive est programmée à sa date/heure avec sa caption, en
   mode **notification** (`autoPublish: false`) : Metricool envoie une notif sur ton téléphone et tu
   publies d'un tap (et ajoutes un son tendance sur Reels/TikTok). La ligne passe alors en *Programmed*.
-  Prérequis : comptes Les Mounas (IG, FB, TikTok, YouTube) liés à la marque Metricool, et Google Drive
-  lié dans Metricool (les médias sont pris depuis les liens Drive).
+  Prérequis : comptes Les Mounas (IG, FB, TikTok, YouTube) liés à la marque Metricool « LesMounas »
+  (id 6134708), et dossier Drive partagé en **« Tous les utilisateurs disposant du lien » (lecteur)** :
+  Metricool télécharge les médias depuis les liens `drive.google.com/file/d/<id>/view` (la liaison
+  Google Drive dans Metricool n'est pas nécessaire). Partager le dossier parent « Les Mounas – Réseaux
+  sociaux » une fois suffit : les sous-dossiers des mois suivants héritent du partage.
 - **Skool** n'a pas d'API de publication : les posts Skool restent à copier-coller depuis `Body`.
 - Les runs ont besoin des connecteurs **Airtable, Canva, Google Drive et Gmail**. Les routines créées
   depuis une session n'en ont aucun : les ajouter dans l'écran Routines de claude.ai.
