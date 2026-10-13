@@ -13,6 +13,8 @@ import SpeakButton from '@/components/app/SpeakButton';
 import MysteryWord, { type DiscoverMode } from '@/components/app/MysteryWord';
 import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/DrawingCanvas';
 import { nextWords, trickySounds, wordsWithSound, type WordCard } from '@/lib/related';
+import type { Mission } from '@/lib/missions';
+import MissionPlayer from '@/components/app/MissionPlayer';
 
 /*
  * The daily activity as a guided flow: one step per screen, a progress bar,
@@ -21,7 +23,7 @@ import { nextWords, trickySounds, wordsWithSound, type WordCard } from '@/lib/re
  * scroll of eight coloured blocks.
  */
 
-type StepKey = 'decouvrir' | 'lire' | 'syllabes' | 'prononcer' | 'epeler' | 'ecrire' | 'activite' | 'chanson';
+type StepKey = 'decouvrir' | 'lire' | 'syllabes' | 'prononcer' | 'epeler' | 'ecrire' | 'activite' | 'chanson' | 'mission';
 
 type StepDef = {
   key: StepKey;
@@ -40,8 +42,9 @@ type StepDef = {
  * child): see it, count its syllables, read its sounds, say it; then an
  * optional chat/activity and the song; then spell it with sounds and write
  * it. Spelling and writing start at level 2 — level 1 is for the youngest.
+ * A linked mission (calcul, problème) comes last, as an optional bonus.
  */
-function buildSteps(a: Activity): StepDef[] {
+function buildSteps(a: Activity, hasMission: boolean): StepDef[] {
   const level = parseInt(a.difficulty, 10) || 1;
   const writing = level >= 2;
   const steps: (StepDef | false)[] = [
@@ -53,6 +56,7 @@ function buildSteps(a: Activity): StepDef[] {
     Boolean(a.songTitle || a.songLyrics) && { key: 'chanson', emoji: '🎵', name: 'Chanson', heading: a.songTitle || 'La chanson', minutes: 2, accent: '#D4530C', tint: '#FCEBDD' },
     writing && { key: 'epeler', emoji: '🔤', name: 'Épeler', heading: 'Construis le mot avec les sons', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
     writing && { key: 'ecrire', emoji: '✍️', name: 'Écrire', heading: 'On écrit le mot', minutes: 2, accent: '#2D9B6F', tint: '#E5F4EC' },
+    hasMission && { key: 'mission', emoji: '🧩', name: 'Mission', heading: 'La mission du jour', minutes: 3, accent: '#C7600A', tint: '#FEF3E2', optional: true },
   ];
   return steps.filter((x): x is StepDef => Boolean(x));
 }
@@ -73,8 +77,16 @@ function TodayChip() {
   );
 }
 
-export default function ActivityFlow({ activity, library }: { activity: Activity; library: WordCard[] }) {
-  const steps = buildSteps(activity);
+export default function ActivityFlow({
+  activity,
+  library,
+  mission = null,
+}: {
+  activity: Activity;
+  library: WordCard[];
+  mission?: Mission | null;
+}) {
+  const steps = buildSteps(activity, Boolean(mission));
   const [index, setIndex] = useState(0);
   const [finished, setFinished] = useState(false);
   // Step 1: did the child read the word alone before hearing it?
@@ -237,6 +249,7 @@ export default function ActivityFlow({ activity, library }: { activity: Activity
               }}
               mode={mode}
               onModeChange={level < 2 ? undefined : setChosenMode}
+              mission={mission}
             />
           </div>
         </section>
@@ -288,12 +301,16 @@ type BodyProps = {
   onReveal: () => void;
   mode: DiscoverMode;
   onModeChange?: (mode: DiscoverMode) => void;
+  mission: Mission | null;
 };
 
 type Attempt = 'alone' | 'together' | null;
 
-function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal, mode, onModeChange }: BodyProps) {
+function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal, mode, onModeChange, mission }: BodyProps) {
   switch (step.key) {
+    case 'mission':
+      return mission ? <MissionPlayer mission={mission} compact /> : null;
+
     case 'decouvrir':
       return (
         <ReadItAlone

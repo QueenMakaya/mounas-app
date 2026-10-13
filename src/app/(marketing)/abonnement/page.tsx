@@ -12,6 +12,7 @@ export const metadata: Metadata = {
 const INCLUDED = [
   { emoji: '🎲', text: 'Tous les mots de la bibliothèque, par niveau et par thème' },
   { emoji: '📒', text: 'Le cahier de dictée, pour écrire avec le doigt' },
+  { emoji: '🧩', text: 'Les missions : compter et résoudre des petits problèmes' },
   { emoji: '🌱', text: 'Le suivi des progrès de ton enfant' },
   { emoji: '💬', text: 'Le rituel quotidien sur WhatsApp' },
 ];
