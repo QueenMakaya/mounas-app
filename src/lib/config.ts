@@ -33,14 +33,22 @@ export const WHATSAPP_NUMBER = (
 // https://cal.com/les-mounas/20min). Works with either tool.
 export const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL || '';
 
-// Social profiles — optional. Each one only shows up on /connect when its
-// NEXT_PUBLIC_* variable is set, so the page never links to an empty profile.
+// Social profiles — each NEXT_PUBLIC_* variable overrides the default URL below,
+// so the links always show up on /connect even when the variables aren't set.
 export const SOCIAL_LINKS = [
-  { key: 'instagram', label: 'Instagram', handle: '@lesmounas', url: process.env.NEXT_PUBLIC_INSTAGRAM_URL || '' },
-  { key: 'tiktok', label: 'TikTok', handle: '@lesmounas', url: process.env.NEXT_PUBLIC_TIKTOK_URL || '' },
-  { key: 'youtube', label: 'YouTube', handle: 'Les Mounas', url: process.env.NEXT_PUBLIC_YOUTUBE_URL || '' },
-  { key: 'facebook', label: 'Facebook', handle: 'Les Mounas', url: process.env.NEXT_PUBLIC_FACEBOOK_URL || '' },
+  { key: 'instagram', label: 'Instagram', handle: '@les_mounas', url: process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://www.instagram.com/les_mounas' },
+  { key: 'tiktok', label: 'TikTok', handle: '@les_mounas', url: process.env.NEXT_PUBLIC_TIKTOK_URL || 'https://www.tiktok.com/@les_mounas' },
+  { key: 'youtube', label: 'YouTube', handle: '@lesmounas', url: process.env.NEXT_PUBLIC_YOUTUBE_URL || 'https://www.youtube.com/@lesmounas' },
+  { key: 'facebook', label: 'Facebook', handle: 'Les Mounas', url: process.env.NEXT_PUBLIC_FACEBOOK_URL || 'https://www.facebook.com/profile.php?id=120218827663422' },
+  { key: 'skool', label: 'Skool', handle: 'Communauté homeschool', url: process.env.NEXT_PUBLIC_SKOOL_URL || 'https://www.skool.com/homeschooling-les-mounas-6553' },
+  { key: 'linkedin', label: 'LinkedIn', handle: 'Les Mounas', url: process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://ca.linkedin.com/company/lesmounas' },
 ].filter((s) => s.url.length > 0);
+
+// Free trial — Stripe payment link: 7 days free, then 10 $ CAD / month.
+// After checkout Stripe redirects to WhatsApp ("J'ai activé mon essai").
+export const TRIAL_URL = process.env.NEXT_PUBLIC_TRIAL_URL || 'https://buy.stripe.com/bJe3cwfg5bCpdhH6Fj8AE03';
+export const TRIAL_DAYS = 7;
+export const MONTHLY_PRICE = '10 $';
 
 /** Build a wa.me link, optionally pre-filling the first message. */
 export function whatsappLink(message?: string): string {
