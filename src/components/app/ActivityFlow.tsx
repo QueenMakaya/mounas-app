@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import type { Activity } from '@/lib/airtable';
 import { levelLabel } from '@/lib/levels';
 import { currentStreak, isCompletedToday, learnedWords, markCompleted } from '@/lib/progress';
@@ -1144,6 +1145,8 @@ function FinishCard({
     });
     setDone(true);
     setStreak(currentStreak());
+    // Cleared once the longest piece has landed (delay 0.6 s + duration 3.8 s).
+    window.setTimeout(() => setConfetti([]), 4600);
     setConfetti(
       Array.from({ length: 48 }, () => ({
         left: Math.random() * 100,
@@ -1158,24 +1161,28 @@ function FinishCard({
 
   return (
     <section aria-labelledby="finish-heading" className="animate-rise overflow-hidden rounded-[28px] bg-white text-center shadow-[0_10px_40px_-12px_rgba(26,26,26,0.18)] ring-1 ring-ink/5">
-      {confetti.length > 0 && (
-        <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
-          {confetti.map((p, i) => (
-            <span
-              key={i}
-              className="confetti-piece absolute top-0 rounded-sm"
-              style={{
-                left: `${p.left}%`,
-                width: p.size,
-                height: p.size * 0.6,
-                backgroundColor: p.color,
-                animation: `mounas-confetti ${p.duration}s ${p.delay}s ease-in forwards`,
-                ['--drift' as string]: `${p.drift}px`,
-              }}
-            />
-          ))}
-        </div>
-      )}
+      {/* Portalled to <body>: the card's rise animation leaves a transform on it,
+          which would pin "fixed" pieces to the card instead of the screen. */}
+      {confetti.length > 0 &&
+        createPortal(
+          <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+            {confetti.map((p, i) => (
+              <span
+                key={i}
+                className="confetti-piece absolute top-0 rounded-sm"
+                style={{
+                  left: `${p.left}%`,
+                  width: p.size,
+                  height: p.size * 0.6,
+                  backgroundColor: p.color,
+                  animation: `mounas-confetti ${p.duration}s ${p.delay}s ease-in forwards`,
+                  ['--drift' as string]: `${p.drift}px`,
+                }}
+              />
+            ))}
+          </div>,
+          document.body,
+        )}
       <div className="h-2 bg-gradient-to-r from-mred via-mamber to-mteal" />
       <div className="p-6 sm:p-10">
         {!done ? (
