@@ -4,7 +4,7 @@ import DiamondIcon from '@/components/brand/DiamondIcon';
 import EbookSignup from '@/components/marketing/EbookSignup';
 import NewsletterSignup from '@/components/marketing/NewsletterSignup';
 import BookingSection from '@/components/marketing/BookingSection';
-import { COLORS, SOCIAL_LINKS, whatsappLink } from '@/lib/config';
+import { COLORS, SOCIAL_LINKS, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: 'Restons connectés — Les Mounas',
@@ -74,15 +74,22 @@ export default function ConnectPage() {
             commencer l’activité du jour.
           </p>
 
-          <div className="mt-9">
+          <div className="mt-9 flex flex-col items-center gap-3">
             <a
-              href={whatsappLink('Bonjour Les Mounas ! Je souhaite rejoindre l’abonnement WhatsApp. 🌍')}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={STRIPE_PAYMENT_LINK}
               className="inline-block rounded-full px-8 py-4 text-lg font-bold shadow-md transition-opacity hover:opacity-90"
               style={{ backgroundColor: COLORS.red, color: COLORS.cream }}
             >
-              💬 Rejoindre sur WhatsApp
+              Commencer l&apos;essai gratuit
+            </a>
+            <a
+              href={whatsappLink('Bonjour Les Mounas ! J’ai une question sur l’abonnement. 🌍')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block rounded-full px-6 py-3 font-bold transition-opacity hover:opacity-80"
+              style={{ color: COLORS.tealDark, border: `1.5px solid ${COLORS.teal}` }}
+            >
+              💬 Une question ? WhatsApp
             </a>
             <p className="mt-3 text-sm italic" style={{ color: COLORS.purple }}>
               Sans engagement, résilie quand tu veux.
