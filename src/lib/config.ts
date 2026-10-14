@@ -31,7 +31,7 @@ export const WHATSAPP_NUMBER = (
 // Stripe Payment Link: every "Essai gratuit" button opens it (10 $/mois,
 // 7 jours gratuits). NEXT_PUBLIC_STRIPE_PAYMENT_LINK overrides it, e.g. to point
 // a preview deployment at a test-mode link.
-const DEFAULT_STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/bJe3cwfg5bCpdhH6Fj8AE03';
+const DEFAULT_STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/7sY5kE6JzbCpcdD4xb8AE06';
 export const STRIPE_PAYMENT_LINK = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK || DEFAULT_STRIPE_PAYMENT_LINK;
 
 // Scheduling — paste your Calendly OR Cal.com booking link here via
