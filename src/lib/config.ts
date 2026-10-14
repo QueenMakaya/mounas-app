@@ -44,10 +44,10 @@ export const SOCIAL_LINKS = [
   { key: 'linkedin', label: 'LinkedIn', handle: 'Les Mounas', url: process.env.NEXT_PUBLIC_LINKEDIN_URL || 'https://ca.linkedin.com/company/lesmounas' },
 ].filter((s) => s.url.length > 0);
 
-// Free trial — Stripe payment link: 7 days free, then 10 $ CAD / month.
+// Free trial — Stripe payment link: 14 days free, then 10 $ CAD / month.
 // After checkout Stripe redirects to WhatsApp ("J'ai activé mon essai").
 export const TRIAL_URL = process.env.NEXT_PUBLIC_TRIAL_URL || 'https://buy.stripe.com/bJe3cwfg5bCpdhH6Fj8AE03';
-export const TRIAL_DAYS = 7;
+export const TRIAL_DAYS = 14;
 export const MONTHLY_PRICE = '10 $';
 
 /** Build a wa.me link, optionally pre-filling the first message. */

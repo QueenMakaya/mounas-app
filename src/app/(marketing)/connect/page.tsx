@@ -9,14 +9,14 @@ import { COLORS, SOCIAL_LINKS, TRIAL_URL, TRIAL_DAYS, MONTHLY_PRICE, whatsappLin
 export const metadata: Metadata = {
   title: `${TRIAL_DAYS} jours offerts : le français en jouant, 10 minutes par jour | Les Mounas`,
   description:
-    'Chaque matin sur WhatsApp, une activité de 10 minutes pour que ton enfant (0-6 ans) parle, lise et chante en français, avec nos racines africaines. 7 jours offerts, sans engagement.',
+    'Chaque matin sur WhatsApp, une activité de 10 minutes pour que ton enfant (0-6 ans) parle, lise et chante en français, avec nos racines africaines. 14 jours offerts, sans engagement.',
 };
 
 /**
  * /connect — the sales page every external CTA points at (bio Instagram/TikTok,
  * end of YouTube videos, articles, flyers, QR codes…).
  *
- * One main action: start the free trial (Stripe payment link, 7 days free).
+ * One main action: start the free trial (Stripe payment link, 14 days free).
  * Everything else (guide, blog, call, newsletter, socials) comes after.
  */
 
@@ -56,7 +56,7 @@ const FOR_CHILD = [
 ];
 
 const STEPS = [
-  { n: '1', title: 'Active tes 7 jours', body: 'Un clic, ton nom et ton numéro. Rien n’est prélevé pendant l’essai.' },
+  { n: '1', title: `Active tes ${TRIAL_DAYS} jours`, body: 'Un clic, ton nom et ton numéro. Rien n’est prélevé pendant l’essai.' },
   { n: '2', title: 'Reçois ton premier mot', body: 'Dès le lendemain matin, sur WhatsApp, avec la mission du jour.' },
   { n: '3', title: 'Joue 10 minutes', body: 'Ton enfant répète, chante et joue. Tu continues seulement si vous aimez.' },
 ];
