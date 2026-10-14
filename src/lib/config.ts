@@ -29,7 +29,7 @@ export const WHATSAPP_NUMBER = (
 ).replace(/[^0-9]/g, '');
 
 // Stripe Payment Link: every "Essai gratuit" button opens it (10 $/mois,
-// 7 jours gratuits). NEXT_PUBLIC_STRIPE_PAYMENT_LINK overrides it, e.g. to point
+// 14 jours gratuits). NEXT_PUBLIC_STRIPE_PAYMENT_LINK overrides it, e.g. to point
 // a preview deployment at a test-mode link.
 const DEFAULT_STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/7sY5kE6JzbCpcdD4xb8AE06';
 export const STRIPE_PAYMENT_LINK = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK || DEFAULT_STRIPE_PAYMENT_LINK;

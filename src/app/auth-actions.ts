@@ -49,7 +49,7 @@ async function requestCode(email: string): Promise<LoginState> {
     return {
       ...base,
       status: 'no_access',
-      message: "On ne trouve pas d'abonnement actif avec cette adresse. Tu peux commencer ton essai gratuit de 7 jours !",
+      message: "On ne trouve pas d'abonnement actif avec cette adresse. Tu peux commencer ton essai gratuit de 14 jours !",
     };
   }
 
