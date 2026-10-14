@@ -64,7 +64,7 @@ export default function LandingPage() {
             </a>
           </div>
           <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
-            10 $/mois après 7 jours gratuits.{' '}
+            10 $/mois après 14 jours gratuits.{' '}
             <Link href="/app" className="font-bold underline underline-offset-4" style={{ color: COLORS.purple }}>
               Découvrir le mot du jour gratuitement →
             </Link>

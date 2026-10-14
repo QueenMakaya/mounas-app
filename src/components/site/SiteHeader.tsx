@@ -58,7 +58,7 @@ export default function SiteHeader({ member = false }: { member?: boolean }) {
               className="rounded-full px-4 py-2 text-sm font-bold shadow-sm transition-opacity hover:opacity-90"
               style={{ backgroundColor: COLORS.red, color: COLORS.cream }}
             >
-              Essai gratuit 7 jours
+              Essai gratuit 14 jours
             </a>
           )}
         </nav>

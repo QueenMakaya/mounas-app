@@ -6,7 +6,7 @@ import { safeNext } from '@/lib/session';
 
 export const metadata: Metadata = {
   title: 'Abonnement | Les Mounas',
-  description: "Toute l'app Les Mounas et le rituel WhatsApp quotidien. 10 $ par mois, 7 jours gratuits.",
+  description: "Toute l'app Les Mounas et le rituel WhatsApp quotidien. 10 $ par mois, 14 jours gratuits.",
 };
 
 const INCLUDED = [
@@ -31,7 +31,7 @@ export default async function AbonnementPage({
           className="inline-flex items-center gap-2 rounded-full px-4 py-1 text-xs font-bold uppercase tracking-widest"
           style={{ backgroundColor: COLORS.tealLight, color: COLORS.tealDark }}
         >
-          <DiamondIcon size={14} inner={COLORS.tealLight} /> 7 jours gratuits
+          <DiamondIcon size={14} inner={COLORS.tealLight} /> 14 jours gratuits
         </span>
 
         {fin && (
@@ -67,7 +67,7 @@ export default async function AbonnementPage({
           10 $/mois
         </p>
         <p className="mt-1 text-base" style={{ color: 'rgba(26,26,26,0.75)' }}>
-          7 jours gratuits pour essayer. Sans engagement, résilie quand tu veux.
+          14 jours gratuits pour essayer. Sans engagement, résilie quand tu veux.
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-4">
