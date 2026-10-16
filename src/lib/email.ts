@@ -12,7 +12,13 @@ const DEFAULT_FROM = 'Les Mounas <contact@lesmounas.school>';
 export type SendResult = { ok: true } | { ok: false; error: 'not_configured' | 'send_error' };
 
 export async function sendLoginCode(to: string, code: string): Promise<SendResult> {
-  const apiKey = process.env.RESEND_API_KEY;
+  // Same repairs as airtableToken(): stray spaces/new lines, wrapping quotes or
+  // a "Bearer " prefix picked up when pasting the key into Vercel.
+  const apiKey = (process.env.RESEND_API_KEY ?? '')
+    .trim()
+    .replace(/^["']|["']$/g, '')
+    .replace(/^Bearer\s+/i, '')
+    .trim();
   const from = process.env.LOGIN_EMAIL_FROM || DEFAULT_FROM;
 
   if (!apiKey) {
@@ -43,7 +49,11 @@ export async function sendLoginCode(to: string, code: string): Promise<SendResul
       cache: 'no-store',
     });
     if (!res.ok) {
-      console.error(`[email] Resend responded ${res.status}: ${await res.text().catch(() => '')}`);
+      // The key's prefix and length (never the key) help spot a wrong or truncated paste.
+      console.error(
+        `[email] Resend responded ${res.status}: ${await res.text().catch(() => '')} ` +
+          `| key starts "${apiKey.slice(0, 3)}" (len ${apiKey.length}) from="${from}"`,
+      );
       return { ok: false, error: 'send_error' };
     }
     return { ok: true };
