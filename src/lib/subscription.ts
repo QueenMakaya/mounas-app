@@ -83,6 +83,41 @@ async function customerHasAccess(customerId: string): Promise<boolean> {
   return subs.data.some((s) => ACCESS_STATUSES.has(s.status));
 }
 
+/**
+ * A phone number as Stripe Checkout stores it (E.164, e.g. +15144660319).
+ * Parents type it any way: "514 466-0319", "(514) 466 0319", "+1 514…",
+ * "0033 6…". Ten digits without a country code are North American (+1).
+ */
+export function normalizePhone(input: string): string | null {
+  const trimmed = input.trim();
+  let digits = trimmed.replace(/\D/g, '');
+  if (!trimmed.startsWith('+') && digits.startsWith('00')) digits = digits.slice(2);
+  else if (!trimmed.startsWith('+') && digits.length === 10) digits = `1${digits}`;
+  return digits.length >= 8 && digits.length <= 15 ? `+${digits}` : null;
+}
+
+/**
+ * Access by phone number (the one given at checkout). Also returns the
+ * customer's email, since the login code is sent there.
+ */
+export async function findAccessByPhone(
+  phone: string,
+): Promise<{ status: 'active'; customerId: string; email: string | null } | { status: 'none' } | { status: 'error' }> {
+  try {
+    const found = await stripe<StripeList<Customer>>(
+      `/customers/search?limit=100&query=${encodeURIComponent(`phone:'${phone}'`)}`,
+    );
+    for (const customer of found.data) {
+      if (!customer.deleted && (await customerHasAccess(customer.id))) {
+        return { status: 'active', customerId: customer.id, email: customer.email };
+      }
+    }
+    return { status: 'none' };
+  } catch {
+    return { status: 'error' };
+  }
+}
+
 /** Which customer (if any) gives this email access. */
 export async function findAccess(email: string): Promise<AccessResult> {
   try {

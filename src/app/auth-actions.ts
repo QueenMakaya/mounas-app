@@ -18,7 +18,7 @@ import {
   signPendingLogin,
   signSession,
 } from '@/lib/session';
-import { createPortalUrl, findAccess, readLoginCode, saveLoginCode } from '@/lib/subscription';
+import { createPortalUrl, findAccess, findAccessByPhone, normalizePhone, readLoginCode, saveLoginCode } from '@/lib/subscription';
 
 // NOTE: this file is 'use server': it may only export async functions.
 
@@ -37,23 +37,65 @@ function sameHex(a: string, b: string): boolean {
   return a.length === b.length && timingSafeEqual(Buffer.from(a), Buffer.from(b));
 }
 
-async function requestCode(email: string): Promise<LoginState> {
-  const base = { step: 'email' as const, email };
-  if (!EMAIL_RE.test(email)) {
-    return { ...base, status: 'error', message: 'Oups, cette adresse email ne semble pas valide.' };
+/** "c•••@hotmail.com": enough for the parent to recognise their own address. */
+function maskEmail(email: string): string {
+  const [name, domain] = email.split('@');
+  return `${name.slice(0, 1)}•••@${domain}`;
+}
+
+/**
+ * The parent types their email or the phone number they gave at checkout.
+ * Either way the code goes to the subscription's email: a phone number only
+ * helps find the account.
+ */
+async function requestCode(identifier: string): Promise<LoginState> {
+  const base = { step: 'email' as const, email: identifier };
+  const byPhone = !identifier.includes('@');
+  let email: string;
+  let customerId: string;
+
+  if (byPhone) {
+    const phone = normalizePhone(identifier);
+    if (!phone) {
+      return { ...base, status: 'error', message: 'Oups, ce numéro ou cette adresse email ne semble pas valide.' };
+    }
+    const access = await findAccessByPhone(phone);
+    if (access.status === 'error') return { ...base, status: 'error', message: PROBLEM };
+    if (access.status === 'none') {
+      return {
+        ...base,
+        status: 'no_access',
+        message:
+          "On ne trouve pas d'abonnement actif avec ce numéro. Essaie avec ton adresse email, ou commence ton essai gratuit de 14 jours !",
+      };
+    }
+    if (!access.email) {
+      return {
+        ...base,
+        status: 'error',
+        message: "Ton abonnement n'a pas d'adresse email. Écris-nous sur WhatsApp, on t'aide tout de suite.",
+      };
+    }
+    email = access.email.toLowerCase();
+    customerId = access.customerId;
+  } else {
+    if (!EMAIL_RE.test(identifier)) {
+      return { ...base, status: 'error', message: 'Oups, cette adresse email ne semble pas valide.' };
+    }
+    const access = await findAccess(identifier);
+    if (access.status === 'error') return { ...base, status: 'error', message: PROBLEM };
+    if (access.status === 'none') {
+      return {
+        ...base,
+        status: 'no_access',
+        message:
+          "On ne trouve pas d'abonnement actif avec cette adresse. Essaie avec ton numéro de téléphone, ou commence ton essai gratuit de 14 jours !",
+      };
+    }
+    email = identifier;
+    customerId = access.customerId;
   }
 
-  const access = await findAccess(email);
-  if (access.status === 'error') return { ...base, status: 'error', message: PROBLEM };
-  if (access.status === 'none') {
-    return {
-      ...base,
-      status: 'no_access',
-      message: "On ne trouve pas d'abonnement actif avec cette adresse. Tu peux commencer ton essai gratuit de 14 jours !",
-    };
-  }
-
-  const { customerId } = access;
   const pending = await signPendingLogin(email, customerId);
   if (!pending) return { ...base, status: 'error', message: PROBLEM };
 
@@ -77,9 +119,9 @@ async function requestCode(email: string): Promise<LoginState> {
   (await cookies()).set(LOGIN_COOKIE, pending, loginCookieOptions);
   return {
     step: 'code',
-    email,
+    email: identifier,
     status: 'sent',
-    message: `On vient de t'envoyer un code à 6 chiffres à ${email}. Pense à regarder dans tes indésirables.`,
+    message: `On vient de t'envoyer un code à 6 chiffres à ${byPhone ? maskEmail(email) : email}. Pense à regarder dans tes indésirables.`,
   };
 }
 

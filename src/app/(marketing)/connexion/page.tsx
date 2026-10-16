@@ -24,8 +24,8 @@ export default async function ConnexionPage({ searchParams }: { searchParams: Pr
           Se connecter
         </h1>
         <p className="mx-auto mt-4 max-w-md text-lg" style={{ color: 'rgba(26,26,26,0.75)' }}>
-          Pas de mot de passe à retenir : entre l&apos;adresse email de ton abonnement, on t&apos;envoie un code à 6
-          chiffres.
+          Pas de mot de passe à retenir : entre l&apos;email ou le numéro de téléphone de ton abonnement, et on
+          t&apos;envoie un code à 6 chiffres par email.
         </p>
         <div className="mt-9">
           <LoginForm next={next} />
