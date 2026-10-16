@@ -13,6 +13,7 @@ import SyllableWord, { SYLLABLE_COLORS, syllableParts } from '@/components/app/S
 import SpeakButton from '@/components/app/SpeakButton';
 import MysteryWord, { type DiscoverMode } from '@/components/app/MysteryWord';
 import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/DrawingCanvas';
+import WritingModePicker, { useWritingMode, writingModel, type WritingMode } from '@/components/app/WritingModePicker';
 import { nextWords, trickySounds, wordsWithSound, type WordCard } from '@/lib/related';
 import type { Mission } from '@/lib/missions';
 import MissionPlayer from '@/components/app/MissionPlayer';
@@ -613,8 +614,9 @@ function BuildWord({ step, activity: a, canSpeak, speak }: { step: StepDef; acti
 }
 
 /**
- * Writing: the word in dotted school cursive on Seyès paper; the child goes
- * over it with a finger or stylus, then copies it on real paper.
+ * Writing: the word in dotted school cursive (or in capitals) on Seyès paper;
+ * the child goes over it with a finger or stylus, then copies it on real
+ * paper. "Feuille blanche" drops the model to write or draw freely.
  */
 function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity }) {
   const canvas = useRef<DrawingCanvasHandle>(null);
@@ -622,17 +624,34 @@ function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity })
   const [bravo, setBravo] = useState(false);
   // First over the dotted model, then from memory.
   const [withModel, setWithModel] = useState(true);
+  const [mode, setMode] = useWritingMode();
   // Cursive is taught in lowercase; capitals in the base would read oddly.
-  const word = a.frenchWord.toLocaleLowerCase('fr');
-  const restart = (model: boolean) => {
+  const model = writingModel(mode, a.frenchWord);
+  const free = mode === 'blanc';
+  const restart = (withGuide: boolean) => {
     canvas.current?.clear();
     setBravo(false);
-    setWithModel(model);
+    setWithModel(withGuide);
+  };
+  const pickMode = (next: WritingMode) => {
+    if (next === mode) return;
+    restart(true);
+    setMode(next);
   };
   return (
     <>
+      <WritingModePicker mode={mode} onChange={pickMode} accent={step.accent} />
       <div className="overflow-hidden rounded-3xl ring-1 ring-ink/10" style={{ backgroundColor: step.tint }}>
-        <DrawingCanvas ref={canvas} height={260} paper="seyes" lineGap={16} guideText={withModel ? word : undefined} size={9} onChange={setStrokes} />
+        <DrawingCanvas
+          ref={canvas}
+          height={260}
+          paper={model.paper}
+          lineGap={16}
+          guideText={withModel ? model.text : undefined}
+          guideFont={model.font}
+          size={9}
+          onChange={setStrokes}
+        />
       </div>
       <div className="mt-3 flex flex-wrap justify-center gap-2">
         <button
@@ -660,7 +679,7 @@ function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity })
           ✓ J’ai fini
         </button>
       </div>
-      {!withModel && (
+      {!withModel && !free && (
         <p className="mt-3 text-center text-sm font-bold text-ink-soft">
           Sans modèle, de mémoire !{' '}
           <button type="button" onClick={() => restart(true)} className="font-extrabold text-[#2D9B6F] underline underline-offset-4">
@@ -671,9 +690,9 @@ function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity })
       {bravo && (
         <div className="animate-rise mt-3 text-center" aria-live="polite">
           <p className="font-display text-xl font-bold text-[#2D9B6F]">
-            {withModel ? 'Bravo, quel bel effort ! ✨' : 'Écrit tout seul, de mémoire ! 🌟'}
+            {free ? 'Bravo, quelle belle page ! 🎨' : withModel ? 'Bravo, quel bel effort ! ✨' : 'Écrit tout seul, de mémoire ! 🌟'}
           </p>
-          {withModel && (
+          {withModel && !free && (
             <button
               type="button"
               onClick={() => restart(false)}
@@ -687,6 +706,7 @@ function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity })
       <Materials items={['Une feuille blanche', 'Un crayon ou un feutre']} />
       <ParentTip>
         D’abord avec le doigt sur l’écran, en suivant les pointillés, puis au crayon sur une vraie feuille.
+        Ton enfant peut choisir les minuscules, les CAPITALES ou la feuille blanche pour écrire librement.
         Encourage chaque essai : le but, c’est l’effort, pas la perfection.
       </ParentTip>
     </>

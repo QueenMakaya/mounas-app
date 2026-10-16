@@ -4,10 +4,10 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 
 ## 16 octobre 2026
 
-- [ ] **Écriture (la partie préférée !)** : proposer plusieurs options
-  - [ ] écrire en CAPITALES
-  - [ ] écrire en minuscules (cursive actuelle)
-  - [ ] feuille blanche (dessiner/écrire librement, sans modèle)
+- [x] **Écriture (la partie préférée !)** : proposer plusieurs options
+  - [x] écrire en CAPITALES
+  - [x] écrire en minuscules (cursive actuelle)
+  - [x] feuille blanche (dessiner/écrire librement, sans modèle)
 - [x] **Bug écriture** : la lettre « l » est coupée (le haut de la boucle sort du cadre).
 - [ ] **Lire les sons ensemble** : ajouter un *slider* sous les sons, comme dans Reading.com
   (l'enfant fait glisser le doigt sous le mot, chaque son s'allume et se lit au passage).
