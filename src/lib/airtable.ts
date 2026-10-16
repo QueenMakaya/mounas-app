@@ -45,6 +45,8 @@ export type Activity = {
   graphemes: string;
   /** Optional discussion questions, one per line. */
   questions: string;
+  /** Day this word is pinned as the word of the day (YYYY-MM-DD), or ''. */
+  wordOfDayDate: string;
 };
 
 const recordToActivity = (record: Records<FieldSet>[number]): Activity => ({
@@ -69,6 +71,7 @@ const recordToActivity = (record: Records<FieldSet>[number]): Activity => ({
   status: (record.get('Status') as string) || '',
   graphemes: (record.get('Graphèmes') as string) || '',
   questions: (record.get('Questions') as string) || '',
+  wordOfDayDate: (record.get('Date mot du jour') as string) || '',
 });
 
 // Only finished activities reach parents. Rows still being written
@@ -78,12 +81,20 @@ const recordToActivity = (record: Records<FieldSet>[number]): Activity => ({
 const VISIBLE_STATUSES = ['Prêt', 'Publié', 'Ready', '🟢 Ready ', '✓ Published '];
 const IS_VISIBLE = `OR(${VISIBLE_STATUSES.map((st) => `{Status} = '${st}'`).join(', ')})`;
 
+// The day changes at midnight Paris time, for the app and the WhatsApp card alike.
+const WORD_OF_DAY_TIME_ZONE = 'Europe/Paris';
+
+/** Today's calendar date in Paris, as YYYY-MM-DD. */
+export const todayInParis = (): string =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: WORD_OF_DAY_TIME_ZONE }).format(new Date());
+
 /**
- * The word of the day: one finished activity per calendar day, cycling
- * through every word marked Prêt/Publié so the whole library gets used.
- * Records are ordered by id, which is stable and mixes levels and themes
- * from one day to the next. The day count is taken in UTC so every visitor
- * sees the same word on a given date.
+ * The word of the day, shared with the daily WhatsApp card.
+ *
+ * A finished word whose "Date mot du jour" is today wins, so the WhatsApp
+ * calendar is planned in Airtable and the app follows it. On a day nobody
+ * planned, the app falls back to cycling through every word marked
+ * Prêt/Publié, ordered by record id, so there is always a word.
  */
 export const getTodayActivity = async (): Promise<Activity | null> => {
   try {
@@ -95,8 +106,14 @@ export const getTodayActivity = async (): Promise<Activity | null> => {
       return null;
     }
 
+    const today = todayInParis();
+    const planned = records.find((r) => r.get('Date mot du jour') === today);
+    if (planned) {
+      return recordToActivity(planned);
+    }
+
     const ordered = [...records].sort((a, b) => a.id.localeCompare(b.id));
-    const dayNumber = Math.floor(Date.now() / 86_400_000);
+    const dayNumber = Math.floor(Date.parse(today) / 86_400_000);
     return recordToActivity(ordered[dayNumber % ordered.length]);
   } catch (error) {
     console.error('Error fetching today activity:', error);
