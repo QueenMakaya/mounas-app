@@ -18,16 +18,18 @@ export default function LoginForm({ next }: { next: string }) {
           <input type="hidden" name="intent" value="request" />
           <input type="hidden" name="next" value={next} />
           <label htmlFor="login-email" className="text-left font-bold" style={{ color: COLORS.ink }}>
-            Ton adresse email
+            Ton email ou ton numéro de téléphone
           </label>
           <input
             id="login-email"
-            type="email"
+            type="text"
             name="email"
             required
             defaultValue={state.email}
-            placeholder="ton@email.com"
-            autoComplete="email"
+            placeholder="ton@email.com ou 514 555 1234"
+            autoComplete="username"
+            autoCapitalize="none"
+            spellCheck={false}
             className={inputClass}
             style={inputStyle}
           />
