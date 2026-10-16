@@ -7,6 +7,7 @@ import { SOUNDS, wordSounds } from '@/lib/phonics';
 import { readPref, writePref } from '@/lib/progress';
 import { useSpeech } from '@/lib/useSpeech';
 import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/DrawingCanvas';
+import WritingModePicker, { useWritingMode } from '@/components/app/WritingModePicker';
 
 /*
  * The dictation notebook: the parent dictates (or lets the app dictate),
@@ -52,6 +53,8 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
   const [size, setSize] = useState(SIZES[1].value);
   const [eraser, setEraser] = useState(false);
   const [bigLines, setBigLines] = useState(true);
+  // Same choice as the "Écrire" step: it sets the paper and how the correction is shown.
+  const [writing, setWriting] = useWritingMode();
   const [canvasH, setCanvasH] = useState(420);
   const canvas = useRef<DrawingCanvasHandle>(null);
 
@@ -265,9 +268,16 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
             {showCorrection && (
               <div className="animate-rise mt-4 rounded-3xl border-2 border-[#2D9B6F] bg-[#E8F8F1] px-5 py-3 text-center">
                 <span className="text-xs font-extrabold uppercase tracking-widest text-[#2D9B6F]">La correction</span>
-                <p className="text-4xl leading-[1.8] text-[#1D3F9E] sm:text-5xl" style={{ fontFamily: 'var(--font-cursive)' }}>
-                  {word}
-                </p>
+                {writing === 'capitales' ? (
+                  <p className="text-4xl font-bold leading-[1.6] text-[#1D3F9E] sm:text-5xl" style={{ fontFamily: 'var(--font-read)' }}>
+                    {word.toLocaleUpperCase('fr')}
+                  </p>
+                ) : (
+                  // The school cursive is ~2.4em tall from the top of the "l" to the tail of the "g".
+                  <p className="text-4xl leading-[2.5] text-[#1D3F9E] sm:text-5xl" style={{ fontFamily: 'var(--font-cursive)' }}>
+                    {word}
+                  </p>
+                )}
               </div>
             )}
 
@@ -288,6 +298,7 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
 
             {mode === 'doigt' ? (
               <section className="mt-3">
+                <WritingModePicker mode={writing} onChange={setWriting} accent="#5B1F8C" />
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   {INKS.map((c) => (
                     <button
@@ -318,11 +329,13 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
                   <button type="button" onClick={() => setEraser((v) => !v)} className={`${tool} ${eraser ? '!bg-mamber' : ''}`}>🧽 Gomme</button>
                   <button type="button" onClick={() => canvas.current?.undo()} className={tool}>↶ Annuler</button>
                   <button type="button" onClick={resetPage} className={tool}>🗑️ Page blanche</button>
-                  <button type="button" onClick={() => setBigLines((v) => !v)} className={tool}>{bigLines ? '🔎 Grandes lignes' : '📏 Lignes normales'}</button>
+                  {writing !== 'blanc' && (
+                    <button type="button" onClick={() => setBigLines((v) => !v)} className={tool}>{bigLines ? '🔎 Grandes lignes' : '📏 Lignes normales'}</button>
+                  )}
                   <button type="button" onClick={savePng} className={tool}>💾 Garder</button>
                 </div>
                 <div className="overflow-hidden rounded-2xl shadow-md ring-1 ring-ink/10">
-                  <DrawingCanvas ref={canvas} height={canvasH} paper="seyes" lineGap={bigLines ? 18 : 11} color={ink} size={size} eraser={eraser} />
+                  <DrawingCanvas ref={canvas} height={canvasH} paper={writing === 'blanc' ? 'blanc' : 'seyes'} lineGap={bigLines ? 18 : 11} color={ink} size={size} eraser={eraser} />
                 </div>
                 <p className="mt-2 text-center text-xs text-ink-soft">Écris avec ton doigt ou un stylet. Avec un stylet, la paume peut se poser sur l’écran.</p>
               </section>
