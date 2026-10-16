@@ -146,6 +146,9 @@ export async function findAccess(email: string): Promise<AccessResult> {
         (await stripe<Customer>('/customers', { method: 'POST', form: { email: email.trim().toLowerCase() } })).id;
       return { status: 'active', customerId };
     }
+    // Says whether ACCESS_EMAILS reached this deployment, without printing it.
+    const allowed = (process.env.ACCESS_EMAILS ?? '').split(',').filter((e) => e.trim()).length;
+    console.info(`[subscription] no active subscription for this email (${customers.length} Stripe customer(s), ACCESS_EMAILS: ${allowed} email(s))`);
     return { status: 'none' };
   } catch {
     return { status: 'error' };
