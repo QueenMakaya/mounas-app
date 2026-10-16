@@ -265,7 +265,8 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
             {showCorrection && (
               <div className="animate-rise mt-4 rounded-3xl border-2 border-[#2D9B6F] bg-[#E8F8F1] px-5 py-3 text-center">
                 <span className="text-xs font-extrabold uppercase tracking-widest text-[#2D9B6F]">La correction</span>
-                <p className="text-4xl leading-[1.8] text-[#1D3F9E] sm:text-5xl" style={{ fontFamily: 'var(--font-cursive)' }}>
+                {/* The school cursive is ~2.4em tall from the top of the "l" to the tail of the "g". */}
+                <p className="text-4xl leading-[2.5] text-[#1D3F9E] sm:text-5xl" style={{ fontFamily: 'var(--font-cursive)' }}>
                   {word}
                 </p>
               </div>
