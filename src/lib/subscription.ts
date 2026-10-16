@@ -11,6 +11,7 @@
  *
  * Access = ANY subscription of ANY customer with that email is `active` or
  * `trialing`, whatever the price, so the founding members keep access.
+ * Emails listed in ACCESS_EMAILS always have access (testing, gifted access).
  */
 
 const STRIPE_API = 'https://api.stripe.com/v1';
@@ -118,11 +119,32 @@ export async function findAccessByPhone(
   }
 }
 
+/**
+ * Emails that always have access, without a subscription (testing, gifted
+ * access): ACCESS_EMAILS, comma-separated, read at call-time.
+ */
+function isAllowlisted(email: string): boolean {
+  const wanted = email.trim().toLowerCase();
+  return (process.env.ACCESS_EMAILS ?? '')
+    .split(',')
+    .map((e) => e.trim().toLowerCase())
+    .some((e) => e && e === wanted);
+}
+
 /** Which customer (if any) gives this email access. */
 export async function findAccess(email: string): Promise<AccessResult> {
   try {
-    for (const customer of await customersByEmail(email)) {
+    const customers = await customersByEmail(email);
+    for (const customer of customers) {
       if (await customerHasAccess(customer.id)) return { status: 'active', customerId: customer.id };
+    }
+    if (isAllowlisted(email)) {
+      // The login code lives in a Stripe customer's metadata, so an allowed
+      // email without one gets a (subscription-free) customer created once.
+      const customerId =
+        customers[0]?.id ??
+        (await stripe<Customer>('/customers', { method: 'POST', form: { email: email.trim().toLowerCase() } })).id;
+      return { status: 'active', customerId };
     }
     return { status: 'none' };
   } catch {
