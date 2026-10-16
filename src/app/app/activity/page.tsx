@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { getTodayActivity, getActivityById, getActivitiesByFilters } from '@/lib/airtable';
 import type { WordCard } from '@/lib/related';
 import ActivityFlow from '@/components/app/ActivityFlow';
+import { getSession, paywallUrl } from '@/lib/auth';
+import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,6 +13,11 @@ export default async function ActivityPage({
   searchParams: Promise<{ id?: string }>;
 }) {
   const { id } = await searchParams;
+  // Today's word is free; any other word needs a subscription.
+  if (id && !(await getSession())) {
+    const today = await getTodayActivity();
+    if (today?.id !== id) redirect(paywallUrl(`/app/activity?id=${encodeURIComponent(id)}`));
+  }
   const [activity, all] = await Promise.all([
     id ? getActivityById(id) : getTodayActivity(),
     getActivitiesByFilters(),

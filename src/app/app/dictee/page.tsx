@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import DicteeClient, { type DicteeWord } from '@/components/app/DicteeClient';
+import { requireSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,5 +30,6 @@ async function loadWords(): Promise<DicteeWord[]> {
 }
 
 export default async function DicteePage() {
+  await requireSession('/app/dictee');
   return <DicteeClient words={await loadWords()} />;
 }

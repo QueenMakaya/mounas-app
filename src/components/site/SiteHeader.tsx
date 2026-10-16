@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import MounasLogo from '@/components/brand/MounasLogo';
-import { COLORS, whatsappLink } from '@/lib/config';
+import { COLORS, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
 
 const NAV = [
   { label: 'Accueil', href: '/' },
@@ -10,7 +10,12 @@ const NAV = [
   { label: "L'app", href: '/app' },
 ];
 
-export default function SiteHeader() {
+/**
+ * `member` is set by the app layout when a subscriber is logged in: the trial
+ * button then gives way to "Mon compte". The marketing pages don't read the
+ * session (they stay static), so they always show "Se connecter".
+ */
+export default function SiteHeader({ member = false }: { member?: boolean }) {
   return (
     <header
       className="sticky top-0 z-40 w-full backdrop-blur"
@@ -30,15 +35,32 @@ export default function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <Link
+            href={member ? '/app/compte' : '/connexion'}
+            className="text-sm font-semibold underline underline-offset-4 transition-opacity hover:opacity-70"
+            style={{ color: COLORS.purple }}
+          >
+            {member ? 'Mon compte' : 'Se connecter'}
+          </Link>
           <a
             href={whatsappLink('Bonjour Les Mounas ! Je souhaite en savoir plus sur l’abonnement. 🌍')}
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-full px-4 py-2 text-sm font-bold shadow-sm transition-opacity hover:opacity-90"
-            style={{ backgroundColor: COLORS.red, color: COLORS.cream }}
+            aria-label="Nous écrire sur WhatsApp"
+            className="rounded-full px-4 py-2 text-sm font-bold transition-opacity hover:opacity-80"
+            style={{ color: COLORS.tealDark, border: `1.5px solid ${COLORS.teal}` }}
           >
-            Rejoindre
+            💬 WhatsApp
           </a>
+          {!member && (
+            <a
+              href={STRIPE_PAYMENT_LINK}
+              className="rounded-full px-4 py-2 text-sm font-bold shadow-sm transition-opacity hover:opacity-90"
+              style={{ backgroundColor: COLORS.red, color: COLORS.cream }}
+            >
+              Essai gratuit 14 jours
+            </a>
+          )}
         </nav>
       </div>
     </header>
