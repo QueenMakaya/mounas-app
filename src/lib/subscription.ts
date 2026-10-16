@@ -123,12 +123,16 @@ export async function findAccessByPhone(
  * Emails that always have access, without a subscription (testing, gifted
  * access): ACCESS_EMAILS, comma-separated, read at call-time.
  */
-function isAllowlisted(email: string): boolean {
-  const wanted = email.trim().toLowerCase();
+function allowlist(): string[] {
+  // Tolerates the ways a value gets pasted: quotes, spaces, ";" or new lines.
   return (process.env.ACCESS_EMAILS ?? '')
-    .split(',')
-    .map((e) => e.trim().toLowerCase())
-    .some((e) => e && e === wanted);
+    .split(/[,;\s]+/)
+    .map((e) => e.replace(/["']/g, '').trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function isAllowlisted(email: string): boolean {
+  return allowlist().includes(email.trim().toLowerCase());
 }
 
 /** Which customer (if any) gives this email access. */
@@ -146,6 +150,9 @@ export async function findAccess(email: string): Promise<AccessResult> {
         (await stripe<Customer>('/customers', { method: 'POST', form: { email: email.trim().toLowerCase() } })).id;
       return { status: 'active', customerId };
     }
+    // Says whether ACCESS_EMAILS reached this deployment, without printing it.
+    const allowed = allowlist().length;
+    console.info(`[subscription] no active subscription for this email (${customers.length} Stripe customer(s), ACCESS_EMAILS: ${allowed} email(s))`);
     return { status: 'none' };
   } catch {
     return { status: 'error' };
