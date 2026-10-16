@@ -51,3 +51,16 @@ Plus tard : enregistrer la voix de Pam pour une vingtaine de consignes. Elle ser
 - https://www.teachyourmonster.org/tymtr-mini-games
 - https://hbook.com/story/endless-reader-app-review
 - https://kb.readingeggs.com/en_US/4-begin-with-the-lessons
+
+## Décisions de Pam (16 octobre 2026)
+
+1. **Mode enfant** : oui, avec un gros bouton ▶ « C'est parti ». **Mais les textes et les astuces pour le parent restent visibles** : on continue de guider les parents.
+2. **Pictos et consigne dite à voix haute** à l'ouverture de chaque étape : oui. **La voix ne se répète pas** quand l'enfant ne fait rien.
+3. **Glisse-sons** : au premier passage, l'app dit chaque son. Aux passages suivants, l'enfant le dit lui-même (son coupé).
+4. **Pas de passage automatique** : une **flèche « suivant » bien visible** (elle s'anime quand l'étape est réussie), mais c'est l'enfant qui touche.
+5. **Mini-jeux qui changent chaque jour** : oui (« Trouve l'image », « La pêche aux sons », « Le mot qui manque », « Nourris le Mounas »).
+6. **Les mots qui reviennent** (révision espacée) : oui.
+7. **« Un autre mot ? »**, jusqu'à 3 mots par jour par défaut (réglable par le parent) : oui.
+8. **Mounaville à construire** (case, baobab, tambour… aucun score) : oui.
+9. **Erreur sans échec** (la tuile tremble, « Écoute encore », une main montre le geste après 2 essais) : oui.
+10. **Espace parent protégé** (appui long, puis « touche le nombre sept ») et réglage du nombre de mots par jour : oui.
