@@ -9,7 +9,7 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   - [x] écrire en minuscules (cursive actuelle)
   - [x] feuille blanche (dessiner/écrire librement, sans modèle)
 - [x] **Bug écriture** : la lettre « l » est coupée (le haut de la boucle sort du cadre).
-- [ ] **Lire les sons ensemble** : ajouter un *slider* sous les sons, comme dans Reading.com
+- [x] **Lire les sons ensemble** : ajouter un *slider* sous les sons, comme dans Reading.com
   (l'enfant fait glisser le doigt sous le mot, chaque son s'allume et se lit au passage).
 - [ ] **Autonomie de l'enfant** : il doit pouvoir enchaîner les mots seul.
   - trop de texte pour l'instant ;
