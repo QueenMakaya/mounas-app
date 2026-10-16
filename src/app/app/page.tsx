@@ -119,6 +119,19 @@ export default async function HomePage() {
             </span>
             <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
           </Link>
+          <Link
+            href="/app/missions"
+            className="group flex items-center gap-4 rounded-3xl bg-white p-4 ring-1 ring-ink/5 transition-colors hover:bg-sand"
+          >
+            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#FEF3E2] text-2xl" aria-hidden="true">
+              🧩
+            </span>
+            <span className="flex-1">
+              <span className="block font-extrabold text-ink">Les missions</span>
+              <span className="block text-sm text-ink-soft">Compter, chercher, résoudre des petits problèmes</span>
+            </span>
+            <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
+          </Link>
           <div className="flex items-center gap-4 rounded-3xl border-2 border-dashed border-ink/10 p-4" aria-label="Mes dessins prennent vie : bientôt disponible">
             <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-sand text-2xl opacity-70" aria-hidden="true">
               🎨
