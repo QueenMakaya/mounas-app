@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import ProgressClient from '@/components/app/ProgressClient';
+import { requireSession } from '@/lib/auth';
 import { wordSounds } from '@/lib/phonics';
 
 export const dynamic = 'force-dynamic';
@@ -26,6 +28,16 @@ async function loadLibrary(): Promise<{ levelTotals: Record<string, number>; all
 }
 
 export default async function ProgresPage() {
+  await requireSession('/app/progres');
   const { levelTotals, allSounds } = await loadLibrary();
-  return <ProgressClient levelTotals={levelTotals} allSounds={allSounds} />;
+  return (
+    <>
+      <ProgressClient levelTotals={levelTotals} allSounds={allSounds} />
+      <p className="bg-cream pb-12 text-center font-body">
+        <Link href="/app/compte" className="font-bold text-mpurple underline underline-offset-4">
+          Gérer mon abonnement
+        </Link>
+      </p>
+    </>
+  );
 }

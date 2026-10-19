@@ -4,7 +4,7 @@ import DiamondIcon from '@/components/brand/DiamondIcon';
 import EbookSignup from '@/components/marketing/EbookSignup';
 import NewsletterSignup from '@/components/marketing/NewsletterSignup';
 import BookingSection from '@/components/marketing/BookingSection';
-import { COLORS, whatsappLink } from '@/lib/config';
+import { COLORS, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: 'Les Mounas — Le français en s’amusant, sur WhatsApp',
@@ -47,22 +47,28 @@ export default function LandingPage() {
 
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
-              href={whatsappLink('Bonjour Les Mounas ! Je souhaite rejoindre l’abonnement WhatsApp. 🌍')}
-              target="_blank"
-              rel="noopener noreferrer"
+              href={STRIPE_PAYMENT_LINK}
               className="rounded-full px-8 py-4 text-lg font-bold shadow-md transition-opacity hover:opacity-90"
               style={{ backgroundColor: COLORS.red, color: COLORS.cream }}
             >
-              💬 Rejoindre sur WhatsApp
+              Commencer l&apos;essai gratuit
             </a>
-            <Link
-              href="/app"
-              className="rounded-full px-8 py-4 text-lg font-bold shadow-sm transition-opacity hover:opacity-90"
-              style={{ backgroundColor: COLORS.amber, color: COLORS.ink }}
+            <a
+              href={whatsappLink('Bonjour Les Mounas ! J’ai une question sur l’abonnement. 🌍')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full px-8 py-4 text-lg font-bold transition-opacity hover:opacity-80"
+              style={{ color: COLORS.tealDark, border: `2px solid ${COLORS.teal}` }}
             >
-              Découvrir l&apos;activité du jour →
-            </Link>
+              💬 Une question ? WhatsApp
+            </a>
           </div>
+          <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
+            10 $/mois après 14 jours gratuits.{' '}
+            <Link href="/app" className="font-bold underline underline-offset-4" style={{ color: COLORS.purple }}>
+              Découvrir le mot du jour gratuitement →
+            </Link>
+          </p>
         </div>
       </section>
 

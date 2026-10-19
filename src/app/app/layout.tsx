@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Andika, Playwrite_FR_Trad } from 'next/font/google';
 import SiteHeader from '@/components/site/SiteHeader';
 import NavTracker from '@/components/app/NavTracker';
+import { getSession } from '@/lib/auth';
 
 // Andika was designed for children learning to read (single-storey "a",
 // clear b/d/p/q). Playwrite FR Trad is the French school cursive taught in
@@ -39,10 +40,11 @@ export const metadata: Metadata = {
  * no site chrome), link to it with target="_blank" from the marketing header —
  * that "forced" tab gets the full-screen app without this menu.
  */
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default async function AppLayout({ children }: { children: React.ReactNode }) {
+  const member = Boolean(await getSession());
   return (
     <div className={`${andika.variable} ${cursive.variable} flex min-h-screen flex-1 flex-col bg-cream text-ink`}>
-      <SiteHeader />
+      <SiteHeader member={member} />
       <NavTracker />
       {children}
     </div>
