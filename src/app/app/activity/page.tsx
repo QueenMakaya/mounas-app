@@ -58,7 +58,8 @@ export default async function ActivityPage({
   return (
     <main className="flex-1 bg-cream font-body">
       <div className="mx-auto max-w-2xl px-4 pt-6 sm:px-6 sm:pt-10">
-        <ActivityFlow activity={activity} library={library} mission={mission} />
+        {/* Keyed by word: « Un autre mot ? » starts the next one from step 1. */}
+        <ActivityFlow key={activity.id} activity={activity} library={library} mission={mission} />
       </div>
     </main>
   );

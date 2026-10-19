@@ -83,5 +83,22 @@ export function useSpeech() {
     [supported, voice],
   );
 
-  return { supported, speak, speakSeries, speaking };
+  /**
+   * Like `speak`, but waits for what is being said to finish instead of
+   * cutting it: the praise comes after the word, not over it.
+   */
+  const speakQueued = useCallback(
+    (text: string, rate = 0.85) => {
+      if (!supported || !text) return;
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'fr-FR';
+      if (voice) u.voice = voice;
+      u.rate = rate;
+      u.pitch = 1.1;
+      window.speechSynthesis.speak(u);
+    },
+    [supported, voice],
+  );
+
+  return { supported, speak, speakSeries, speakQueued, speaking };
 }

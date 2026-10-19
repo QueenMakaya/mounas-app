@@ -17,6 +17,12 @@ import WritingModePicker, { useWritingMode, writingModel, type WritingMode } fro
 import { nextWords, trickySounds, wordsWithSound, type WordCard } from '@/lib/related';
 import type { Mission } from '@/lib/missions';
 import MissionPlayer from '@/components/app/MissionPlayer';
+import { markWordDoneToday, useChildMode, useWordsDoneToday, useWordsPerDay, wordsDoneToday, wordsPerDay } from '@/lib/child-mode';
+import { ANOTHER_WORD, DAY_DONE, STEP_PROMPTS, TRY_AGAIN, YOUR_TURN, praiseFor, type Prompt } from '@/lib/prompts';
+import KidIcon, { HintHand } from '@/components/app/kid/KidIcon';
+import KidPrompt from '@/components/app/kid/KidPrompt';
+import ParentLock from '@/components/app/kid/ParentLock';
+import { useTries } from '@/components/app/kid/useTries';
 
 /*
  * The daily activity as a guided flow: one step per screen, a progress bar,
@@ -63,6 +69,11 @@ function buildSteps(a: Activity, hasMission: boolean): StepDef[] {
   return steps.filter((x): x is StepDef => Boolean(x));
 }
 
+/** The child-mode instruction for a step (the first step depends on how the word is discovered). */
+function promptFor(step: StepDef, mode: DiscoverMode): Prompt | undefined {
+  return STEP_PROMPTS[step.key === 'decouvrir' ? `decouvrir-${mode}` : step.key];
+}
+
 const subscribeNoop = () => () => {};
 const todayLabel = () =>
   new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -105,11 +116,39 @@ export default function ActivityFlow({
   const containerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
-  const { supported: canSpeak, speak, speakSeries } = useSpeech();
+  const { supported: canSpeak, speak, speakSeries, speakQueued } = useSpeech();
+  // Child mode: pictures and a voice on top of the parent's guidance.
+  const childMode = useChildMode();
+  // The step whose success signal fired: its "next" arrow glows.
+  const [wonAt, setWonAt] = useState<number | null>(null);
 
   const step = steps[index];
   const isLast = index === steps.length - 1;
   const minutesLeft = steps.slice(index).reduce((t, s) => t + s.minutes, 0);
+  const prompt = finished ? undefined : promptFor(step, mode);
+  const glow = childMode && !finished && wonAt === index;
+
+  // No automatic move on: a chime and a word on the effort, then the arrow
+  // glows and the child taps it. `chimed`: the step already played the chime.
+  const win = (chimed = false) => {
+    if (wonAt === index) return;
+    setWonAt(index);
+    if (!childMode) return;
+    if (!chimed) playChime();
+    speakQueued(praiseFor(index));
+  };
+
+  // Child mode says the step's instruction once, as the step opens. It is not
+  // repeated on its own: the child touches the picture to hear it again.
+  const spokenFor = useRef('');
+  const say = prompt?.say ?? '';
+  useEffect(() => {
+    if (!childMode || !canSpeak || !say) return;
+    const id = `${index}:${say}`;
+    if (spokenFor.current === id) return;
+    spokenFor.current = id;
+    speak(say, 0.85);
+  }, [childMode, canSpeak, say, index, speak]);
 
   const go = (next: number) => {
     moved.current = true;
@@ -147,12 +186,16 @@ export default function ActivityFlow({
     <div ref={containerRef} className="scroll-mt-24">
       {/* ── Top bar: context + progress ── */}
       <div className="mb-5 flex items-center justify-between gap-3">
-        <Link
-          href="/app"
-          className="inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-bold text-ink hover:bg-ink/5"
-        >
-          <span aria-hidden="true">←</span> Accueil
-        </Link>
+        {childMode ? (
+          <ParentLock />
+        ) : (
+          <Link
+            href="/app"
+            className="inline-flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-bold text-ink hover:bg-ink/5"
+          >
+            <span aria-hidden="true">←</span> Accueil
+          </Link>
+        )}
         <div className="flex items-center gap-2 text-xs font-bold">
           <TodayChip />
           {activity.difficulty && (
@@ -206,6 +249,8 @@ export default function ActivityFlow({
           readAlone={mode === 'lire' && attempt === 'alone'}
           spelledAlone={mode === 'ecoute' && attempt === 'alone'}
           headingRef={headingRef}
+          childMode={childMode}
+          speak={speak}
         />
       ) : (
         <section
@@ -215,6 +260,9 @@ export default function ActivityFlow({
         >
           <div className="h-2" style={{ backgroundColor: step.accent }} />
           <div className="p-5 sm:p-8">
+            {childMode && prompt && (
+              <KidPrompt prompt={prompt} accent={step.accent} tint={step.tint} onReplay={canSpeak ? () => speak(prompt.say, 0.85) : undefined} />
+            )}
             <p className="mb-2 flex items-center gap-2 text-xs font-extrabold uppercase tracking-[0.14em]" style={{ color: step.accent }}>
               <span
                 aria-hidden="true"
@@ -245,7 +293,11 @@ export default function ActivityFlow({
               speakSeries={speakSeries}
               library={library}
               attempt={attempt}
-              setAttempt={setAttempt}
+              setAttempt={(a) => {
+                setAttempt(a);
+                if (a) win();
+              }}
+              onSuccess={win}
               revealed={revealed}
               onReveal={() => {
                 setChosenMode(mode);
@@ -276,11 +328,22 @@ export default function ActivityFlow({
             <button
               type="button"
               onClick={() => go(index + 1)}
-              className="min-h-14 flex-1 rounded-full px-6 text-lg font-extrabold text-cream shadow-lg transition-transform active:scale-[0.98]"
+              className={`inline-flex min-h-14 flex-1 items-center justify-center gap-2 rounded-full px-6 text-lg font-extrabold text-cream shadow-lg transition-transform active:scale-[0.98] ${
+                childMode ? 'min-h-16' : ''
+              } ${glow ? 'animate-glow outline-4 outline-offset-2 outline-mamber' : ''}`}
               style={{ backgroundColor: isLast ? '#E63946' : '#1A1A1A' }}
             >
               {isLast ? 'Terminer 🎉' : (
-                <>Suivant · {steps[index + 1].emoji} {steps[index + 1].name} <span aria-hidden="true">→</span></>
+                <>
+                  <span>Suivant · {steps[index + 1].emoji} {steps[index + 1].name}</span>
+                  {childMode ? (
+                    <span aria-hidden="true" className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-cream text-ink">
+                      <KidIcon name="suivant" className="h-7 w-7" strokeWidth={2.6} />
+                    </span>
+                  ) : (
+                    <span aria-hidden="true">→</span>
+                  )}
+                </>
               )}
             </button>
           )}
@@ -306,11 +369,13 @@ type BodyProps = {
   mode: DiscoverMode;
   onModeChange?: (mode: DiscoverMode) => void;
   mission: Mission | null;
+  /** The step's success signal (child mode: the "next" arrow glows). */
+  onSuccess: (chimed?: boolean) => void;
 };
 
 type Attempt = 'alone' | 'together' | null;
 
-function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal, mode, onModeChange, mission }: BodyProps) {
+function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal, mode, onModeChange, mission, onSuccess }: BodyProps) {
   switch (step.key) {
     case 'mission':
       return mission ? <MissionPlayer mission={mission} compact /> : null;
@@ -332,19 +397,19 @@ function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, at
       );
 
     case 'lire':
-      return <ReadAlong step={step} activity={a} canSpeak={canSpeak} speak={speak} speakSeries={speakSeries} library={library} />;
+      return <ReadAlong step={step} activity={a} canSpeak={canSpeak} speak={speak} speakSeries={speakSeries} library={library} onSuccess={onSuccess} />;
 
     case 'syllabes':
-      return <SyllableClap step={step} activity={a} speak={speak} />;
+      return <SyllableClap step={step} activity={a} speak={speak} onSuccess={onSuccess} />;
 
     case 'prononcer':
-      return <SayItThree step={step} activity={a} canSpeak={canSpeak} speak={speak} />;
+      return <SayItThree step={step} activity={a} canSpeak={canSpeak} speak={speak} onSuccess={onSuccess} />;
 
     case 'epeler':
-      return <BuildWord step={step} activity={a} canSpeak={canSpeak} speak={speak} />;
+      return <BuildWord step={step} activity={a} canSpeak={canSpeak} speak={speak} onSuccess={onSuccess} />;
 
     case 'ecrire':
-      return <TraceWord step={step} activity={a} />;
+      return <TraceWord step={step} activity={a} onSuccess={onSuccess} />;
 
     case 'activite':
       return <TalkAndDo activity={a} accent={step.accent} />;
@@ -403,7 +468,7 @@ function Materials({ items }: { items: string[] }) {
   );
 }
 
-function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library }: Pick<BodyProps, 'step' | 'activity' | 'canSpeak' | 'speak' | 'speakSeries' | 'library'>) {
+function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library, onSuccess }: Pick<BodyProps, 'step' | 'activity' | 'canSpeak' | 'speak' | 'speakSeries' | 'library' | 'onSuccess'>) {
   const sounds = wordSounds(a.frenchWord, a.graphemes);
   const [lit, setLit] = useState<number | null>(null);
   // undefined: the slider is not in use.
@@ -470,6 +535,7 @@ function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library }:
             canSpeak={canSpeak}
             speak={speak}
             onLit={setSlideLit}
+            onEnd={() => onSuccess()}
           />
         </div>
         <p className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs font-bold text-ink-soft">
@@ -502,6 +568,10 @@ function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library }:
  * the child drags the ball from left to right, each sound lights up and is
  * heard as the ball passes under it, and the end of the track reads the whole
  * word. Keyboard arrows step through the sounds.
+ *
+ * Only the first pass says the sounds. After that they are muted and the
+ * child says them (a mouth shows it's their turn); the end still reads the
+ * whole word, and the replay button brings the voice back.
  */
 function SoundSlider({
   word,
@@ -510,6 +580,7 @@ function SoundSlider({
   canSpeak,
   speak,
   onLit,
+  onEnd,
 }: {
   word: string;
   sounds: Sound[];
@@ -517,6 +588,8 @@ function SoundSlider({
   canSpeak: boolean;
   speak: BodyProps['speak'];
   onLit: (i: number | null | undefined) => void;
+  /** The ball reached the end: the whole word was read. */
+  onEnd?: () => void;
 }) {
   // Tiles in reading order (separators are not tiles), as indexes into `sounds`.
   const tiles = sounds.map((s, i) => ({ s, i })).filter(({ s }) => s.kind !== 'separator');
@@ -528,6 +601,9 @@ function SoundSlider({
   const at = useRef(-1);
   const [step, setStep] = useState(-1);
   const release = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Passes that reached the end; from the second one, the child says the sounds.
+  const [passes, setPasses] = useState(0);
+  const muted = passes > 0;
 
   useEffect(() => () => { if (release.current) clearTimeout(release.current); }, []);
 
@@ -555,12 +631,14 @@ function SoundSlider({
     if (k >= tiles.length) {
       onLit(-1);
       setDone(true);
+      setPasses((n) => n + 1);
       if (canSpeak) speak(word, 0.8);
+      onEnd?.();
       return;
     }
     const { s, i } = tiles[k];
     onLit(i);
-    if (canSpeak && s.kind !== 'silent' && s.key) speak(SOUNDS[s.key].say, 0.7);
+    if (canSpeak && !muted && s.kind !== 'silent' && s.key) speak(SOUNDS[s.key].say, 0.7);
   };
 
   // The ball lights a tile once its centre reaches the tile's left half.
@@ -626,6 +704,7 @@ function SoundSlider({
     step < 0 ? 'Début du mot' : step >= tiles.length ? `Le mot entier : ${word}` : tiles[step].s.kind === 'silent' ? `${tiles[step].s.text}, lettre muette` : `Son ${SOUNDS[tiles[step].s.key]?.hint ?? tiles[step].s.text}`;
 
   return (
+    <>
     <div
       role="slider"
       tabIndex={0}
@@ -676,6 +755,23 @@ function SoundSlider({
         </span>
       </div>
     </div>
+    {muted && canSpeak && (
+      <div className="animate-rise mt-2 flex items-center justify-center gap-2" aria-live="polite">
+        <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 font-extrabold text-mpurple ring-1 ring-mpurple/20">
+          <KidIcon name="dire" className="h-6 w-6" />
+          {YOUR_TURN}
+        </span>
+        <button
+          type="button"
+          onClick={() => setPasses(0)}
+          aria-label="Réentendre les sons"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-ink ring-1 ring-ink/15 active:scale-95"
+        >
+          <KidIcon name="rejouer" className="h-6 w-6" />
+        </button>
+      </div>
+    )}
+    </>
   );
 }
 
@@ -692,24 +788,31 @@ function scramble<T>(items: T[], seed: string): T[] {
 /**
  * "Construis le mot": the sounds of the word, mixed up. The child taps them
  * in the right order to rebuild the word (silent letters included — we write
- * them even if we don't hear them). A hint plays the next sound.
+ * them even if we don't hear them). A hint plays the next sound. A wrong tile
+ * shakes and the voice says « Écoute encore » ; after two wrong tries on the
+ * same sound, a hand points at the right tile.
  */
 function BuildTiles({ activity: a, canSpeak, speak, onDone }: { activity: Activity; canSpeak: boolean; speak: BodyProps['speak']; onDone?: () => void }) {
   const sounds = wordSounds(a.frenchWord, a.graphemes).filter((x) => x.kind !== 'separator');
   const pool = scramble(sounds.map((sound, i) => ({ sound, i })), a.frenchWord);
   const [placed, setPlaced] = useState<number[]>([]); // pool indexes, in slot order
   const [wrong, setWrong] = useState<number | null>(null);
+  const tries = useTries();
   const done = placed.length === sounds.length;
   const next = sounds[placed.length];
   const label = (x: Sound) => x.text.toLocaleLowerCase('fr');
+  const fits = (x: Sound) => Boolean(next) && label(x) === label(next) && (x.kind === 'silent') === (next.kind === 'silent');
+  // The tile the hand shows: the first free one that fits the next slot.
+  const handOn = tries.hand(String(placed.length)) ? pool.findIndex(({ sound }, p) => !placed.includes(p) && fits(sound)) : -1;
 
   const tap = (p: number) => {
     if (done || placed.includes(p)) return;
     const tile = pool[p].sound;
-    if (label(tile) === label(next) && (tile.kind === 'silent') === (next.kind === 'silent')) {
+    if (fits(tile)) {
       const nowPlaced = [...placed, p];
       setPlaced(nowPlaced);
       setWrong(null);
+      tries.reset();
       if (nowPlaced.length === sounds.length) {
         if (canSpeak) speak(a.frenchWord);
         playChime();
@@ -719,6 +822,8 @@ function BuildTiles({ activity: a, canSpeak, speak, onDone }: { activity: Activi
       }
     } else {
       setWrong(p);
+      tries.miss(String(placed.length), p);
+      if (canSpeak) speak(TRY_AGAIN, 0.85);
     }
   };
 
@@ -763,14 +868,15 @@ function BuildTiles({ activity: a, canSpeak, speak, onDone }: { activity: Activi
                 <span key={p} className="h-16 min-w-12 rounded-2xl bg-ink/5" aria-hidden="true" />
               ) : (
                 <button
-                  key={p}
+                  key={`${p}-${tries.shake(p)}`}
                   type="button"
                   onClick={() => tap(p)}
                   aria-label={x.kind === 'silent' ? `${label(x)}, lettre muette` : `Son ${SOUNDS[x.key].hint}, écrit ${label(x)}`}
-                  className={`flex h-16 min-w-12 flex-col items-center justify-center rounded-2xl bg-white px-2 shadow-[0_4px_0_rgba(26,26,26,0.15)] ring-1 ring-ink/10 transition-transform active:translate-y-1 active:shadow-none ${
-                    wrong === p ? 'animate-[mounas-pop_0.35s] ring-2 ring-mred' : ''
-                  }`}
+                  className={`relative flex h-16 min-w-12 flex-col items-center justify-center rounded-2xl bg-white px-2 shadow-[0_4px_0_rgba(26,26,26,0.15)] ring-1 ring-ink/10 transition-transform active:translate-y-1 active:shadow-none ${
+                    wrong === p ? 'animate-shake ring-2 ring-mred' : ''
+                  } ${handOn === p ? 'ring-4 ring-mamber' : ''}`}
                 >
+                  {handOn === p && <HintHand />}
                   <span className={`font-display text-3xl font-bold leading-none ${x.kind === 'silent' ? 'text-ink/30' : x.kind === 'vowel' ? 'text-mred' : 'text-ink'}`}>
                     {label(x)}
                   </span>
@@ -800,11 +906,11 @@ function BuildTiles({ activity: a, canSpeak, speak, onDone }: { activity: Activi
   );
 }
 
-function BuildWord({ step, activity: a, canSpeak, speak }: { step: StepDef; activity: Activity; canSpeak: boolean; speak: BodyProps['speak'] }) {
+function BuildWord({ step, activity: a, canSpeak, speak, onSuccess }: { step: StepDef; activity: Activity; canSpeak: boolean; speak: BodyProps['speak']; onSuccess: BodyProps['onSuccess'] }) {
   return (
     <>
       <Stage tint={step.tint}>
-        <BuildTiles activity={a} canSpeak={canSpeak} speak={speak} />
+        <BuildTiles activity={a} canSpeak={canSpeak} speak={speak} onDone={() => onSuccess(true)} />
       </Stage>
       <ParentTip>
         Ton enfant dit chaque son à voix haute en le touchant (« sss », « ooo »…). Les lettres muettes s’écrivent mais ne s’entendent pas : elles gardent quand même leur place dans le mot.
@@ -818,7 +924,7 @@ function BuildWord({ step, activity: a, canSpeak, speak }: { step: StepDef; acti
  * the child goes over it with a finger or stylus, then copies it on real
  * paper. "Feuille blanche" drops the model to write or draw freely.
  */
-function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity }) {
+function TraceWord({ step, activity: a, onSuccess }: { step: StepDef; activity: Activity; onSuccess: BodyProps['onSuccess'] }) {
   const canvas = useRef<DrawingCanvasHandle>(null);
   const [strokes, setStrokes] = useState(0);
   const [bravo, setBravo] = useState(false);
@@ -872,7 +978,10 @@ function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity })
         </button>
         <button
           type="button"
-          onClick={() => setBravo(true)}
+          onClick={() => {
+            setBravo(true);
+            onSuccess();
+          }}
           disabled={strokes === 0}
           className="min-h-11 rounded-full bg-[#2D9B6F] px-5 font-extrabold text-cream shadow-md disabled:opacity-40"
         >
@@ -1010,7 +1119,7 @@ function SoundTile({ sound, lit, onTap }: { sound: Sound; lit: boolean; onTap: (
   );
 }
 
-function SyllableClap({ step, activity: a, speak }: { step: StepDef; activity: Activity; speak: BodyProps['speak'] }) {
+function SyllableClap({ step, activity: a, speak, onSuccess }: { step: StepDef; activity: Activity; speak: BodyProps['speak']; onSuccess: BodyProps['onSuccess'] }) {
   // Clap the syllables as they are written in Airtable, even when they are
   // spelled differently from the word — never silently collapse to one.
   const written = syllableParts(a.syllables);
@@ -1022,7 +1131,9 @@ function SyllableClap({ step, activity: a, speak }: { step: StepDef; activity: A
 
   const clap = (i: number) => {
     speak(parts[i], 0.7);
-    if (!claps.includes(i)) setClaps([...claps, i]);
+    if (claps.includes(i)) return;
+    setClaps([...claps, i]);
+    if (claps.length + 1 >= total) onSuccess();
   };
 
   return (
@@ -1066,7 +1177,7 @@ function SyllableClap({ step, activity: a, speak }: { step: StepDef; activity: A
   );
 }
 
-function SayItThree({ step, activity: a, canSpeak, speak }: Pick<BodyProps, 'step' | 'activity' | 'canSpeak' | 'speak'>) {
+function SayItThree({ step, activity: a, canSpeak, speak, onSuccess }: Pick<BodyProps, 'step' | 'activity' | 'canSpeak' | 'speak' | 'onSuccess'>) {
   const [said, setSaid] = useState(0);
   return (
     <>
@@ -1091,6 +1202,7 @@ function SayItThree({ step, activity: a, canSpeak, speak }: Pick<BodyProps, 'ste
                 onClick={() => {
                   setSaid(Math.max(said, i + 1));
                   speak(a.frenchWord);
+                  if (i + 1 >= 3) onSuccess();
                 }}
                 aria-label={`Fois ${i + 1}${on ? ' (dit)' : ''}`}
                 aria-pressed={on}
@@ -1341,12 +1453,16 @@ function FinishCard({
   readAlone,
   spelledAlone,
   headingRef,
+  childMode,
+  speak,
 }: {
   activity: Activity;
   library: WordCard[];
   readAlone: boolean;
   spelledAlone: boolean;
   headingRef: React.RefObject<HTMLHeadingElement | null>;
+  childMode: boolean;
+  speak: BodyProps['speak'];
 }) {
   // Read once when this card mounts (client only — it only renders after a click).
   const [done, setDone] = useState(() => isCompletedToday(a.id));
@@ -1363,8 +1479,10 @@ function FinishCard({
       readAlone,
       spelledAlone,
     });
+    markWordDoneToday(a.id);
     setDone(true);
     setStreak(currentStreak());
+    if (childMode) speak(wordsDoneToday().length >= wordsPerDay() ? DAY_DONE : ANOTHER_WORD, 0.85);
     // Cleared once the longest piece has landed (delay 0.6 s + duration 3.8 s).
     window.setTimeout(() => setConfetti([]), 4600);
     setConfetti(
@@ -1438,6 +1556,7 @@ function FinishCard({
                 {streak === 1 ? 'Premier jour ! Reviens demain pour continuer.' : `${streak} jours de suite — bravo !`}
               </p>
             )}
+            {childMode && <AnotherWord activity={a} library={library} />}
             <NextWords activity={a} library={library} />
             <div className="mx-auto mt-8 flex max-w-sm flex-col gap-3">
               <Link
@@ -1469,6 +1588,47 @@ function FinishCard({
         )}
       </div>
     </section>
+  );
+}
+
+/**
+ * Child mode: a big ▶ to chain the next word (same sound or same family
+ * first, never one already done today), up to the parent's daily number.
+ * Then: « Tu as bien travaillé aujourd'hui, à demain ! ».
+ */
+function AnotherWord({ activity: a, library }: { activity: Activity; library: WordCard[] }) {
+  const doneToday = useWordsDoneToday();
+  const perDay = useWordsPerDay();
+  if (doneToday.length >= perDay) {
+    return (
+      <p className="mx-auto mt-8 max-w-sm rounded-3xl bg-[#E5F4EC] px-5 py-4 font-display text-2xl font-bold leading-snug text-[#1F6B4C]" aria-live="polite">
+        <span aria-hidden="true">🌙 </span>
+        {DAY_DONE}
+      </p>
+    );
+  }
+  const current: WordCard = { id: a.id, word: a.frenchWord, level: a.difficulty, theme: a.theme, syllables: a.syllables, graphemes: a.graphemes };
+  const { sameSound, sameTheme } = nextWords(current, library);
+  const skip = new Set([a.id, ...doneToday]);
+  const next = [...sameSound.map((x) => x.word), ...sameTheme, ...library].find((w) => !skip.has(w.id));
+  if (!next) return null;
+  return (
+    <Link
+      href={`/app/activity?id=${next.id}`}
+      className="mx-auto mt-8 flex max-w-sm items-center gap-4 rounded-[28px] bg-mred-dark p-4 text-left text-cream shadow-lg active:scale-[0.98]"
+    >
+      <span aria-hidden="true" className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-full bg-cream text-mred shadow-[0_5px_0_rgba(26,26,26,0.18)]">
+        <svg viewBox="0 0 24 24" className="ml-1.5 h-10 w-10" fill="currentColor">
+          <path d="M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z" />
+        </svg>
+      </span>
+      <span>
+        <span className="block font-display text-3xl font-bold leading-tight">{ANOTHER_WORD}</span>
+        <span className="mt-1 block text-sm font-semibold text-cream/90">
+          Mot {doneToday.length + 1} sur {perDay} aujourd’hui
+        </span>
+      </span>
+    </Link>
   );
 }
 

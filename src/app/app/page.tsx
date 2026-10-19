@@ -4,6 +4,7 @@ import { levelLabel } from '@/lib/levels';
 import MysteryTiles, { letterCount } from '@/components/app/MysteryTiles';
 import { themeEmoji } from '@/lib/themes';
 import WeekProgress from '@/components/app/WeekProgress';
+import ChildStart from '@/components/app/kid/ChildStart';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,6 +27,12 @@ export default async function HomePage() {
           </h1>
         </header>
 
+        {todayActivity && (
+          <div className="mb-5">
+            <ChildStart href={`/app/activity?id=${todayActivity.id}`} />
+          </div>
+        )}
+
         {todayActivity ? (
           <section
             aria-labelledby="today-word"
@@ -43,7 +50,7 @@ export default async function HomePage() {
                 letters={Array.from(todayActivity.frenchWord).map((c) => ({ char: /[\s'’-]/.test(c) ? c : '?', color: '#1A1A1A' }))}
               />
               <p className="mt-5 font-display text-lg font-bold text-ink">
-                {letterCount(todayActivity.frenchWord)} lettres… qui sera le plus rapide à le lire ?
+                {letterCount(todayActivity.frenchWord)} lettres… qui veut essayer de le lire ?
               </p>
               <ul className="mt-4 flex flex-wrap justify-center gap-2 text-sm font-bold">
                 {todayActivity.theme && (
