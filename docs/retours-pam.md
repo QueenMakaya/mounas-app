@@ -15,6 +15,7 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   - trop de texte pour l'instant ;
   - remplacer les consignes par des **symboles / pictos** (écouter, toucher, glisser, écrire, suivant) ;
   - le parent ne doit pas être obligé d'être là.
-- [ ] **Le flow** : Pam l'aime beaucoup, mais il paraît parfois répétitif → varier les étapes / l'ordre / les jeux.
+- [x] **Le flow** : Pam l'aime beaucoup, mais il paraît parfois répétitif → varier les étapes / l'ordre / les jeux
+  (branche feat/jeux-mounaville : 1 ou 2 mini-jeux différents chaque jour, « Les mots qui reviennent » en échauffement, Mounaville sur la page des progrès).
 - [x] **Étudier Reading.com** (reverse engineering des meilleures fonctionnalités) et implémenter les meilleures idées
   (étude : docs/plan-mode-enfant.md ; glisse-sons en deux temps : l'app dit les sons, puis l'enfant les dit seul).
