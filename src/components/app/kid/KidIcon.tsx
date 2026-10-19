@@ -16,8 +16,8 @@ const FINGER =
 const PATHS: Record<Name, React.ReactNode> = {
   ecouter: (
     <>
-      <path d="M7 9.5a5 5 0 0 1 10 0c0 3-2.5 4-3 6s-1.5 3.5-3.5 3.5S7.5 18 7.5 16.5" />
-      <path d="M10 10a2 2 0 0 1 4 0c0 1.2-1 1.8-1.5 2.5" />
+      <path d="M3.5 9.5h3.5l5-4v13l-5-4H3.5z" />
+      <path d="M15.5 9.5a3.5 3.5 0 0 1 0 5M18.5 6.5a7.5 7.5 0 0 1 0 11" />
     </>
   ),
   toucher: (
