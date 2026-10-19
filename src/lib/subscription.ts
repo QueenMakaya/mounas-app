@@ -98,6 +98,18 @@ export function normalizePhone(input: string): string | null {
 }
 
 /**
+ * Stripe's search matches the phone exactly as it was saved. Checkout saves
+ * "+15144660319", but a number typed in the dashboard keeps its typing, so
+ * for North American numbers the usual ways of writing it are tried too.
+ */
+function phoneVariants(e164: string): string[] {
+  const m = e164.match(/^\+1(\d{3})(\d{3})(\d{4})$/);
+  if (!m) return [e164];
+  const [, a, b, c] = m;
+  return [e164, `(${a}) ${b}-${c}`, `${a}-${b}-${c}`, `${a}${b}${c}`, `+1 ${a}-${b}-${c}`, `+1 (${a}) ${b}-${c}`, `+1 ${a} ${b} ${c}`];
+}
+
+/**
  * Access by phone number (the one given at checkout). Also returns the
  * customer's email, since the login code is sent there.
  */
@@ -105,12 +117,14 @@ export async function findAccessByPhone(
   phone: string,
 ): Promise<{ status: 'active'; customerId: string; email: string | null } | { status: 'none' } | { status: 'error' }> {
   try {
-    const found = await stripe<StripeList<Customer>>(
-      `/customers/search?limit=100&query=${encodeURIComponent(`phone:'${phone}'`)}`,
-    );
-    for (const customer of found.data) {
-      if (!customer.deleted && (await customerHasAccess(customer.id))) {
-        return { status: 'active', customerId: customer.id, email: customer.email };
+    for (const variant of phoneVariants(phone)) {
+      const found = await stripe<StripeList<Customer>>(
+        `/customers/search?limit=100&query=${encodeURIComponent(`phone:'${variant}'`)}`,
+      );
+      for (const customer of found.data) {
+        if (!customer.deleted && (await customerHasAccess(customer.id))) {
+          return { status: 'active', customerId: customer.id, email: customer.email };
+        }
       }
     }
     return { status: 'none' };
