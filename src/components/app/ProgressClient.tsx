@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useSyncExternalStore } from 'react';
 import BackButton from '@/components/app/BackButton';
+import Mounaville from '@/components/app/Mounaville';
 import { LEVELS, levelLabel } from '@/lib/levels';
 import { SOUNDS } from '@/lib/phonics';
 import { completedDays, currentStreak, learnedWords, localDate, type LearnedWord } from '@/lib/progress';
@@ -80,6 +81,9 @@ function Stats({ raw, levelTotals, allSounds }: { raw: string; levelTotals: Reco
         <Tile value={readAlone} label={readAlone > 1 ? 'lus tout seul' : 'lu tout seul'} emoji="🎉" />
         <Tile value={minutes >= 60 ? `${Math.floor(minutes / 60)} h ${String(minutes % 60).padStart(2, '0')}` : `${minutes} min`} label="ensemble (environ)" emoji="⏱" />
       </section>
+
+      {/* ── The village the words build ── */}
+      {learned.length > 0 && <Mounaville learned={learned} />}
 
       {/* ── Per level ── */}
       <section aria-labelledby="levels-title" className="mt-6 rounded-[28px] bg-white p-5 ring-1 ring-ink/5">
