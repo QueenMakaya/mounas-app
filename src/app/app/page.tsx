@@ -50,7 +50,7 @@ export default async function HomePage() {
                 letters={Array.from(todayActivity.frenchWord).map((c) => ({ char: /[\s'’-]/.test(c) ? c : '?', color: '#1A1A1A' }))}
               />
               <p className="mt-5 font-display text-lg font-bold text-ink">
-                {letterCount(todayActivity.frenchWord)} lettres… qui sera le plus rapide à le lire ?
+                {letterCount(todayActivity.frenchWord)} lettres… qui va réussir à le lire ?
               </p>
               <ul className="mt-4 flex flex-wrap justify-center gap-2 text-sm font-bold">
                 {todayActivity.theme && (
