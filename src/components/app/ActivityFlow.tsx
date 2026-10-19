@@ -5,7 +5,7 @@ import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } fro
 import { createPortal } from 'react-dom';
 import type { Activity } from '@/lib/airtable';
 import { levelLabel } from '@/lib/levels';
-import { currentStreak, isCompletedToday, learnedWords, markCompleted } from '@/lib/progress';
+import { currentStreak, isCompletedToday, learnedWords, localDate, markCompleted } from '@/lib/progress';
 import { useSpeech } from '@/lib/useSpeech';
 import { SOUNDS, wordSounds, type Sound } from '@/lib/phonics';
 import { playChime } from '@/lib/chime';
@@ -23,6 +23,14 @@ import KidIcon, { HintHand } from '@/components/app/kid/KidIcon';
 import KidPrompt from '@/components/app/kid/KidPrompt';
 import ParentLock from '@/components/app/kid/ParentLock';
 import { useTries } from '@/components/app/kid/useTries';
+import { gamesOfTheDay, type GameKey } from '@/lib/games';
+import { useDueReviews } from '@/lib/review';
+import type { LearnedWord } from '@/lib/progress';
+import ReviewWords from '@/components/app/ReviewWords';
+import FindImage from '@/components/app/games/FindImage';
+import SoundFishing from '@/components/app/games/SoundFishing';
+import MissingWord from '@/components/app/games/MissingWord';
+import FeedMounas from '@/components/app/games/FeedMounas';
 
 /*
  * The daily activity as a guided flow: one step per screen, a progress bar,
@@ -31,7 +39,7 @@ import { useTries } from '@/components/app/kid/useTries';
  * scroll of eight coloured blocks.
  */
 
-type StepKey = 'decouvrir' | 'lire' | 'syllabes' | 'prononcer' | 'epeler' | 'ecrire' | 'activite' | 'chanson' | 'mission';
+type StepKey = 'revision' | 'decouvrir' | 'lire' | 'syllabes' | 'prononcer' | 'epeler' | 'ecrire' | 'activite' | 'chanson' | 'mission' | GameKey;
 
 type StepDef = {
   key: StepKey;
@@ -51,18 +59,30 @@ type StepDef = {
  * optional chat/activity and the song; then spell it with sounds and write
  * it. Spelling and writing start at level 2 — level 1 is for the youngest.
  * A linked mission (calcul, problème) comes last, as an optional bonus.
+ *
+ * Around that fixed order, the day adds variety: words learned a few days ago
+ * come back first (« Les mots qui reviennent »), and one or two mini-games
+ * slot in where they fit: the sound fishing after reading the sounds, the
+ * picture and the sentence after saying the word, and « Nourris le Mounas »
+ * replaces « Épeler » on its days.
  */
-function buildSteps(a: Activity, hasMission: boolean): StepDef[] {
+function buildSteps(a: Activity, hasMission: boolean, games: GameKey[] = [], review = false): StepDef[] {
   const level = parseInt(a.difficulty, 10) || 1;
   const writing = level >= 2;
+  const game = (k: GameKey) => games.includes(k);
   const steps: (StepDef | false)[] = [
+    review && { key: 'revision', emoji: '🔁', name: 'Ça revient', heading: 'Les mots qui reviennent', minutes: 1, accent: '#C7600A', tint: '#FEF3E2' },
     { key: 'decouvrir', emoji: '✨', name: 'Le mot mystère', heading: 'Le mot mystère du jour', minutes: 1, accent: '#E63946', tint: '#FDECEE' },
     { key: 'syllabes', emoji: '👏', name: 'Syllabes', heading: 'On compte les syllabes', minutes: 1, accent: '#0E8C80', tint: '#E3F8F5' },
     { key: 'lire', emoji: '📖', name: 'Les sons', heading: 'On lit les sons ensemble', minutes: 2, accent: '#E08A1E', tint: '#FEF3E2' },
+    game('jeu-peche') && { key: 'jeu-peche', emoji: '🎣', name: 'La pêche', heading: 'La pêche aux sons', minutes: 1, accent: '#1D6FA4', tint: '#E4F0F8' },
     { key: 'prononcer', emoji: '🗣️', name: 'Le dire', heading: 'On le dit à voix haute', minutes: 1, accent: '#5B1F8C', tint: '#F1E9F8' },
+    game('jeu-image') && { key: 'jeu-image', emoji: '🖼️', name: 'L’image', heading: 'Trouve l’image', minutes: 1, accent: '#D4530C', tint: '#FCEBDD' },
+    game('jeu-phrase') && { key: 'jeu-phrase', emoji: '🧩', name: 'La phrase', heading: 'Le mot qui manque', minutes: 1, accent: '#2D9B6F', tint: '#E5F4EC' },
     { key: 'activite', emoji: '💬', name: 'On en parle', heading: a.activityTitle ? `On en parle · ${a.activityTitle}` : 'On en parle', minutes: 3, accent: '#1D6FA4', tint: '#E4F0F8', optional: true },
     Boolean(a.songTitle || a.songLyrics) && { key: 'chanson', emoji: '🎵', name: 'Chanson', heading: a.songTitle || 'La chanson', minutes: 2, accent: '#D4530C', tint: '#FCEBDD' },
-    writing && { key: 'epeler', emoji: '🔤', name: 'Épeler', heading: 'Construis le mot avec les sons', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
+    writing && !game('jeu-nourris') && { key: 'epeler', emoji: '🔤', name: 'Épeler', heading: 'Construis le mot avec les sons', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
+    writing && game('jeu-nourris') && { key: 'jeu-nourris', emoji: '😋', name: 'Le Mounas', heading: 'Nourris le Mounas', minutes: 1, accent: '#E63946', tint: '#FDECEE' },
     writing && { key: 'ecrire', emoji: '✍️', name: 'Écrire', heading: 'On écrit le mot', minutes: 2, accent: '#2D9B6F', tint: '#E5F4EC' },
     hasMission && { key: 'mission', emoji: '🧩', name: 'Mission', heading: 'La mission du jour', minutes: 3, accent: '#C7600A', tint: '#FEF3E2', optional: true },
   ];
@@ -99,7 +119,11 @@ export default function ActivityFlow({
   library: WordCard[];
   mission?: Mission | null;
 }) {
-  const steps = buildSteps(activity, Boolean(mission));
+  // The day (client only: it must be the parent's date) picks the games, and
+  // this device's history the words that come back.
+  const today = useSyncExternalStore(subscribeNoop, localDate, () => '');
+  const reviewWords = useDueReviews(activity.id);
+  const steps = buildSteps(activity, Boolean(mission), today ? gamesOfTheDay(activity, library, today) : [], reviewWords.length > 0);
   const [index, setIndex] = useState(0);
   const [finished, setFinished] = useState(false);
   // Step 1: did the child read the word alone before hearing it?
@@ -298,6 +322,7 @@ export default function ActivityFlow({
                 if (a) win();
               }}
               onSuccess={win}
+              reviewWords={reviewWords}
               revealed={revealed}
               onReveal={() => {
                 setChosenMode(mode);
@@ -371,12 +396,56 @@ type BodyProps = {
   mission: Mission | null;
   /** The step's success signal (child mode: the "next" arrow glows). */
   onSuccess: (chimed?: boolean) => void;
+  reviewWords: LearnedWord[];
 };
 
 type Attempt = 'alone' | 'together' | null;
 
-function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal, mode, onModeChange, mission, onSuccess }: BodyProps) {
+function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal, mode, onModeChange, mission, onSuccess, reviewWords }: BodyProps) {
+  const game = { activity: a, library, canSpeak, speak, onSuccess, accent: step.accent };
   switch (step.key) {
+    case 'revision':
+      return (
+        <>
+          <Stage tint={step.tint}>
+            <ReviewWords words={reviewWords} library={library} canSpeak={canSpeak} speak={speak} onSuccess={onSuccess} />
+          </Stage>
+          <ParentTip>Ces mots ont été appris il y a quelques jours. Ton enfant essaie de les lire seul, puis touche le haut-parleur pour vérifier.</ParentTip>
+        </>
+      );
+
+    case 'jeu-image':
+      return (
+        <>
+          <Stage tint={step.tint}><FindImage {...game} /></Stage>
+          <ParentTip>Laisse ton enfant écouter le mot autant de fois qu’il veut avant de choisir. Pas de piège : on cherche ensemble.</ParentTip>
+        </>
+      );
+
+    case 'jeu-peche':
+      return (
+        <>
+          <Stage tint={step.tint}><SoundFishing {...game} /></Stage>
+          <ParentTip>Lisez chaque poisson ensemble, doucement. Ton enfant pêche ceux où il entend le son. Les autres restent dans l’eau.</ParentTip>
+        </>
+      );
+
+    case 'jeu-phrase':
+      return (
+        <>
+          <Stage tint={step.tint}><MissingWord {...game} /></Stage>
+          <ParentTip>Lis la phrase en marquant une petite pause au trou, puis ton enfant choisit le mot qui va dedans.</ParentTip>
+        </>
+      );
+
+    case 'jeu-nourris':
+      return (
+        <>
+          <Stage tint={step.tint}><FeedMounas {...game} /></Stage>
+          <ParentTip>Ton enfant dit chaque son à voix haute en le donnant au Mounas, dans l’ordre du mot. Les lettres muettes se mangent aussi !</ParentTip>
+        </>
+      );
+
     case 'mission':
       return mission ? <MissionPlayer mission={mission} compact /> : null;
 
