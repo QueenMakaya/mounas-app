@@ -4,6 +4,7 @@ import { levelLabel } from '@/lib/levels';
 import MysteryTiles, { letterCount } from '@/components/app/MysteryTiles';
 import { themeEmoji } from '@/lib/themes';
 import WeekProgress from '@/components/app/WeekProgress';
+import ChildStart from '@/components/app/kid/ChildStart';
 
 export const dynamic = 'force-dynamic';
 
@@ -25,6 +26,12 @@ export default async function HomePage() {
             Prêts pour le mot du jour&nbsp;?
           </h1>
         </header>
+
+        {todayActivity && (
+          <div className="mb-5">
+            <ChildStart href={`/app/activity?id=${todayActivity.id}`} />
+          </div>
+        )}
 
         {todayActivity ? (
           <section
