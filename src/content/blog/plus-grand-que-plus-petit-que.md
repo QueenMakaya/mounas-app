@@ -7,6 +7,8 @@ author: Les Mounas
 
 Aujourd'hui, chez Les Mounas, on a appris deux petits signes : **>** et **<**. « Plus grand que » et « plus petit que ». Sur le papier, c'est facile. Ce qui est vraiment intéressant, c'est de comprendre **à quoi ils servent dans la vraie vie**. Parce qu'un enfant qui compare, c'est un enfant qui réfléchit, qui choisit et qui défend son point de vue. 🐊
 
+![Kroko le crocodile ouvre sa bouche vers le 5 : 5 est plus grand que 2](/promo/plus-grand-que/kroko_post_carte.png)
+
 ## La mini leçon : le crocodile du marigot
 
 Au Burkina Faso, dans le village de Bazoulé, il y a une mare où vivent des crocodiles sacrés. Les habitants les respectent et vivent à côté d'eux depuis des générations. Chez Les Mounas, on a invité un de leurs cousins dans nos leçons de maths : **Kroko, le crocodile du marigot**.
