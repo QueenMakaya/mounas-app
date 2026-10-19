@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { getTodayActivity, getActivityById, getActivitiesByFilters } from '@/lib/airtable';
 import type { WordCard } from '@/lib/related';
 import ActivityFlow from '@/components/app/ActivityFlow';
+import { getMissionForWord } from '@/lib/missions';
 import { getSession, paywallUrl } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 
@@ -51,10 +52,13 @@ export default async function ActivityPage({
     );
   }
 
+  // The optional last step, when the word has a ready mission.
+  const mission = await getMissionForWord(activity.id);
+
   return (
     <main className="flex-1 bg-cream font-body">
       <div className="mx-auto max-w-2xl px-4 pt-6 sm:px-6 sm:pt-10">
-        <ActivityFlow activity={activity} library={library} />
+        <ActivityFlow activity={activity} library={library} mission={mission} />
       </div>
     </main>
   );
