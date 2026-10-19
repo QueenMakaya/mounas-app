@@ -13,6 +13,7 @@ import SyllableWord, { SYLLABLE_COLORS, syllableParts } from '@/components/app/S
 import SpeakButton from '@/components/app/SpeakButton';
 import MysteryWord, { type DiscoverMode } from '@/components/app/MysteryWord';
 import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/DrawingCanvas';
+import WritingModePicker, { useWritingMode, writingModel, type WritingMode } from '@/components/app/WritingModePicker';
 import { nextWords, trickySounds, wordsWithSound, type WordCard } from '@/lib/related';
 import type { Mission } from '@/lib/missions';
 import MissionPlayer from '@/components/app/MissionPlayer';
@@ -131,6 +132,8 @@ export default function ActivityFlow({
   const onKey = useEffectEvent((e: KeyboardEvent) => {
     const t = e.target as HTMLElement | null;
     if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    // Already used by a control (the sounds slider steps with the arrows).
+    if (e.defaultPrevented) return;
     if (e.key === 'ArrowRight' && !finished) go(index + 1);
     if (e.key === 'ArrowLeft') go(finished ? steps.length - 1 : index - 1);
   });
@@ -403,6 +406,9 @@ function Materials({ items }: { items: string[] }) {
 function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library }: Pick<BodyProps, 'step' | 'activity' | 'canSpeak' | 'speak' | 'speakSeries' | 'library'>) {
   const sounds = wordSounds(a.frenchWord, a.graphemes);
   const [lit, setLit] = useState<number | null>(null);
+  // undefined: the slider is not in use.
+  const [slideLit, setSlideLit] = useState<number | null | undefined>(undefined);
+  const rowRef = useRef<HTMLDivElement>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => () => { if (timer.current) clearInterval(timer.current); }, []);
@@ -441,17 +447,30 @@ function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library }:
     }, 900);
   };
 
+  // While the finger is on the slider, it decides what is lit.
+  const shown = slideLit === undefined ? lit : slideLit;
+
   return (
     <>
       <Stage tint={step.tint}>
-        <div className="flex flex-wrap items-end justify-center gap-1.5 sm:gap-2" aria-label={`Les sons du mot ${a.frenchWord}`}>
-          {sounds.map((s, i) =>
-            s.kind === 'separator' ? (
-              <span key={i} className="w-3" aria-hidden="true" />
-            ) : (
-              <SoundTile key={i} sound={s} lit={lit === i || lit === -1} onTap={() => playOne(i)} />
-            ),
-          )}
+        <div className="mx-auto w-fit min-w-[min(100%,280px)] max-w-full">
+          <div ref={rowRef} className="flex flex-wrap items-end justify-center gap-1.5 sm:gap-2" aria-label={`Les sons du mot ${a.frenchWord}`}>
+            {sounds.map((s, i) =>
+              s.kind === 'separator' ? (
+                <span key={i} className="w-3" aria-hidden="true" />
+              ) : (
+                <SoundTile key={i} sound={s} lit={shown === i || shown === -1} onTap={() => playOne(i)} />
+              ),
+            )}
+          </div>
+          <SoundSlider
+            word={a.frenchWord}
+            sounds={sounds}
+            rowRef={rowRef}
+            canSpeak={canSpeak}
+            speak={speak}
+            onLit={setSlideLit}
+          />
         </div>
         <p className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs font-bold text-ink-soft">
           <span><span className="text-mred">■</span> voyelle</span>
@@ -470,11 +489,193 @@ function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library }:
       </Stage>
       <SoundReminders activity={a} library={library} canSpeak={canSpeak} speak={speak} />
       <ParentTip>
-        On lit les <strong>sons</strong>, pas le nom des lettres : on dit « mmm », pas « èm ». Glisse ton doigt sous chaque son,
-        puis colle-les ensemble pour dire le mot.
+        On lit les <strong>sons</strong>, pas le nom des lettres : on dit « mmm », pas « èm ». Glisse ton doigt sous chaque son
+        (ou fais rouler la boule rouge sous le mot), puis colle-les ensemble pour dire le mot.
         {canSpeak && ' Touche un son pour l’entendre.'}
       </ParentTip>
     </>
+  );
+}
+
+/**
+ * "Glisse sous le mot", like the finger a parent slides under the letters:
+ * the child drags the ball from left to right, each sound lights up and is
+ * heard as the ball passes under it, and the end of the track reads the whole
+ * word. Keyboard arrows step through the sounds.
+ */
+function SoundSlider({
+  word,
+  sounds,
+  rowRef,
+  canSpeak,
+  speak,
+  onLit,
+}: {
+  word: string;
+  sounds: Sound[];
+  rowRef: React.RefObject<HTMLDivElement | null>;
+  canSpeak: boolean;
+  speak: BodyProps['speak'];
+  onLit: (i: number | null | undefined) => void;
+}) {
+  // Tiles in reading order (separators are not tiles), as indexes into `sounds`.
+  const tiles = sounds.map((s, i) => ({ s, i })).filter(({ s }) => s.kind !== 'separator');
+  const railRef = useRef<HTMLDivElement>(null);
+  const [pos, setPos] = useState(0); // 0..1 along the rail
+  const [dragging, setDragging] = useState(false);
+  const [done, setDone] = useState(false);
+  // Last step reached: -1 before the first sound, tiles.length = the whole word.
+  const at = useRef(-1);
+  const [step, setStep] = useState(-1);
+  const release = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => () => { if (release.current) clearTimeout(release.current); }, []);
+
+  // Where each tile sits along the rail (its centre, 0..1). Wrapped words fall
+  // back to even steps, since the rail is a single line.
+  const stops = () => {
+    const rail = railRef.current?.getBoundingClientRect();
+    const els = Array.from(rowRef.current?.querySelectorAll<HTMLElement>(':scope > button') ?? []);
+    const even = tiles.map((_, k) => 0.08 + ((k + 0.5) / tiles.length) * 0.8);
+    if (!rail || rail.width === 0 || els.length !== tiles.length) return even;
+    const rects = els.map((el) => el.getBoundingClientRect());
+    if (rects.some((r) => Math.abs(r.top - rects[0].top) > 4)) return even;
+    return rects.map((r) => Math.min(0.94, Math.max(0, (r.left + r.width / 2 - rail.left) / rail.width)));
+  };
+
+  // Step k: -1 start, 0..n-1 a sound, n the whole word.
+  const enter = (k: number) => {
+    if (k === at.current) return;
+    at.current = k;
+    setStep(Math.max(-1, k));
+    if (k < 0) {
+      onLit(null);
+      return;
+    }
+    if (k >= tiles.length) {
+      onLit(-1);
+      setDone(true);
+      if (canSpeak) speak(word, 0.8);
+      return;
+    }
+    const { s, i } = tiles[k];
+    onLit(i);
+    if (canSpeak && s.kind !== 'silent' && s.key) speak(SOUNDS[s.key].say, 0.7);
+  };
+
+  // The ball lights a tile once its centre reaches the tile's left half.
+  const stepAt = (p: number, st = stops()) => {
+    if (p >= 0.97) return tiles.length;
+    let k = -1;
+    st.forEach((c, j) => {
+      const prev = j === 0 ? 0 : st[j - 1];
+      if (p >= c - (c - prev) / 2) k = j;
+    });
+    return k;
+  };
+
+  const move = (clientX: number) => {
+    const r = railRef.current!.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+    setPos(p);
+    enter(stepAt(p));
+  };
+
+  const onDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (release.current) clearTimeout(release.current);
+    e.currentTarget.setPointerCapture(e.pointerId);
+    setDragging(true);
+    setDone(false);
+    at.current = -2;
+    move(e.clientX);
+  };
+  const onMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (dragging) move(e.clientX);
+  };
+  const onUp = () => {
+    if (!dragging) return;
+    setDragging(false);
+    // The ball rolls back to the start; the word stays lit a moment if read.
+    setPos(0);
+    at.current = -1;
+    setStep(-1);
+    const reached = done;
+    release.current = setTimeout(() => {
+      onLit(undefined);
+      setDone(false);
+    }, reached ? 1400 : 300);
+  };
+
+  const onKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const cur = Math.max(-1, at.current);
+    let k: number;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') k = Math.min(tiles.length, cur + 1);
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') k = Math.max(-1, cur - 1);
+    else if (e.key === 'Home') k = -1;
+    else if (e.key === 'End') k = tiles.length;
+    else return;
+    e.preventDefault();
+    if (release.current) clearTimeout(release.current);
+    const st = stops();
+    setPos(k < 0 ? 0 : k >= tiles.length ? 1 : st[k]);
+    setDone(k >= tiles.length);
+    enter(k);
+  };
+
+  const valueText =
+    step < 0 ? 'Début du mot' : step >= tiles.length ? `Le mot entier : ${word}` : tiles[step].s.kind === 'silent' ? `${tiles[step].s.text}, lettre muette` : `Son ${SOUNDS[tiles[step].s.key]?.hint ?? tiles[step].s.text}`;
+
+  return (
+    <div
+      role="slider"
+      tabIndex={0}
+      aria-label="Glisse sous le mot pour lire les sons"
+      aria-valuemin={0}
+      aria-valuemax={tiles.length + 1}
+      aria-valuenow={step + 1}
+      aria-valuetext={valueText}
+      onPointerDown={onDown}
+      onPointerMove={onMove}
+      onPointerUp={onUp}
+      onPointerCancel={onUp}
+      onKeyDown={onKey}
+      onBlur={() => {
+        if (dragging) return;
+        at.current = -1;
+        setStep(-1);
+        setPos(0);
+        setDone(false);
+        onLit(undefined);
+      }}
+      className="relative mt-4 h-14 cursor-grab touch-none select-none rounded-full outline-none focus-visible:ring-4 focus-visible:ring-mamber/60 active:cursor-grabbing"
+      style={{ touchAction: 'none' }}
+    >
+      {/* The rail, inset by the ball's radius so the ball stays inside. */}
+      <div ref={railRef} className="absolute inset-y-0 left-6 right-6">
+        <div className="absolute inset-x-0 top-1/2 h-3 -translate-y-1/2 rounded-full bg-white ring-1 ring-ink/10" />
+        <div
+          className={`absolute left-0 top-1/2 h-3 -translate-y-1/2 rounded-full bg-mamber ${dragging ? '' : 'transition-[width] duration-300'}`}
+          style={{ width: `${pos * 100}%` }}
+        />
+        <span
+          aria-hidden="true"
+          className={`absolute right-0 top-1/2 flex h-8 w-8 -translate-y-1/2 translate-x-1/2 items-center justify-center rounded-full text-base transition-colors ${
+            done ? 'bg-mamber' : 'bg-white ring-1 ring-ink/10'
+          }`}
+        >
+          ⭐
+        </span>
+        <span
+          aria-hidden="true"
+          className={`absolute top-1/2 flex h-12 w-12 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-mred text-xl font-black text-cream shadow-[0_4px_0_rgba(26,26,26,0.2)] ${
+            dragging ? 'scale-110' : 'transition-[left,transform] duration-300'
+          }`}
+          style={{ left: `${pos * 100}%` }}
+        >
+          ➜
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -613,8 +814,9 @@ function BuildWord({ step, activity: a, canSpeak, speak }: { step: StepDef; acti
 }
 
 /**
- * Writing: the word in dotted school cursive on Seyès paper; the child goes
- * over it with a finger or stylus, then copies it on real paper.
+ * Writing: the word in dotted school cursive (or in capitals) on Seyès paper;
+ * the child goes over it with a finger or stylus, then copies it on real
+ * paper. "Feuille blanche" drops the model to write or draw freely.
  */
 function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity }) {
   const canvas = useRef<DrawingCanvasHandle>(null);
@@ -622,17 +824,34 @@ function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity })
   const [bravo, setBravo] = useState(false);
   // First over the dotted model, then from memory.
   const [withModel, setWithModel] = useState(true);
+  const [mode, setMode] = useWritingMode();
   // Cursive is taught in lowercase; capitals in the base would read oddly.
-  const word = a.frenchWord.toLocaleLowerCase('fr');
-  const restart = (model: boolean) => {
+  const model = writingModel(mode, a.frenchWord);
+  const free = mode === 'blanc';
+  const restart = (withGuide: boolean) => {
     canvas.current?.clear();
     setBravo(false);
-    setWithModel(model);
+    setWithModel(withGuide);
+  };
+  const pickMode = (next: WritingMode) => {
+    if (next === mode) return;
+    restart(true);
+    setMode(next);
   };
   return (
     <>
+      <WritingModePicker mode={mode} onChange={pickMode} accent={step.accent} />
       <div className="overflow-hidden rounded-3xl ring-1 ring-ink/10" style={{ backgroundColor: step.tint }}>
-        <DrawingCanvas ref={canvas} height={260} paper="seyes" lineGap={16} guideText={withModel ? word : undefined} size={9} onChange={setStrokes} />
+        <DrawingCanvas
+          ref={canvas}
+          height={260}
+          paper={model.paper}
+          lineGap={16}
+          guideText={withModel ? model.text : undefined}
+          guideFont={model.font}
+          size={9}
+          onChange={setStrokes}
+        />
       </div>
       <div className="mt-3 flex flex-wrap justify-center gap-2">
         <button
@@ -660,7 +879,7 @@ function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity })
           ✓ J’ai fini
         </button>
       </div>
-      {!withModel && (
+      {!withModel && !free && (
         <p className="mt-3 text-center text-sm font-bold text-ink-soft">
           Sans modèle, de mémoire !{' '}
           <button type="button" onClick={() => restart(true)} className="font-extrabold text-[#2D9B6F] underline underline-offset-4">
@@ -671,9 +890,9 @@ function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity })
       {bravo && (
         <div className="animate-rise mt-3 text-center" aria-live="polite">
           <p className="font-display text-xl font-bold text-[#2D9B6F]">
-            {withModel ? 'Bravo, quel bel effort ! ✨' : 'Écrit tout seul, de mémoire ! 🌟'}
+            {free ? 'Bravo, quelle belle page ! 🎨' : withModel ? 'Bravo, quel bel effort ! ✨' : 'Écrit tout seul, de mémoire ! 🌟'}
           </p>
-          {withModel && (
+          {withModel && !free && (
             <button
               type="button"
               onClick={() => restart(false)}
@@ -687,6 +906,7 @@ function TraceWord({ step, activity: a }: { step: StepDef; activity: Activity })
       <Materials items={['Une feuille blanche', 'Un crayon ou un feutre']} />
       <ParentTip>
         D’abord avec le doigt sur l’écran, en suivant les pointillés, puis au crayon sur une vraie feuille.
+        Ton enfant peut choisir les minuscules, les CAPITALES ou la feuille blanche pour écrire librement.
         Encourage chaque essai : le but, c’est l’effort, pas la perfection.
       </ParentTip>
     </>

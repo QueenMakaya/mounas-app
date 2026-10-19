@@ -134,14 +134,34 @@ export default function DrawingCanvas({
       } catch {
         /* font may be unavailable — canvas falls back */
       }
+      // Fit the real ink box, not the font size: the school cursive reaches
+      // ~1.45em above the baseline (l, h, k…) and ~0.9em below (g, p, y), so a
+      // size picked from the height alone cut the top of the "l".
+      const pad = Math.max(10, height * 0.05);
+      const box = () => {
+        const m = g.measureText(guideText);
+        return { width: m.width, asc: m.actualBoundingBoxAscent, desc: m.actualBoundingBoxDescent };
+      };
       g.font = fontFor(px);
-      while (g.measureText(guideText).width > w * 0.86 && px > 20) {
+      let b = box();
+      while ((b.width > w * 0.86 || b.asc + b.desc > height - pad * 2) && px > 20) {
         px -= 4;
         g.font = fontFor(px);
+        b = box();
       }
-      const tw = g.measureText(guideText).width;
-      const x = (w - tw) / 2;
-      const y = height * 0.62;
+      const x = (w - b.width) / 2;
+      // Centre the ink vertically, then sit the baseline on the nearest Seyès
+      // main line where the letters still fit (the lower one on a near tie).
+      let y = (height - b.asc - b.desc) / 2 + b.asc;
+      if (paper === 'seyes') {
+        const main = lineGap * 4;
+        const fits = (by: number) => by - b.asc >= pad && by + b.desc <= height - pad;
+        const below = Math.ceil(y / main) * main;
+        const above = Math.floor(y / main) * main;
+        const score = (by: number) => Math.abs(by - y) - (by === below ? 8 : 0);
+        const best = [below, above].filter(fits).sort((p, q) => score(p) - score(q))[0];
+        if (best !== undefined) y = best;
+      }
       g.fillStyle = 'rgba(244, 163, 64, 0.16)';
       g.fillText(guideText, x, y);
       g.setLineDash([3, 7]);
