@@ -50,7 +50,19 @@ The 5 and the 2 are added on each side afterwards, so Kroko must stay in the mid
 Download the chosen clips and send them back: they go in `clips/` as `shot_a.mp4`,
 `shot_b.mp4`, `shot_c.mp4`, then `python3 make_reel.py`.
 
-## 2. Optional: Pam's voice (recommended)
+## 2. Music
+
+Two ways, and the A/B test can use either as long as both versions get the same sound:
+
+- **Trending sound, added in the app (best for reach).** Export without music:
+  `python3 make_reel.py --no-music` gives `*_sans-musique.mp4` (with Pam's voice if
+  `audio/vo.wav` exists). Upload it and pick the sound in Instagram / TikTok, at a low
+  volume under the voice. On a business account only the commercial library is offered.
+- **A track baked into the file (WhatsApp, Skool, YouTube Shorts, and every platform at
+  once).** Save a licensed track as `audio/music.mp3`; it replaces the generated groove.
+  `--music-start 32` starts it at 0:32, on the catchy part.
+
+## 3. Optional: Pam's voice (recommended)
 
 The reel works muted with the on-screen text, but a real voice usually holds attention
 better. Record in one take, about 20 s, saved as `audio/vo.wav`; the music is lowered under it.
@@ -60,7 +72,7 @@ better. Record in one take, about 20 s, saved as `audio/vo.wav`; the music is lo
 3. (10 s) « Le jeu des dix minutes : deux bols, des graines, et Kroko croque le bol le plus plein. »
 4. (15 s) « Quatorze jours gratuits, le lien est dans la bio. »
 
-## 3. The A/B test
+## 4. The A/B test
 
 - **Version A**: `out/kroko_reel_slideshow.mp4` (current format). **Version B**: `out/kroko_reel_higgsfield.mp4`.
 - Same caption (below), same audio, same weekday and hour (e.g. Wednesday 10 h-12 h,

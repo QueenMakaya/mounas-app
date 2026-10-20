@@ -7,6 +7,9 @@
 Put the Higgsfield clips in clips/ as shot_a.mp4, shot_b.mp4, shot_c.mp4. A missing
 clip is replaced by a slow push-in on its start image (frames/), so the reel can be
 previewed before any generation; the file is then named *_preview.mp4.
+Music: audio/music.mp3 (or .m4a/.wav), a licensed track, replaces the generated groove;
+--music-start 32 starts it at 0:32 (the catchy part). --no-music exports without music
+(*_sans-musique.mp4), to add a trending sound inside Instagram/TikTok instead.
 Optional: audio/vo.wav (Pam's voice-over) is mixed over the music, which is lowered.
 All text is drawn here, never by the video model.
 """
@@ -146,23 +149,42 @@ def card_frame(card, dst, shadow=False):
     return dst
 
 
+def arg_value(flag, default):
+    return sys.argv[sys.argv.index(flag) + 1] if flag in sys.argv else default
+
+
+def music_file():
+    """audio/music.* (a licensed track you downloaded) wins over the generated groove."""
+    for ext in ("mp3", "m4a", "wav", "aac"):
+        p = os.path.join(HERE, "audio", "music." + ext)
+        if os.path.exists(p):
+            return p
+    return os.path.join(HERE, "audio", "groove.m4a")
+
+
 def audio_args(total):
-    """Music (+ optional voice-over), normalised for social at -14 LUFS."""
-    music = os.path.join(HERE, "audio", "groove.m4a")
+    """Music (+ optional voice-over), normalised for social at -14 LUFS.
+    --no-music keeps only the voice-over (or silence), to add a trending sound in the app."""
     vo = os.path.join(HERE, "audio", "vo.wav")
+    has_vo = os.path.exists(vo)
     fade = f"afade=t=in:d=0.3,afade=t=out:st={total - 0.8}:d=0.8"
-    if os.path.exists(vo):
-        return (["-i", music, "-i", vo],
+    if "--no-music" in sys.argv:
+        if has_vo:
+            return ["-i", vo], f"[1:a]apad,atrim=0:{total},{fade},loudnorm=I=-14:TP=-1.5[aout]"
+        return (["-f", "lavfi", "-t", str(total), "-i", "anullsrc=r=44100:cl=stereo"], "[1:a]anull[aout]")
+    music = ["-ss", arg_value("--music-start", "0"), "-i", music_file()]
+    if has_vo:
+        return (music + ["-i", vo],
                 f"[1:a]volume=0.28[m];[2:a]apad[v];[m][v]amix=inputs=2:duration=first:normalize=0,"
                 f"atrim=0:{total},{fade},loudnorm=I=-14:TP=-1.5[aout]")
-    return ["-i", music], f"[1:a]atrim=0:{total},{fade},loudnorm=I=-14:TP=-1.5[aout]"
+    return music, f"[1:a]atrim=0:{total},{fade},loudnorm=I=-14:TP=-1.5[aout]"
 
 
 def encode(video_in, overlays, total, dst):
     """Burn the timed overlays (with soft fades) and mix the audio, in one pass."""
     a_inputs, a_filter = audio_args(total)
     cmd = ["ffmpeg", "-y", "-i", video_in] + a_inputs
-    first_ov = 1 + len(a_inputs) // 2
+    first_ov = 1 + a_inputs.count("-i")
     chain, last = [], "[0:v]"
     for i, (png, s, e) in enumerate(overlays):
         cmd += ["-loop", "1", "-framerate", str(FPS), "-t", str(total), "-i", png]
@@ -176,6 +198,10 @@ def encode(video_in, overlays, total, dst):
             "-c:v", "libx264", "-profile:v", "high", "-crf", "19", "-preset", "medium", "-g", "60",
             "-c:a", "aac", "-b:a", "192k", "-movflags", "+faststart", dst]
     run(cmd)
+
+
+def suffix():
+    return "_sans-musique" if "--no-music" in sys.argv else ""
 
 
 def concat(parts, dst, tmp):
@@ -199,7 +225,7 @@ def main():
             parts.append(seg)
         joined = os.path.join(tmp, "joined.mp4")
         concat(parts, joined, tmp)
-        dst = os.path.join(OUT, "kroko_reel_slideshow.mp4")
+        dst = os.path.join(OUT, f"kroko_reel_slideshow{suffix()}.mp4")
         encode(joined, [], sum(durs), dst)
         print("control reel:", dst)
         return
@@ -221,7 +247,7 @@ def main():
     concat(parts, joined, tmp)
 
     total = sum(d for _, d in SHOTS) + END_DUR
-    name = "kroko_reel_higgsfield_preview.mp4" if missing else "kroko_reel_higgsfield.mp4"
+    name = ("kroko_reel_higgsfield_preview" if missing else "kroko_reel_higgsfield") + suffix() + ".mp4"
     dst = os.path.join(OUT, name)
     encode(joined, build_overlays(tmp), total, dst)
     if missing:
