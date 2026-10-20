@@ -44,3 +44,4 @@ next-env.d.ts
 # Local dev logs
 dev.log
 *.log
+__pycache__/
