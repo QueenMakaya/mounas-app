@@ -31,3 +31,11 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 - [x] **Calcul façon Kumon** (/app/calcul) : additions, soustractions, puis tables une par une ; sans limite par jour.
   Le parent choisit le niveau du cahier ; l'app avance quand 18 des 20 derniers calculs sont justes du premier coup
   et faits sans trop chercher, revient au niveau d'avant si beaucoup d'erreurs, et refait passer les calculs ratés.
+
+## 26 octobre 2026 (suite)
+
+- [x] **Chaque rubrique a sa place, sans chercher** : une rangée d'icônes en haut de chaque écran de l'app
+  (✨ Mot du jour · 📒 Dictée · 1+2 Calcul · 🧩 Missions · 📊 Progrès). Masquée pendant le mot lui-même
+  (le mode enfant ne doit pas pouvoir partir ailleurs). Les cartes « Encore plus » de l'accueil restent.
+- [x] **Suivi du calcul dans Airtable** (LES MOUNAS — App → Familles) : nouvelles colonnes « Niveau calcul »,
+  « Calculs faits » et « Calcul · derniers jours ».

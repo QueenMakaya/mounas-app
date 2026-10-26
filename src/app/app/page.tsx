@@ -5,6 +5,7 @@ import MysteryTiles, { letterCount } from '@/components/app/MysteryTiles';
 import { themeEmoji } from '@/lib/themes';
 import WeekProgress from '@/components/app/WeekProgress';
 import ChildStart from '@/components/app/kid/ChildStart';
+import { CalculIcon } from '@/components/app/AppSections';
 
 export const dynamic = 'force-dynamic';
 
@@ -130,8 +131,8 @@ export default async function HomePage() {
             href="/app/calcul"
             className="group flex items-center gap-4 rounded-3xl bg-white p-4 ring-1 ring-ink/5 transition-colors hover:bg-sand"
           >
-            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F1E9F8] text-2xl" aria-hidden="true">
-              🔢
+            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F1E9F8]">
+              <CalculIcon className="text-lg" />
             </span>
             <span className="flex-1">
               <span className="block font-extrabold text-ink">Le calcul</span>

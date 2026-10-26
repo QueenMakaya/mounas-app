@@ -3,7 +3,7 @@
  * base (written by the app only, never by hand):
  *
  *   - Familles (AIRTABLE_FAMILIES_TABLE): one row per parent email, with a
- *     summary Pam can read (last visit, active days, words, missions) and
+ *     summary Pam can read (last visit, active days, words, missions, calcul) and
  *     "Progression", the JSON snapshot that follows the parent from one
  *     device to another (src/lib/progress-snapshot.ts).
  *   - Journal (AIRTABLE_JOURNAL_TABLE): one row per word done on a day and
@@ -16,6 +16,7 @@
 
 import { airtableToken } from '@/lib/airtable-token';
 import { getMissions } from '@/lib/missions';
+import { LEVELS, levelById } from '@/lib/calcul';
 import { mergeSnapshots, parseSnapshot, streakOf, type ProgressEvent, type Snapshot } from '@/lib/progress-snapshot';
 
 // Addressed by id, like the Signups table: survives a rename.
@@ -104,6 +105,23 @@ function newEvents(prev: Snapshot, next: Snapshot, since: string): ProgressEvent
   return events.slice(0, 50);
 }
 
+/** « Le calcul » at a glance for Pam: level, total, the last 7 days and the levels mastered. */
+function calculFields(c: Snapshot['calcul']): Record<string, unknown> {
+  const stats = Object.values(c.stats);
+  const total = stats.reduce((t, s) => t + s.answered, 0);
+  if (total === 0) return {};
+  const days = Object.entries(c.days)
+    .sort(([a], [b]) => b.localeCompare(a))
+    .slice(0, 7)
+    .map(([d, x]) => `${d} : ${x.done} calcul${x.done > 1 ? 's' : ''}, ${x.done ? Math.round((x.ok / x.done) * 100) : 0} % justes`);
+  const mastered = LEVELS.filter((l) => c.stats[l.id]?.mastered).map((l) => l.label);
+  return {
+    'Niveau calcul': levelById(c.level).label,
+    'Calculs faits': total,
+    'Calcul · derniers jours': [...days, ...(mastered.length ? ['', `Maîtrisés : ${mastered.join(', ')}`] : [])].join('\n'),
+  };
+}
+
 /** The progress saved for this parent; null when Airtable isn't set up or can't be reached. */
 export async function loadProgress(email: string): Promise<Snapshot | null> {
   const cfg = config();
@@ -146,6 +164,7 @@ export async function saveProgress(email: string, customerId: string, incoming: 
         .slice(0, 10)
         .map((w) => `${w.word} (${w.date})`)
         .join('\n'),
+      ...calculFields(merged.calcul),
       Progression: JSON.stringify(merged),
     };
     if (!record) fields['Première visite'] = now;

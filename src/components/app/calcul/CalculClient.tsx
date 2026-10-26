@@ -2,6 +2,7 @@
 
 import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } from 'react';
 import BackButton from '@/components/app/BackButton';
+import { CalculIcon } from '@/components/app/AppSections';
 import SpeakButton from '@/components/app/SpeakButton';
 import { playChime } from '@/lib/chime';
 import { localDate } from '@/lib/progress';
@@ -156,7 +157,7 @@ export default function CalculClient() {
       <div className="mx-auto max-w-xl px-4 pb-16 pt-6 sm:px-6 sm:pt-10">
         <BackButton />
         <header className="mb-5 mt-3">
-          <h1 className="font-display text-3xl font-bold leading-tight text-ink sm:text-4xl">🔢 Le calcul</h1>
+          <h1 className="flex items-center gap-3 font-display text-3xl font-bold leading-tight text-ink sm:text-4xl"><CalculIcon /> Le calcul</h1>
           <p className="mt-2 text-ink-soft">Un calcul à la fois, autant qu’elle veut. Le niveau s’adapte à ses réponses, comme dans un cahier Kumon.</p>
         </header>
 

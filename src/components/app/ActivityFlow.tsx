@@ -26,6 +26,7 @@ import { useTries } from '@/components/app/kid/useTries';
 import { gamesOfTheDay, type GameKey } from '@/lib/games';
 import { useReviewChoice } from '@/lib/review';
 import { ReviewOption } from '@/components/app/ReviewWords';
+import { CalculIcon } from '@/components/app/AppSections';
 import FindImage from '@/components/app/games/FindImage';
 import SoundFishing from '@/components/app/games/SoundFishing';
 import MissingWord from '@/components/app/games/MissingWord';
@@ -1648,6 +1649,12 @@ function FinishCard({
                 className="flex min-h-12 items-center justify-center rounded-full bg-mteal-light px-6 font-bold text-[#115E59] hover:bg-mteal/30"
               >
                 📒 Faire une petite dictée
+              </Link>
+              <Link
+                href="/app/calcul"
+                className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#F1E9F8] px-6 font-bold text-mpurple hover:bg-mpurple/15"
+              >
+                <CalculIcon /> Faire du calcul
               </Link>
               <Link
                 href="/app"
