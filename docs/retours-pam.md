@@ -48,3 +48,18 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 - [x] **Nouveau design du calcul** : fini le pavé de calculatrice. Le calcul en très gros, la réponse sur une ligne en pointillés,
   des jetons ronds 1 à 0, vérification dès que la réponse a le bon nombre de chiffres, puis calcul suivant.
   Brouillon à côté (sous le calcul sur téléphone) pour faire des ronds, des bâtons…
+
+## 26 octobre 2026 (syllabes, Trouve le mot, Ma phrase)
+
+- [x] **Syllabes** : le nombre de syllabes reste un « ? » ; il n'apparaît qu'une fois toutes les syllabes tapées.
+- [x] **« Trouve le mot » remplace « Le mot qui manque »** dans les mini-jeux du jour. L'app dit le mot, l'enfant le touche
+  parmi des mots qui lui ressemblent, avec des pièges : lettres miroir (b/d, p/q, m/n, n/u, f/t, a/o, i/l), deux lettres
+  inversées (lapin → lpain), une lettre en plus ou en moins (lapins), un vrai mot proche (sapin).
+  Niveau 1 : 3 mots et le modèle affiché ; niveau 2 : 4 ; niveau 3 : 5 ; niveau 4 : 6, à l'oreille seulement.
+  Base pédagogique : identification rapide des mots du CP (exercices « comparer des suites de lettres »), confusions
+  visuelles classiques du lecteur débutant, « orthographic mapping » (L. Ehri) : regarder chaque lettre dans l'ordre.
+  Airtable : nouvelle colonne « Mots pièges » (Activités App), facultative ; vide = l'app fabrique les pièges.
+  Le code de « Le mot qui manque » est gardé, il peut revenir.
+- [x] **« Chanson » devient « Ma phrase et ma poésie »** (pour tous les mots) : l'enfant invente sa phrase avec le mot,
+  le parent l'écrit (gardée sur l'appareil), l'enfant la dit en chanson ou en récitant. La poésie du mot (champ
+  « Song lyrics ») se lit, se chante, se récite ; dès le niveau 3, « Par cœur » cache les mots petit à petit.

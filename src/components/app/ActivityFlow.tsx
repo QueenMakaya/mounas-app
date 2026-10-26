@@ -30,6 +30,8 @@ import { CalculIcon } from '@/components/app/AppSections';
 import FindImage from '@/components/app/games/FindImage';
 import SoundFishing from '@/components/app/games/SoundFishing';
 import MissingWord from '@/components/app/games/MissingWord';
+import FindWord from '@/components/app/games/FindWord';
+import PhrasePoem from '@/components/app/PhrasePoem';
 import FeedMounas from '@/components/app/games/FeedMounas';
 
 /*
@@ -79,8 +81,10 @@ function buildSteps(a: Activity, hasMission: boolean, games: GameKey[] = []): St
     { key: 'prononcer', emoji: '🗣️', name: 'Le dire', heading: 'On le dit à voix haute', minutes: 1, accent: '#5B1F8C', tint: '#F1E9F8' },
     game('jeu-image') && { key: 'jeu-image', emoji: '🖼️', name: 'L’image', heading: 'Trouve l’image', minutes: 1, accent: '#D4530C', tint: '#FCEBDD' },
     game('jeu-phrase') && { key: 'jeu-phrase', emoji: '🧩', name: 'La phrase', heading: 'Le mot qui manque', minutes: 1, accent: '#2D9B6F', tint: '#E5F4EC' },
+    game('jeu-mot') && { key: 'jeu-mot', emoji: '🔎', name: 'Trouve le mot', heading: 'Trouve le mot', minutes: 1, accent: '#2D9B6F', tint: '#E5F4EC' },
     { key: 'activite', emoji: '💬', name: 'On en parle', heading: a.activityTitle ? `On en parle · ${a.activityTitle}` : 'On en parle', minutes: 3, accent: '#1D6FA4', tint: '#E4F0F8', optional: true },
-    Boolean(a.songTitle || a.songLyrics) && { key: 'chanson', emoji: '🎵', name: 'Chanson', heading: a.songTitle || 'La chanson', minutes: 2, accent: '#D4530C', tint: '#FCEBDD' },
+    // « Ma phrase » (and the poem when the word has one): for every word.
+    { key: 'chanson', emoji: '🎤', name: 'Ma phrase', heading: a.songLyrics.trim() ? 'Ma phrase et ma poésie' : 'Ma phrase', minutes: 2, accent: '#D4530C', tint: '#FCEBDD' },
     writing && !game('jeu-nourris') && { key: 'epeler', emoji: '🔤', name: 'Épeler', heading: 'Construis le mot avec les sons', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
     writing && game('jeu-nourris') && { key: 'jeu-nourris', emoji: '😋', name: 'Le Mounas', heading: 'Nourris le Mounas', minutes: 1, accent: '#E63946', tint: '#FDECEE' },
     writing && { key: 'ecrire', emoji: '✍️', name: 'Écrire', heading: 'On écrit le mot', minutes: 2, accent: '#2D9B6F', tint: '#E5F4EC' },
@@ -428,6 +432,14 @@ function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, at
         </>
       );
 
+    case 'jeu-mot':
+      return (
+        <>
+          <Stage tint={step.tint}><FindWord {...game} /></Stage>
+          <ParentTip>Le mot est caché parmi des mots qui lui ressemblent. Ton enfant regarde chaque lettre, dans l’ordre, avant de choisir : les lettres miroir (b et d, p et q) sont des pièges exprès.</ParentTip>
+        </>
+      );
+
     case 'jeu-phrase':
       return (
         <>
@@ -484,17 +496,8 @@ function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, at
     case 'chanson':
       return (
         <>
-          {a.songLyrics && (
-            <Stage tint={step.tint} align="left">
-              <p className="whitespace-pre-line font-display text-lg italic leading-loose text-ink sm:text-xl">{a.songLyrics}</p>
-            </Stage>
-          )}
-          {a.songLyrics && (
-            <div className="mt-4 flex justify-center">
-              <SpeakButton text={a.songLyrics} label="Écouter les paroles" rate={0.85} tone="soft" />
-            </div>
-          )}
-          <ParentTip>Chantez ensemble en tapant dans les mains. Inventez des gestes pour chaque phrase !</ParentTip>
+          <PhrasePoem activity={a} accent={step.accent} tint={step.tint} canSpeak={canSpeak} speak={speak} onSuccess={() => onSuccess()} />
+          <ParentTip>Laisse ton enfant inventer sa phrase, même toute simple, et écris-la pour lui. Il la dit ensuite en chantant ou en récitant. Les plus grands apprennent la poésie par cœur.</ParentTip>
         </>
       );
   }
@@ -1227,10 +1230,13 @@ function SyllableClap({ step, activity: a, speak, onSuccess }: { step: StepDef; 
           })}
         </div>
         <p className="mt-6 font-display text-2xl font-bold text-ink" aria-live="polite">
+          {/* The number of syllables stays a « ? » until the child has clapped them all. */}
           {done ? (
             <>Bravo ! {total} syllabe{total > 1 ? 's' : ''} 🎉</>
+          ) : count === 0 ? (
+            <>Combien de syllabes ? <span className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-mteal-ink ring-2 ring-mteal-ink/30">?</span></>
           ) : (
-            <>👏 {count} / {total}</>
+            <>👏 {count}… ?</>
           )}
         </p>
         {done && (

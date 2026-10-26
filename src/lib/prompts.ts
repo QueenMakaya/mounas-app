@@ -17,13 +17,14 @@ export const STEP_PROMPTS: Record<string, Prompt> = {
   lire: { icon: 'glisser', say: 'Glisse ton doigt sous le mot.' },
   prononcer: { icon: 'dire', say: 'Dis le mot trois fois.' },
   activite: { icon: 'dire', say: 'On en parle ensemble.' },
-  chanson: { icon: 'ecouter', say: 'On chante ensemble !' },
+  chanson: { icon: 'dire', say: 'Invente ta phrase avec le mot, puis dis-la !' },
   epeler: { icon: 'toucher', say: 'Touche les sons dans le bon ordre.' },
   ecrire: { icon: 'ecrire', say: 'Écris le mot avec ton doigt.' },
   mission: { icon: 'ecouter', say: 'Écoute bien la mission.' },
   'jeu-image': { icon: 'ecouter', say: 'Écoute le mot, puis touche la bonne image.' },
   'jeu-peche': { icon: 'toucher', say: 'Pêche les mots qui ont ce son.' },
   'jeu-phrase': { icon: 'toucher', say: 'Trouve le mot qui manque dans la phrase.' },
+  'jeu-mot': { icon: 'ecouter', say: 'Écoute le mot, puis touche-le. Attention aux pièges !' },
   'jeu-nourris': { icon: 'glisser', say: 'Donne les sons au Mounas, dans le bon ordre.' },
 };
 
