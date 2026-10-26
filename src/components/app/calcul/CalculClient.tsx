@@ -5,7 +5,7 @@ import BackButton from '@/components/app/BackButton';
 import { CalculIcon } from '@/components/app/AppSections';
 import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/DrawingCanvas';
 import { playChime } from '@/lib/chime';
-import { localDate } from '@/lib/progress';
+import { localDate, readPref, writePref } from '@/lib/progress';
 import { useSpeech } from '@/lib/useSpeech';
 import {
   LEVELS,
@@ -45,6 +45,9 @@ import {
  */
 
 type Feedback = 'ok' | 'wrong' | 'shown' | null;
+type Entry = 'jetons' | 'clavier';
+
+const LS_ENTRY = 'mounas_calcul_saisie';
 
 const ACCENT: Record<string, string> = { addition: '#0E8C80', soustraction: '#1D6FA4', multiplication: '#5B1F8C' };
 /** The number tokens, in the app's soft colours. */
@@ -73,6 +76,9 @@ export default function CalculClient() {
   const [change, setChange] = useState<Change>(null);
   const [screen, setScreen] = useState<'start' | 'calc' | 'page' | 'end'>('start');
   const [scratchOpen, setScratchOpen] = useState(false);
+  /** How the child answers: big number tokens, or the device's keyboard (its own choice, kept on the device). */
+  const [entry, setEntry] = useState<Entry>('jetons');
+  const answerRef = useRef<HTMLInputElement>(null);
   const scratch = useRef<DrawingCanvasHandle>(null);
   const shownAt = useRef(0);
   const timer = useRef<number | null>(null);
@@ -94,6 +100,7 @@ export default function CalculClient() {
   };
 
   const startSeries = () => {
+    setEntry(readPref(LS_ENTRY) === 'clavier' ? 'clavier' : 'jetons');
     setSeries([]);
     setChange(null);
     setScreen('calc');
@@ -150,6 +157,20 @@ export default function CalculClient() {
     setInput(next);
     if (next.length >= String(problem.answer).length) check(next);
   };
+  // The device keyboard (« Clavier »): same rules as the tokens.
+  const typed = (value: string) => {
+    if (!problem || feedback === 'ok' || feedback === 'shown') return;
+    if (feedback === 'wrong') setFeedback(null);
+    const next = value.replace(/\D/g, '').slice(0, 4);
+    setInput(next);
+    if (next.length >= String(problem.answer).length) check(next);
+  };
+  const chooseEntry = (e: Entry) => {
+    setEntry(e);
+    writePref(LS_ENTRY, e);
+    if (e === 'clavier') answerRef.current?.focus();
+  };
+
   const erase = () => {
     if (feedback === 'ok' || feedback === 'shown') return;
     setInput((v) => v.slice(0, -1));
@@ -235,62 +256,27 @@ export default function CalculClient() {
           )}
 
           {screen === 'calc' && problem && (
-            <div className="p-4 sm:p-6">
-              <SeriesDots series={series} current={feedback === 'ok' || feedback === 'shown' ? -1 : series.length} accent={accent} />
-
-              <div className="mt-3 grid gap-4 sm:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)] sm:items-start">
-                <div>
-                  <ProblemView problem={problem} input={input} feedback={feedback} accent={accent} />
-                  <div className="flex min-h-12 items-center justify-center gap-3" aria-live="polite">
-                    {feedback === 'ok' && <p className="animate-pop font-display text-2xl font-bold text-[#2D9B6F]">Bravo ! ✓</p>}
-                    {feedback === 'wrong' && <p className="font-bold text-morange-ink">Presque ! Essaie encore.</p>}
-                    {feedback === 'shown' && (
-                      <button type="button" onClick={() => advance(series.length)} className="min-h-12 rounded-full bg-ink px-6 font-extrabold text-cream active:scale-95">
-                        Suivant →
-                      </button>
-                    )}
-                    {!feedback && canSpeak && (
-                      <button
-                        type="button"
-                        onClick={() => speak(problemSaid(problem), 0.8)}
-                        aria-label={`Écouter : ${problemSaid(problem)}`}
-                        className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-xl ring-1 ring-ink/15"
-                      >
-                        🔈
-                      </button>
-                    )}
-                  </div>
-                  <NumberTokens onDigit={press} onErase={erase} onCheck={() => check(input)} canCheck={Boolean(input) && !feedback} />
-                </div>
-
-                <div>
-                  <button
-                    type="button"
-                    onClick={() => setScratchOpen((o) => !o)}
-                    aria-expanded={scratchOpen}
-                    className="mx-auto flex min-h-11 items-center gap-2 rounded-full bg-sand px-5 font-bold text-ink sm:hidden"
-                  >
-                    ✏️ {scratchOpen ? 'Fermer le brouillon' : 'Mon brouillon'}
-                  </button>
-                  <div className={`${scratchOpen ? 'block' : 'hidden'} mt-3 sm:mt-0 sm:block`}>
-                    <p className="mb-2 hidden text-center text-sm font-extrabold text-ink-soft sm:block">✏️ Mon brouillon</p>
-                    <div className="overflow-hidden rounded-3xl bg-cream ring-1 ring-ink/10">
-                      <DrawingCanvas ref={scratch} height={260} paper="blanc" size={6} color="#1A1A1A" />
-                    </div>
-                    <p className="mt-2 text-center text-xs text-ink-soft">
-                      Pour faire des ronds, des bâtons… Il s’efface tout seul au calcul suivant.{' '}
-                      <button type="button" onClick={() => scratch.current?.clear()} className="font-bold text-ink underline underline-offset-4">
-                        Effacer
-                      </button>
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <button type="button" onClick={stop} className="mx-auto mt-6 flex min-h-11 items-center rounded-full px-5 text-sm font-bold text-ink-soft ring-1 ring-ink/10 hover:bg-sand">
-                J’ai fini pour aujourd’hui
-              </button>
-            </div>
+            <CalcStage
+              problem={problem}
+              input={input}
+              feedback={feedback}
+              accent={accent}
+              series={series}
+              entry={entry}
+              onEntry={chooseEntry}
+              onType={typed}
+              onDigit={press}
+              onErase={erase}
+              onCheck={() => check(input)}
+              onNext={() => advance(series.length)}
+              onStop={stop}
+              canSpeak={canSpeak}
+              speak={speak}
+              scratch={scratch}
+              scratchOpen={scratchOpen}
+              onScratch={() => setScratchOpen((o) => !o)}
+              inputRef={answerRef}
+            />
           )}
 
           {screen === 'page' && <PageDone series={series} onMore={startSeries} onStop={stop} />}
@@ -318,32 +304,268 @@ function SeriesDots({ series, current, accent }: { series: boolean[]; current: n
   );
 }
 
-/** The calculation, big: on one line, or in columns (as on paper) for two-digit additions and subtractions. */
-function ProblemView({ problem: p, input, feedback, accent }: { problem: Problem; input: string; feedback: Feedback; accent: string }) {
+/** The visible part of the screen (it shrinks when the device keyboard opens). */
+function useVisualViewport() {
+  const [vp, setVp] = useState<{ height: number; top: number } | null>(null);
+  useEffect(() => {
+    const v = window.visualViewport;
+    const update = () => setVp(v ? { height: v.height, top: v.offsetTop } : { height: window.innerHeight, top: 0 });
+    update();
+    v?.addEventListener('resize', update);
+    v?.addEventListener('scroll', update);
+    window.addEventListener('resize', update);
+    return () => {
+      v?.removeEventListener('resize', update);
+      v?.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+    };
+  }, []);
+  return vp;
+}
+
+/** The height of an element, for the scratch pad's canvas. */
+function useHeight<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [h, setH] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => setH(Math.floor(el.clientHeight)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return [ref, h] as const;
+}
+
+/*
+ * A series in progress takes the whole screen, sized to it: the calculation
+ * grows or shrinks with the space left (CSS container units), so whether it is
+ * on one line or in columns, with the tokens, the device keyboard or the
+ * scratch pad open, nothing ever needs scrolling.
+ */
+function CalcStage({
+  problem,
+  input,
+  feedback,
+  accent,
+  series,
+  entry,
+  onEntry,
+  onType,
+  onDigit,
+  onErase,
+  onCheck,
+  onNext,
+  onStop,
+  canSpeak,
+  speak,
+  scratch,
+  scratchOpen,
+  onScratch,
+  inputRef,
+}: {
+  problem: Problem;
+  input: string;
+  feedback: Feedback;
+  accent: string;
+  series: boolean[];
+  entry: Entry;
+  onEntry: (e: Entry) => void;
+  onType: (value: string) => void;
+  onDigit: (d: string) => void;
+  onErase: () => void;
+  onCheck: () => void;
+  onNext: () => void;
+  onStop: () => void;
+  canSpeak: boolean;
+  speak: (text: string, rate?: number) => void;
+  scratch: React.RefObject<DrawingCanvasHandle | null>;
+  scratchOpen: boolean;
+  onScratch: () => void;
+  inputRef: React.RefObject<HTMLInputElement | null>;
+}) {
+  const vp = useVisualViewport();
+  const [padRef, padHeight] = useHeight<HTMLDivElement>();
+  const done = feedback === 'ok' || feedback === 'shown';
+
+  // No page scroll behind the series.
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, []);
+
+  // Keyboard mode: keep the (invisible) answer field focused, so the device keyboard stays open.
+  useEffect(() => {
+    if (entry === 'clavier') inputRef.current?.focus({ preventScroll: true });
+  }, [entry, problem, inputRef]);
+
+  return (
+    <div
+      className="fixed inset-x-0 z-50 flex flex-col bg-cream font-body"
+      style={{ top: vp?.top ?? 0, height: vp ? vp.height : '100dvh' }}
+      role="dialog"
+      aria-label="Série de calculs"
+    >
+      {/* Top bar: stop, the ten dots, how to answer, listen. */}
+      <div className="flex items-center gap-2 px-3 pb-1 pt-[max(env(safe-area-inset-top),0.5rem)]">
+        <button type="button" onClick={onStop} className="h-10 flex-shrink-0 rounded-full bg-white px-3 text-sm font-bold text-ink ring-1 ring-ink/15">
+          ✕ <span className="hidden sm:inline">J’ai fini</span>
+        </button>
+        <div className="min-w-0 flex-1">
+          <SeriesDots series={series} current={done ? -1 : series.length} accent={accent} />
+        </div>
+        <div role="radiogroup" aria-label="Répondre avec" className="flex flex-shrink-0 rounded-full bg-white p-0.5 ring-1 ring-ink/15">
+          {(
+            [
+              ['jetons', '🔢', 'Jetons'],
+              ['clavier', '⌨️', 'Clavier'],
+            ] as const
+          ).map(([value, icon, label]) => (
+            <button
+              key={value}
+              type="button"
+              role="radio"
+              aria-checked={entry === value}
+              aria-label={label}
+              onClick={() => onEntry(value)}
+              className={`h-9 rounded-full px-2.5 text-sm font-bold sm:px-3 ${entry === value ? 'bg-ink text-cream' : 'text-ink-soft'}`}
+            >
+              {icon}
+              <span className="hidden sm:inline"> {label}</span>
+            </button>
+          ))}
+        </div>
+        {canSpeak && (
+          <button
+            type="button"
+            onClick={() => speak(problemSaid(problem), 0.8)}
+            aria-label={`Écouter : ${problemSaid(problem)}`}
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-white text-lg ring-1 ring-ink/15"
+          >
+            🔈
+          </button>
+        )}
+      </div>
+
+      <div className="flex min-h-0 flex-1 flex-col gap-2 px-3 pb-[max(env(safe-area-inset-bottom),0.5rem)] sm:flex-row sm:gap-4">
+        {/* The calculation and the answer. */}
+        <div className="flex min-h-0 flex-1 flex-col">
+          <label htmlFor="calcul-reponse" className="flex min-h-0 flex-1 items-center justify-center [container-type:size]">
+            <ProblemView problem={problem} input={input} feedback={feedback} accent={accent} caret={entry === 'clavier' && !done} />
+          </label>
+          {/* Invisible field that receives the device keyboard (16px so iOS doesn't zoom). */}
+          <input
+            ref={inputRef}
+            id="calcul-reponse"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            enterKeyHint="done"
+            autoComplete="off"
+            aria-label="Ta réponse"
+            value={input}
+            readOnly={done || entry !== 'clavier'}
+            tabIndex={entry === 'clavier' ? 0 : -1}
+            onChange={(e) => onType(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key !== 'Enter') return;
+              e.preventDefault();
+              if (feedback === 'shown') onNext();
+              else onCheck();
+            }}
+            className="pointer-events-none absolute h-px w-px opacity-0"
+            style={{ fontSize: 16 }}
+          />
+          <div className="flex h-12 flex-shrink-0 items-center justify-center gap-3" aria-live="polite">
+            {feedback === 'ok' && <p className="animate-pop font-display text-2xl font-bold text-[#2D9B6F]">Bravo ! ✓</p>}
+            {feedback === 'wrong' && <p className="font-bold text-morange-ink">Presque ! Essaie encore.</p>}
+            {feedback === 'shown' && (
+              <button type="button" onClick={onNext} className="min-h-11 rounded-full bg-ink px-6 font-extrabold text-cream active:scale-95">
+                Suivant →
+              </button>
+            )}
+            {!feedback && input && (
+              <>
+                <button type="button" onClick={onErase} className="min-h-10 rounded-full bg-white px-4 text-sm font-bold text-ink ring-1 ring-ink/15">
+                  ⌫ Effacer
+                </button>
+                <button type="button" onClick={onCheck} className="min-h-10 rounded-full bg-ink px-4 text-sm font-bold text-cream">
+                  ✓ C’est ma réponse
+                </button>
+              </>
+            )}
+            {!feedback && !input && entry === 'clavier' && (
+              <button type="button" onClick={() => inputRef.current?.focus()} className="text-sm font-bold text-ink-soft underline underline-offset-4">
+                Touche ici pour écrire
+              </button>
+            )}
+          </div>
+          {entry === 'jetons' && <NumberTokens onDigit={onDigit} />}
+          <button
+            type="button"
+            onClick={onScratch}
+            aria-expanded={scratchOpen}
+            className="mx-auto mt-2 flex min-h-10 flex-shrink-0 items-center gap-2 rounded-full bg-sand px-4 text-sm font-bold text-ink sm:hidden"
+          >
+            ✏️ {scratchOpen ? 'Fermer le brouillon' : 'Mon brouillon'}
+          </button>
+        </div>
+
+        {/* The scratch pad: beside the calculation on a tablet, under it (when opened) on a phone. */}
+        <div className={`${scratchOpen ? 'flex' : 'hidden'} min-h-0 flex-col sm:flex sm:flex-1 ${scratchOpen ? 'basis-[38%] sm:basis-auto' : ''}`}>
+          <div className="mb-1 flex flex-shrink-0 items-center justify-between px-1 text-xs font-bold text-ink-soft">
+            <span>✏️ Mon brouillon</span>
+            <button type="button" onClick={() => scratch.current?.clear()} className="underline underline-offset-4">
+              Effacer
+            </button>
+          </div>
+          <div ref={padRef} className="min-h-0 flex-1 overflow-hidden rounded-3xl bg-white ring-1 ring-ink/10">
+            {padHeight > 0 && <DrawingCanvas ref={scratch} height={padHeight} paper="blanc" size={6} color="#1A1A1A" />}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The calculation, as big as its box allows: on one line, or in columns (as
+ * on paper) for two-digit additions and subtractions. Sized with container
+ * units so it always fits without scrolling.
+ */
+function ProblemView({ problem: p, input, feedback, accent, caret }: { problem: Problem; input: string; feedback: Feedback; accent: string; caret: boolean }) {
   const symbol = opInfo(p.op).symbol;
   const columns = p.op !== 'multiplication' && (p.a >= 10 || p.b >= 10);
   const color = feedback === 'shown' ? '#C7600A' : feedback === 'ok' ? '#2D9B6F' : '#1A1A1A';
   const answer = (
     <span
-      className={`inline-flex min-w-[1.6ch] justify-center border-b-[6px] border-dashed px-2 ${columns ? 'w-full justify-end' : ''} ${feedback === 'wrong' ? 'animate-shake' : ''} ${feedback === 'ok' ? 'animate-pop' : ''}`}
+      className={`inline-flex min-w-[1.6ch] items-baseline justify-center border-b-[0.08em] border-dashed px-[0.1em] ${columns ? 'w-full justify-end' : ''} ${feedback === 'wrong' ? 'animate-shake' : ''} ${feedback === 'ok' ? 'animate-pop' : ''}`}
       style={{ color, borderColor: feedback === 'ok' ? '#2D9B6F' : accent }}
     >
-      {input || ' '}
+      {input || (caret ? '' : '\u00a0')}
+      {caret && <span className="ml-[0.05em] inline-block h-[0.8em] w-[0.06em] animate-pulse self-center" style={{ backgroundColor: accent }} />}
     </span>
   );
+  // Columns: 3 rows (≈ 3.6 line heights) and ~4 characters wide. One line: its width in em, measured
+  // (≈ 2.1em of signs and gaps + 0.62em per digit, the answer counted at its real length).
+  const digits = String(p.a).length + String(p.b).length + Math.max(1.6, String(p.answer).length);
+  const fontSize = columns ? 'min(24cqh, 26cqw, 8rem)' : `min(55cqh, ${(92 / (2.1 + 0.62 * digits)).toFixed(1)}cqw, 8rem)`;
   return (
-    <div className="flex justify-center py-6 font-display font-bold tabular-nums text-ink sm:py-10" aria-label={`${p.a} ${symbol} ${p.b} égale ?`}>
+    <div className="font-display font-bold tabular-nums leading-tight text-ink" style={{ fontSize }} aria-label={`${p.a} ${symbol} ${p.b} égale ?`}>
       {columns ? (
-        <div className="text-right text-7xl leading-tight sm:text-8xl">
+        <div className="text-right">
           <div>{p.a}</div>
           <div>
-            <span className="mr-4" style={{ color: accent }}>{symbol}</span>
+            <span className="mr-[0.3em]" style={{ color: accent }}>{symbol}</span>
             {p.b}
           </div>
-          <div className="mt-1 border-t-[6px] border-ink pt-1">{answer}</div>
+          <div className="mt-[0.05em] border-t-[0.08em] border-ink">{answer}</div>
         </div>
       ) : (
-        <p className="flex flex-wrap items-baseline justify-center gap-x-4 text-7xl sm:text-8xl">
+        <p className="flex items-baseline justify-center gap-x-[0.25em] whitespace-nowrap">
           <span>{p.a}</span>
           <span style={{ color: accent }}>{symbol}</span>
           <span>{p.b}</span>
@@ -356,32 +578,20 @@ function ProblemView({ problem: p, input, feedback, accent }: { problem: Problem
 }
 
 /** Ten round number tokens on two rows, like number cards on the table: no calculator. */
-function NumberTokens({ onDigit, onErase, onCheck, canCheck }: { onDigit: (d: string) => void; onErase: () => void; onCheck: () => void; canCheck: boolean }) {
+function NumberTokens({ onDigit }: { onDigit: (d: string) => void }) {
   return (
-    <div className="mx-auto max-w-sm">
-      <div className="grid grid-cols-5 gap-2.5">
-        {['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].map((d, i) => (
-          <button
-            key={d}
-            type="button"
-            onClick={() => onDigit(d)}
-            className="aspect-square rounded-full font-display text-3xl font-bold text-ink shadow-[0_3px_0_rgba(26,26,26,0.15)] ring-1 ring-ink/10 active:translate-y-0.5 active:shadow-none"
-            style={{ backgroundColor: TOKEN_COLORS[i % TOKEN_COLORS.length] }}
-          >
-            {d}
-          </button>
-        ))}
-      </div>
-      <div className="mt-3 flex justify-center gap-3">
-        <button type="button" onClick={onErase} className="min-h-11 rounded-full bg-white px-5 font-bold text-ink ring-1 ring-ink/15">
-          ⌫ Effacer
+    <div className="mx-auto grid w-full max-w-sm flex-shrink-0 grid-cols-5 gap-2">
+      {['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'].map((d, i) => (
+        <button
+          key={d}
+          type="button"
+          onClick={() => onDigit(d)}
+          className="mx-auto flex aspect-square h-[min(3.75rem,8.5dvh)] items-center justify-center rounded-full font-display text-[min(1.9rem,4.5dvh)] font-bold text-ink shadow-[0_3px_0_rgba(26,26,26,0.15)] ring-1 ring-ink/10 active:translate-y-0.5 active:shadow-none"
+          style={{ backgroundColor: TOKEN_COLORS[i % TOKEN_COLORS.length] }}
+        >
+          {d}
         </button>
-        {canCheck && (
-          <button type="button" onClick={onCheck} className="min-h-11 rounded-full bg-ink px-5 font-bold text-cream">
-            ✓ C’est ma réponse
-          </button>
-        )}
-      </div>
+      ))}
     </div>
   );
 }

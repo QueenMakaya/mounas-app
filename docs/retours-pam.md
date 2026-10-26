@@ -63,3 +63,11 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 - [x] **« Chanson » devient « Ma phrase et ma poésie »** (pour tous les mots) : l'enfant invente sa phrase avec le mot,
   le parent l'écrit (gardée sur l'appareil), l'enfant la dit en chanson ou en récitant. La poésie du mot (champ
   « Song lyrics ») se lit, se chante, se récite ; dès le niveau 3, « Par cœur » cache les mots petit à petit.
+
+## 26 octobre 2026 (calcul sans défiler)
+
+- [x] **Plus besoin de défiler pendant une série** : la série prend tout l'écran et le calcul s'ajuste à la place
+  disponible (en ligne ou en colonnes, avec les jetons, le clavier ou le brouillon ouvert). Vérifié sur iPhone SE,
+  iPhone récent, iPad portrait et paysage.
+- [x] **Répondre avec les jetons ou le clavier** : bouton 🔢 Jetons / ⌨️ Clavier en haut. Le clavier ouvre le pavé
+  chiffré du téléphone ou de la tablette (un clavier physique marchait déjà). Le choix est retenu sur l'appareil.
