@@ -24,9 +24,8 @@ import KidPrompt from '@/components/app/kid/KidPrompt';
 import ParentLock from '@/components/app/kid/ParentLock';
 import { useTries } from '@/components/app/kid/useTries';
 import { gamesOfTheDay, type GameKey } from '@/lib/games';
-import { useDueReviews } from '@/lib/review';
-import type { LearnedWord } from '@/lib/progress';
-import ReviewWords from '@/components/app/ReviewWords';
+import { useReviewChoice } from '@/lib/review';
+import { ReviewOption } from '@/components/app/ReviewWords';
 import FindImage from '@/components/app/games/FindImage';
 import SoundFishing from '@/components/app/games/SoundFishing';
 import MissingWord from '@/components/app/games/MissingWord';
@@ -39,7 +38,7 @@ import FeedMounas from '@/components/app/games/FeedMounas';
  * scroll of eight coloured blocks.
  */
 
-type StepKey = 'revision' | 'decouvrir' | 'lire' | 'syllabes' | 'prononcer' | 'epeler' | 'ecrire' | 'activite' | 'chanson' | 'mission' | GameKey;
+type StepKey = 'decouvrir' | 'lire' | 'syllabes' | 'prononcer' | 'epeler' | 'ecrire' | 'activite' | 'chanson' | 'mission' | GameKey;
 
 type StepDef = {
   key: StepKey;
@@ -60,18 +59,18 @@ type StepDef = {
  * it. Spelling and writing start at level 2 — level 1 is for the youngest.
  * A linked mission (calcul, problème) comes last, as an optional bonus.
  *
- * Around that fixed order, the day adds variety: words learned a few days ago
- * come back first (« Les mots qui reviennent »), and one or two mini-games
- * slot in where they fit: the sound fishing after reading the sounds, the
- * picture and the sentence after saying the word, and « Nourris le Mounas »
- * replaces « Épeler » on its days.
+ * Around that fixed order, the day adds variety: one or two mini-games slot
+ * in where they fit: the sound fishing after reading the sounds, the picture
+ * and the sentence after saying the word, and « Nourris le Mounas » replaces
+ * « Épeler » on its days. The day always opens on the mystery word; words
+ * learned before (« Les mots qui reviennent ») are an option offered under it
+ * and again at the end, never a step of their own.
  */
-function buildSteps(a: Activity, hasMission: boolean, games: GameKey[] = [], review = false): StepDef[] {
+function buildSteps(a: Activity, hasMission: boolean, games: GameKey[] = []): StepDef[] {
   const level = parseInt(a.difficulty, 10) || 1;
   const writing = level >= 2;
   const game = (k: GameKey) => games.includes(k);
   const steps: (StepDef | false)[] = [
-    review && { key: 'revision', emoji: '🔁', name: 'Ça revient', heading: 'Les mots qui reviennent', minutes: 1, accent: '#C7600A', tint: '#FEF3E2' },
     { key: 'decouvrir', emoji: '✨', name: 'Le mot mystère', heading: 'Le mot mystère du jour', minutes: 1, accent: '#E63946', tint: '#FDECEE' },
     { key: 'syllabes', emoji: '👏', name: 'Syllabes', heading: 'On compte les syllabes', minutes: 1, accent: '#0E8C80', tint: '#E3F8F5' },
     { key: 'lire', emoji: '📖', name: 'Les sons', heading: 'On lit les sons ensemble', minutes: 2, accent: '#E08A1E', tint: '#FEF3E2' },
@@ -120,10 +119,10 @@ export default function ActivityFlow({
   mission?: Mission | null;
 }) {
   // The day (client only: it must be the parent's date) picks the games, and
-  // this device's history the words that come back.
+  // this device's history the words offered for review.
   const today = useSyncExternalStore(subscribeNoop, localDate, () => '');
-  const reviewWords = useDueReviews(activity.id);
-  const steps = buildSteps(activity, Boolean(mission), today ? gamesOfTheDay(activity, library, today) : [], reviewWords.length > 0);
+  const review = useReviewChoice(activity.id);
+  const steps = buildSteps(activity, Boolean(mission), today ? gamesOfTheDay(activity, library, today) : []);
   const [index, setIndex] = useState(0);
   const [finished, setFinished] = useState(false);
   // Step 1: did the child read the word alone before hearing it?
@@ -275,6 +274,8 @@ export default function ActivityFlow({
           headingRef={headingRef}
           childMode={childMode}
           speak={speak}
+          canSpeak={canSpeak}
+          review={review}
         />
       ) : (
         <section
@@ -322,7 +323,6 @@ export default function ActivityFlow({
                 if (a) win();
               }}
               onSuccess={win}
-              reviewWords={reviewWords}
               revealed={revealed}
               onReveal={() => {
                 setChosenMode(mode);
@@ -334,6 +334,13 @@ export default function ActivityFlow({
             />
           </div>
         </section>
+      )}
+
+      {/* Revising earlier words is the family's choice: offered under the first step, never imposed. */}
+      {!finished && index === 0 && (
+        <div className="mt-5">
+          <ReviewOption key="debut" {...review} library={library} canSpeak={canSpeak} speak={speak} where="debut" />
+        </div>
       )}
 
       {/* ── Bottom nav, in the thumb zone ── */}
@@ -396,24 +403,13 @@ type BodyProps = {
   mission: Mission | null;
   /** The step's success signal (child mode: the "next" arrow glows). */
   onSuccess: (chimed?: boolean) => void;
-  reviewWords: LearnedWord[];
 };
 
 type Attempt = 'alone' | 'together' | null;
 
-function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal, mode, onModeChange, mission, onSuccess, reviewWords }: BodyProps) {
+function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal, mode, onModeChange, mission, onSuccess }: BodyProps) {
   const game = { activity: a, library, canSpeak, speak, onSuccess, accent: step.accent };
   switch (step.key) {
-    case 'revision':
-      return (
-        <>
-          <Stage tint={step.tint}>
-            <ReviewWords words={reviewWords} library={library} canSpeak={canSpeak} speak={speak} onSuccess={onSuccess} />
-          </Stage>
-          <ParentTip>Ces mots ont été appris il y a quelques jours. Ton enfant essaie de les lire seul, puis touche le haut-parleur pour vérifier.</ParentTip>
-        </>
-      );
-
     case 'jeu-image':
       return (
         <>
@@ -1524,6 +1520,8 @@ function FinishCard({
   headingRef,
   childMode,
   speak,
+  canSpeak,
+  review,
 }: {
   activity: Activity;
   library: WordCard[];
@@ -1532,6 +1530,8 @@ function FinishCard({
   headingRef: React.RefObject<HTMLHeadingElement | null>;
   childMode: boolean;
   speak: BodyProps['speak'];
+  canSpeak: boolean;
+  review: ReturnType<typeof useReviewChoice>;
 }) {
   // Read once when this card mounts (client only — it only renders after a click).
   const [done, setDone] = useState(() => isCompletedToday(a.id));
@@ -1626,6 +1626,9 @@ function FinishCard({
               </p>
             )}
             {childMode && <AnotherWord activity={a} library={library} />}
+            <div className="mx-auto mt-6 max-w-sm">
+              <ReviewOption key="fin" {...review} library={library} canSpeak={canSpeak} speak={speak} where="fin" />
+            </div>
             <NextWords activity={a} library={library} />
             <div className="mx-auto mt-8 flex max-w-sm flex-col gap-3">
               <Link

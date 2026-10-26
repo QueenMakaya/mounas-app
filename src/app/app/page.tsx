@@ -127,6 +127,19 @@ export default async function HomePage() {
             <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
           </Link>
           <Link
+            href="/app/calcul"
+            className="group flex items-center gap-4 rounded-3xl bg-white p-4 ring-1 ring-ink/5 transition-colors hover:bg-sand"
+          >
+            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F1E9F8] text-2xl" aria-hidden="true">
+              🔢
+            </span>
+            <span className="flex-1">
+              <span className="block font-extrabold text-ink">Le calcul</span>
+              <span className="block text-sm text-ink-soft">Additions, soustractions, multiplications, à son rythme</span>
+            </span>
+            <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
+          </Link>
+          <Link
             href="/app/missions"
             className="group flex items-center gap-4 rounded-3xl bg-white p-4 ring-1 ring-ink/5 transition-colors hover:bg-sand"
           >

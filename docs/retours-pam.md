@@ -19,3 +19,15 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   (branche feat/jeux-mounaville : 1 ou 2 mini-jeux différents chaque jour, « Les mots qui reviennent » en échauffement, Mounaville sur la page des progrès).
 - [x] **Étudier Reading.com** (reverse engineering des meilleures fonctionnalités) et implémenter les meilleures idées
   (étude : docs/plan-mode-enfant.md ; glisse-sons en deux temps : l'app dit les sons, puis l'enfant les dit seul).
+
+## 26 octobre 2026
+
+- [x] **Révision = une option, pas le début de la journée** : le parcours commence toujours par le mot mystère.
+  « Revoir des mots d'avant » est proposé sous la première étape et à la fin (à côté d'« Un autre mot ? »).
+  Les jours sans mot à revoir, l'option propose quelques mots déjà appris.
+- [x] **Écriture** : l'écran s'ouvre toujours sur le mot en pointillés (Minuscules) ; le dernier choix n'est plus mémorisé.
+- [x] **« 👀 Je lis / 👂 J'écoute »** : de nouveau sur le premier écran (à partir du niveau 2, comme avant).
+- [ ] **Mini-jeux du jour / mise à jour du 19 octobre** : on ne touche à rien pour l'instant, Pam veut d'abord bien comprendre.
+- [x] **Calcul façon Kumon** (/app/calcul) : additions, soustractions, puis tables une par une ; sans limite par jour.
+  Le parent choisit le niveau du cahier ; l'app avance quand 18 des 20 derniers calculs sont justes du premier coup
+  et faits sans trop chercher, revient au niveau d'avant si beaucoup d'erreurs, et refait passer les calculs ratés.

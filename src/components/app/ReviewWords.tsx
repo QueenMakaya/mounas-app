@@ -69,3 +69,77 @@ export default function ReviewWords({
     </ul>
   );
 }
+
+/**
+ * The review as an option, never a step: a card the family can open at the
+ * start of the word (before the mystery word) or at the end (instead of a new
+ * word). Closed, it only says how many words are waiting.
+ */
+export function ReviewOption({
+  words,
+  due,
+  library,
+  canSpeak,
+  speak,
+  where,
+}: {
+  words: LearnedWord[];
+  due: boolean;
+  library: WordCard[];
+  canSpeak: boolean;
+  speak: (text: string, rate?: number) => void;
+  where: 'debut' | 'fin';
+}) {
+  const [open, setOpen] = useState(false);
+  const [done, setDone] = useState(false);
+  if (words.length === 0) return null;
+  const title = due ? 'Les mots qui reviennent' : 'Revoir des mots déjà appris';
+  const count = words.length === 1 ? '1 mot' : `${words.length} mots`;
+
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          setOpen(true);
+          if (canSpeak) speak('Lis ces mots, puis écoute-les pour vérifier.', 0.85);
+        }}
+        className="flex w-full items-center gap-4 rounded-3xl bg-white p-4 text-left ring-1 ring-ink/10 transition-colors hover:bg-sand"
+      >
+        <span aria-hidden="true" className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#FEF3E2] text-2xl">
+          🔁
+        </span>
+        <span className="flex-1">
+          <span className="block font-extrabold text-ink">{where === 'debut' ? `Envie de revoir des mots d’avant ?` : title}</span>
+          <span className="block text-sm text-ink-soft">
+            {count} · {due ? 'appris il y a quelques jours' : 'déjà appris'} · facultatif
+          </span>
+        </span>
+        <span aria-hidden="true" className="text-xl text-ink">→</span>
+      </button>
+    );
+  }
+
+  return (
+    <section aria-label={title} className="animate-rise rounded-3xl bg-[#FEF3E2] p-4 text-left ring-1 ring-ink/5 sm:p-5">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <h3 className="font-display text-xl font-bold text-ink">🔁 {title}</h3>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="min-h-11 rounded-full bg-white px-4 text-sm font-bold text-ink ring-1 ring-ink/15"
+        >
+          Fermer
+        </button>
+      </div>
+      <ReviewWords words={words} library={library} canSpeak={canSpeak} speak={speak} onSuccess={() => setDone(true)} />
+      {done ? (
+        <p className="animate-rise mt-3 text-center font-display text-lg font-bold text-[#1F6B4C]" aria-live="polite">
+          Bravo, tu les as tous relus ! 🌟
+        </p>
+      ) : (
+        <p className="mt-3 text-center text-sm text-ink-soft">Ton enfant essaie de lire chaque mot seul, puis touche le haut-parleur pour vérifier.</p>
+      )}
+    </section>
+  );
+}

@@ -21,7 +21,6 @@ export const STEP_PROMPTS: Record<string, Prompt> = {
   epeler: { icon: 'toucher', say: 'Touche les sons dans le bon ordre.' },
   ecrire: { icon: 'ecrire', say: 'Écris le mot avec ton doigt.' },
   mission: { icon: 'ecouter', say: 'Écoute bien la mission.' },
-  revision: { icon: 'toucher', say: 'Lis ces mots, puis écoute-les pour vérifier.' },
   'jeu-image': { icon: 'ecouter', say: 'Écoute le mot, puis touche la bonne image.' },
   'jeu-peche': { icon: 'toucher', say: 'Pêche les mots qui ont ce son.' },
   'jeu-phrase': { icon: 'toucher', say: 'Trouve le mot qui manque dans la phrase.' },
