@@ -45,6 +45,8 @@ export type Activity = {
   graphemes: string;
   /** Optional discussion questions, one per line. */
   questions: string;
+  /** Optional traps for « Trouve le mot », comma-separated (else generated, src/lib/games.ts). */
+  traps: string;
 };
 
 const recordToActivity = (record: Records<FieldSet>[number]): Activity => ({
@@ -69,6 +71,7 @@ const recordToActivity = (record: Records<FieldSet>[number]): Activity => ({
   status: (record.get('Status') as string) || '',
   graphemes: (record.get('Graphèmes') as string) || '',
   questions: (record.get('Questions') as string) || '',
+  traps: (record.get('Mots pièges') as string) || '',
 });
 
 // Only finished activities reach parents. Rows still being written

@@ -1,32 +1,18 @@
 'use client';
 
-import { useState, useSyncExternalStore } from 'react';
-import { readPref, writePref } from '@/lib/progress';
+import { useState } from 'react';
 
 /**
  * How the child writes: over the school cursive (minuscules), over capitals,
- * or on a blank page with no model. The last choice is remembered on the
- * device, so a child who loves capitals finds them again the next day.
+ * or on a blank page with no model. The writing screen always opens on the
+ * dotted word in minuscules: the choice is not remembered from one day to
+ * the next, so a tap on « Feuille blanche » never hides the model for good.
  */
 
 export type WritingMode = 'minuscules' | 'capitales' | 'blanc';
 
-const LS_WRITING_MODE = 'mounas_writing_mode';
-const MODES: WritingMode[] = ['minuscules', 'capitales', 'blanc'];
-const subscribeNoop = () => () => {};
-const readMode = (): WritingMode => {
-  const saved = readPref(LS_WRITING_MODE);
-  return MODES.find((m) => m === saved) ?? 'minuscules';
-};
-
 export function useWritingMode(): [WritingMode, (mode: WritingMode) => void] {
-  const saved = useSyncExternalStore(subscribeNoop, readMode, () => 'minuscules' as const);
-  const [chosen, setChosen] = useState<WritingMode | null>(null);
-  const choose = (mode: WritingMode) => {
-    setChosen(mode);
-    writePref(LS_WRITING_MODE, mode);
-  };
-  return [chosen ?? saved, choose];
+  return useState<WritingMode>('minuscules');
 }
 
 /** The tracing model for a word: text, CSS font variable and paper. */

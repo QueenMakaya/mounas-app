@@ -18,7 +18,7 @@ import { mergeSnapshots, parseSnapshot, type Snapshot } from '@/lib/progress-sna
  *   saved and when the app goes to the background.
  *
  * The localStorage keys are the ones of src/lib/progress.ts,
- * src/lib/mission-progress.ts and src/lib/review.ts; their own code is left
+ * src/lib/mission-progress.ts, src/lib/review.ts and src/lib/calcul.ts; their own code is left
  * untouched. Without network or storage, the app works exactly as before.
  */
 
@@ -59,6 +59,7 @@ function readLocal(): Snapshot {
     missions: readJson('mounas_missions'),
     completed,
     review: readJson('mounas_review'),
+    calcul: readJson('mounas_calcul'),
   });
 }
 
@@ -70,12 +71,14 @@ function writeLocal(s: Snapshot): void {
     ls.setItem('mounas_learned', JSON.stringify(s.learned));
     ls.setItem('mounas_missions', JSON.stringify(s.missions));
     ls.setItem('mounas_review', JSON.stringify(s.review));
+    if (s.calcul.updated > 0) ls.setItem('mounas_calcul', JSON.stringify(s.calcul));
     const from = keepFrom();
     for (const key of s.completed) {
       const cut = key.lastIndexOf('_');
       if (key.slice(cut + 1) >= from) ls.setItem(`mounas_completed_${key.slice(0, cut)}_${key.slice(cut + 1)}`, 'true');
     }
     window.dispatchEvent(new Event('mounas-missions'));
+    window.dispatchEvent(new Event('mounas-calcul'));
   } catch {
     // storage unavailable: this device keeps its own progress
   }

@@ -22,7 +22,7 @@ import { checkoutAccess, findAccess } from '@/lib/subscription';
  *    only Airtable knows which word is today's (free) one.
  */
 
-const PAID_PREFIXES = ['/app/select', '/app/dictee', '/app/progres', '/app/compte', '/app/missions'];
+const PAID_PREFIXES = ['/app/select', '/app/dictee', '/app/progres', '/app/compte', '/app/missions', '/app/calcul'];
 
 function isPaid(pathname: string): boolean {
   return PAID_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));

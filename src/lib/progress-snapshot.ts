@@ -15,6 +15,7 @@
 
 import type { LearnedWord } from '@/lib/progress';
 import type { MissionRecord } from '@/lib/mission-progress';
+import { emptyCalcul, mergeCalcul, parseCalcul, type CalculState } from '@/lib/calcul';
 
 export type Snapshot = {
   /** Days with at least one finished activity (YYYY-MM-DD). */
@@ -27,6 +28,8 @@ export type Snapshot = {
   completed: string[];
   /** « Les mots qui reviennent »: returns done per word. */
   review: Record<string, number>;
+  /** « Le calcul »: level, stats per level and per day (src/lib/calcul.ts). */
+  calcul: CalculState;
 };
 
 /** Something finished since the last sync, for the Journal table. */
@@ -34,7 +37,7 @@ export type ProgressEvent =
   | { kind: 'mot'; id: string; label: string; date: string; readAlone: boolean; spelledAlone: boolean }
   | { kind: 'mission'; id: string; date: string; solved: boolean; tries: number; hints: number };
 
-export const emptySnapshot = (): Snapshot => ({ days: [], seen: [], learned: [], missions: {}, completed: [], review: {} });
+export const emptySnapshot = (): Snapshot => ({ days: [], seen: [], learned: [], missions: {}, completed: [], review: {}, calcul: emptyCalcul() });
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_ITEMS = 2000;
@@ -96,6 +99,7 @@ export function parseSnapshot(v: unknown): Snapshot {
     missions,
     completed: strings(v.completed, (s) => /_\d{4}-\d{2}-\d{2}$/.test(s)),
     review,
+    calcul: parseCalcul(v.calcul),
   };
 }
 
@@ -141,6 +145,7 @@ export function mergeSnapshots(a: Snapshot, b: Snapshot): Snapshot {
     missions,
     completed: union(a.completed, b.completed),
     review,
+    calcul: mergeCalcul(a.calcul, b.calcul),
   };
 }
 

@@ -3,6 +3,7 @@ import { Andika, Playwrite_FR_Trad } from 'next/font/google';
 import SiteHeader from '@/components/site/SiteHeader';
 import NavTracker from '@/components/app/NavTracker';
 import ProgressSync from '@/components/app/ProgressSync';
+import AppSections from '@/components/app/AppSections';
 import { getSession } from '@/lib/auth';
 
 // Andika was designed for children learning to read (single-storey "a",
@@ -46,6 +47,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <div className={`${andika.variable} ${cursive.variable} flex min-h-screen flex-1 flex-col bg-cream text-ink`}>
       <SiteHeader member={member} />
+      <AppSections />
       <NavTracker />
       {member && <ProgressSync />}
       {children}

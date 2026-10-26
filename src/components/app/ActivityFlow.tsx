@@ -24,12 +24,14 @@ import KidPrompt from '@/components/app/kid/KidPrompt';
 import ParentLock from '@/components/app/kid/ParentLock';
 import { useTries } from '@/components/app/kid/useTries';
 import { gamesOfTheDay, type GameKey } from '@/lib/games';
-import { useDueReviews } from '@/lib/review';
-import type { LearnedWord } from '@/lib/progress';
-import ReviewWords from '@/components/app/ReviewWords';
+import { useReviewChoice } from '@/lib/review';
+import { ReviewOption } from '@/components/app/ReviewWords';
+import { CalculIcon } from '@/components/app/AppSections';
 import FindImage from '@/components/app/games/FindImage';
 import SoundFishing from '@/components/app/games/SoundFishing';
 import MissingWord from '@/components/app/games/MissingWord';
+import FindWord from '@/components/app/games/FindWord';
+import PhrasePoem from '@/components/app/PhrasePoem';
 import FeedMounas from '@/components/app/games/FeedMounas';
 
 /*
@@ -39,7 +41,7 @@ import FeedMounas from '@/components/app/games/FeedMounas';
  * scroll of eight coloured blocks.
  */
 
-type StepKey = 'revision' | 'decouvrir' | 'lire' | 'syllabes' | 'prononcer' | 'epeler' | 'ecrire' | 'activite' | 'chanson' | 'mission' | GameKey;
+type StepKey = 'decouvrir' | 'lire' | 'syllabes' | 'prononcer' | 'epeler' | 'ecrire' | 'activite' | 'chanson' | 'mission' | GameKey;
 
 type StepDef = {
   key: StepKey;
@@ -60,18 +62,18 @@ type StepDef = {
  * it. Spelling and writing start at level 2 — level 1 is for the youngest.
  * A linked mission (calcul, problème) comes last, as an optional bonus.
  *
- * Around that fixed order, the day adds variety: words learned a few days ago
- * come back first (« Les mots qui reviennent »), and one or two mini-games
- * slot in where they fit: the sound fishing after reading the sounds, the
- * picture and the sentence after saying the word, and « Nourris le Mounas »
- * replaces « Épeler » on its days.
+ * Around that fixed order, the day adds variety: one or two mini-games slot
+ * in where they fit: the sound fishing after reading the sounds, the picture
+ * and the sentence after saying the word, and « Nourris le Mounas » replaces
+ * « Épeler » on its days. The day always opens on the mystery word; words
+ * learned before (« Les mots qui reviennent ») are an option offered under it
+ * and again at the end, never a step of their own.
  */
-function buildSteps(a: Activity, hasMission: boolean, games: GameKey[] = [], review = false): StepDef[] {
+function buildSteps(a: Activity, hasMission: boolean, games: GameKey[] = []): StepDef[] {
   const level = parseInt(a.difficulty, 10) || 1;
   const writing = level >= 2;
   const game = (k: GameKey) => games.includes(k);
   const steps: (StepDef | false)[] = [
-    review && { key: 'revision', emoji: '🔁', name: 'Ça revient', heading: 'Les mots qui reviennent', minutes: 1, accent: '#C7600A', tint: '#FEF3E2' },
     { key: 'decouvrir', emoji: '✨', name: 'Le mot mystère', heading: 'Le mot mystère du jour', minutes: 1, accent: '#E63946', tint: '#FDECEE' },
     { key: 'syllabes', emoji: '👏', name: 'Syllabes', heading: 'On compte les syllabes', minutes: 1, accent: '#0E8C80', tint: '#E3F8F5' },
     { key: 'lire', emoji: '📖', name: 'Les sons', heading: 'On lit les sons ensemble', minutes: 2, accent: '#E08A1E', tint: '#FEF3E2' },
@@ -79,8 +81,10 @@ function buildSteps(a: Activity, hasMission: boolean, games: GameKey[] = [], rev
     { key: 'prononcer', emoji: '🗣️', name: 'Le dire', heading: 'On le dit à voix haute', minutes: 1, accent: '#5B1F8C', tint: '#F1E9F8' },
     game('jeu-image') && { key: 'jeu-image', emoji: '🖼️', name: 'L’image', heading: 'Trouve l’image', minutes: 1, accent: '#D4530C', tint: '#FCEBDD' },
     game('jeu-phrase') && { key: 'jeu-phrase', emoji: '🧩', name: 'La phrase', heading: 'Le mot qui manque', minutes: 1, accent: '#2D9B6F', tint: '#E5F4EC' },
+    game('jeu-mot') && { key: 'jeu-mot', emoji: '🔎', name: 'Trouve le mot', heading: 'Trouve le mot', minutes: 1, accent: '#2D9B6F', tint: '#E5F4EC' },
     { key: 'activite', emoji: '💬', name: 'On en parle', heading: a.activityTitle ? `On en parle · ${a.activityTitle}` : 'On en parle', minutes: 3, accent: '#1D6FA4', tint: '#E4F0F8', optional: true },
-    Boolean(a.songTitle || a.songLyrics) && { key: 'chanson', emoji: '🎵', name: 'Chanson', heading: a.songTitle || 'La chanson', minutes: 2, accent: '#D4530C', tint: '#FCEBDD' },
+    // « Ma phrase » (and the poem when the word has one): for every word.
+    { key: 'chanson', emoji: '🎤', name: 'Ma phrase', heading: a.songLyrics.trim() ? 'Ma phrase et ma poésie' : 'Ma phrase', minutes: 2, accent: '#D4530C', tint: '#FCEBDD' },
     writing && !game('jeu-nourris') && { key: 'epeler', emoji: '🔤', name: 'Épeler', heading: 'Construis le mot avec les sons', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
     writing && game('jeu-nourris') && { key: 'jeu-nourris', emoji: '😋', name: 'Le Mounas', heading: 'Nourris le Mounas', minutes: 1, accent: '#E63946', tint: '#FDECEE' },
     writing && { key: 'ecrire', emoji: '✍️', name: 'Écrire', heading: 'On écrit le mot', minutes: 2, accent: '#2D9B6F', tint: '#E5F4EC' },
@@ -120,23 +124,24 @@ export default function ActivityFlow({
   mission?: Mission | null;
 }) {
   // The day (client only: it must be the parent's date) picks the games, and
-  // this device's history the words that come back.
+  // this device's history the words offered for review.
   const today = useSyncExternalStore(subscribeNoop, localDate, () => '');
-  const reviewWords = useDueReviews(activity.id);
-  const steps = buildSteps(activity, Boolean(mission), today ? gamesOfTheDay(activity, library, today) : [], reviewWords.length > 0);
+  const review = useReviewChoice(activity.id);
+  const steps = buildSteps(activity, Boolean(mission), today ? gamesOfTheDay(activity, library, today) : []);
   const [index, setIndex] = useState(0);
   const [finished, setFinished] = useState(false);
   // Step 1: did the child read the word alone before hearing it?
   const [attempt, setAttempt] = useState<Attempt>(null);
   const [revealed, setRevealed] = useState(false);
-  // How the word is discovered: the child reads it (new word), or hears it and
-  // spells it before turning the cards (a word already learned). Level 1 only
-  // reads; from level 2 the parent can switch, and the choice is kept once the
-  // cards are turned so finishing the word doesn't change it.
+  // How the word is discovered: the child reads it (👀 Je lis), or hears it and
+  // spells it before turning the cards (👂 J'écoute). The choice is offered at
+  // every level, level 1 included (Pam, 26 Oct.). By default a new word is
+  // read and, from level 2, a word already learned is heard; the choice is
+  // kept once the cards are turned so finishing the word doesn't change it.
   const level = parseInt(activity.difficulty, 10) || 1;
   const known = useSyncExternalStore(subscribeNoop, () => learnedWords().some((l) => l.id === activity.id), () => false);
   const [chosenMode, setChosenMode] = useState<DiscoverMode | null>(null);
-  const mode: DiscoverMode = level < 2 ? 'lire' : (chosenMode ?? (known ? 'ecoute' : 'lire'));
+  const mode: DiscoverMode = chosenMode ?? (known && level >= 2 ? 'ecoute' : 'lire');
   const containerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
@@ -275,6 +280,8 @@ export default function ActivityFlow({
           headingRef={headingRef}
           childMode={childMode}
           speak={speak}
+          canSpeak={canSpeak}
+          review={review}
         />
       ) : (
         <section
@@ -322,18 +329,24 @@ export default function ActivityFlow({
                 if (a) win();
               }}
               onSuccess={win}
-              reviewWords={reviewWords}
               revealed={revealed}
               onReveal={() => {
                 setChosenMode(mode);
                 setRevealed(true);
               }}
               mode={mode}
-              onModeChange={level < 2 ? undefined : setChosenMode}
+              onModeChange={setChosenMode}
               mission={mission}
             />
           </div>
         </section>
+      )}
+
+      {/* Revising earlier words is the family's choice: offered under the first step, never imposed. */}
+      {!finished && index === 0 && (
+        <div className="mt-5">
+          <ReviewOption key="debut" {...review} library={library} canSpeak={canSpeak} speak={speak} where="debut" />
+        </div>
       )}
 
       {/* ── Bottom nav, in the thumb zone ── */}
@@ -396,24 +409,13 @@ type BodyProps = {
   mission: Mission | null;
   /** The step's success signal (child mode: the "next" arrow glows). */
   onSuccess: (chimed?: boolean) => void;
-  reviewWords: LearnedWord[];
 };
 
 type Attempt = 'alone' | 'together' | null;
 
-function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal, mode, onModeChange, mission, onSuccess, reviewWords }: BodyProps) {
+function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, attempt, setAttempt, revealed, onReveal, mode, onModeChange, mission, onSuccess }: BodyProps) {
   const game = { activity: a, library, canSpeak, speak, onSuccess, accent: step.accent };
   switch (step.key) {
-    case 'revision':
-      return (
-        <>
-          <Stage tint={step.tint}>
-            <ReviewWords words={reviewWords} library={library} canSpeak={canSpeak} speak={speak} onSuccess={onSuccess} />
-          </Stage>
-          <ParentTip>Ces mots ont été appris il y a quelques jours. Ton enfant essaie de les lire seul, puis touche le haut-parleur pour vérifier.</ParentTip>
-        </>
-      );
-
     case 'jeu-image':
       return (
         <>
@@ -427,6 +429,14 @@ function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, at
         <>
           <Stage tint={step.tint}><SoundFishing {...game} /></Stage>
           <ParentTip>Lisez chaque poisson ensemble, doucement. Ton enfant pêche ceux où il entend le son. Les autres restent dans l’eau.</ParentTip>
+        </>
+      );
+
+    case 'jeu-mot':
+      return (
+        <>
+          <Stage tint={step.tint}><FindWord {...game} /></Stage>
+          <ParentTip>Le mot est caché parmi des mots qui lui ressemblent. Ton enfant regarde chaque lettre, dans l’ordre, avant de choisir : les lettres miroir (b et d, p et q) sont des pièges exprès.</ParentTip>
         </>
       );
 
@@ -486,17 +496,8 @@ function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, at
     case 'chanson':
       return (
         <>
-          {a.songLyrics && (
-            <Stage tint={step.tint} align="left">
-              <p className="whitespace-pre-line font-display text-lg italic leading-loose text-ink sm:text-xl">{a.songLyrics}</p>
-            </Stage>
-          )}
-          {a.songLyrics && (
-            <div className="mt-4 flex justify-center">
-              <SpeakButton text={a.songLyrics} label="Écouter les paroles" rate={0.85} tone="soft" />
-            </div>
-          )}
-          <ParentTip>Chantez ensemble en tapant dans les mains. Inventez des gestes pour chaque phrase !</ParentTip>
+          <PhrasePoem activity={a} accent={step.accent} tint={step.tint} canSpeak={canSpeak} speak={speak} onSuccess={() => onSuccess()} />
+          <ParentTip>Laisse ton enfant inventer sa phrase, même toute simple, et écris-la pour lui. Il la dit ensuite en chantant ou en récitant. Les plus grands apprennent la poésie par cœur.</ParentTip>
         </>
       );
   }
@@ -1229,10 +1230,13 @@ function SyllableClap({ step, activity: a, speak, onSuccess }: { step: StepDef; 
           })}
         </div>
         <p className="mt-6 font-display text-2xl font-bold text-ink" aria-live="polite">
+          {/* The number of syllables stays a « ? » until the child has clapped them all. */}
           {done ? (
             <>Bravo ! {total} syllabe{total > 1 ? 's' : ''} 🎉</>
+          ) : count === 0 ? (
+            <>Combien de syllabes ? <span className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-mteal-ink ring-2 ring-mteal-ink/30">?</span></>
           ) : (
-            <>👏 {count} / {total}</>
+            <>👏 {count}… ?</>
           )}
         </p>
         {done && (
@@ -1524,6 +1528,8 @@ function FinishCard({
   headingRef,
   childMode,
   speak,
+  canSpeak,
+  review,
 }: {
   activity: Activity;
   library: WordCard[];
@@ -1532,6 +1538,8 @@ function FinishCard({
   headingRef: React.RefObject<HTMLHeadingElement | null>;
   childMode: boolean;
   speak: BodyProps['speak'];
+  canSpeak: boolean;
+  review: ReturnType<typeof useReviewChoice>;
 }) {
   // Read once when this card mounts (client only — it only renders after a click).
   const [done, setDone] = useState(() => isCompletedToday(a.id));
@@ -1626,6 +1634,9 @@ function FinishCard({
               </p>
             )}
             {childMode && <AnotherWord activity={a} library={library} />}
+            <div className="mx-auto mt-6 max-w-sm">
+              <ReviewOption key="fin" {...review} library={library} canSpeak={canSpeak} speak={speak} where="fin" />
+            </div>
             <NextWords activity={a} library={library} />
             <div className="mx-auto mt-8 flex max-w-sm flex-col gap-3">
               <Link
@@ -1645,6 +1656,12 @@ function FinishCard({
                 className="flex min-h-12 items-center justify-center rounded-full bg-mteal-light px-6 font-bold text-[#115E59] hover:bg-mteal/30"
               >
                 📒 Faire une petite dictée
+              </Link>
+              <Link
+                href="/app/calcul"
+                className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#F1E9F8] px-6 font-bold text-mpurple hover:bg-mpurple/15"
+              >
+                <CalculIcon /> Faire du calcul
               </Link>
               <Link
                 href="/app"
