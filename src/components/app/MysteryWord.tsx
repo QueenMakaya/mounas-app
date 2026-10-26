@@ -31,7 +31,7 @@ type Props = {
   canSpeak: boolean;
   speak: (text: string, rate?: number) => void;
   mode: DiscoverMode;
-  /** Shows the "Je lis / J'écoute" switch (not at level 1). */
+  /** Shows the "Je lis / J’écoute" switch (every level). */
   onModeChange?: (mode: DiscoverMode) => void;
   /** Extra tools under the listen controls (the sound tiles). */
   extra?: React.ReactNode;

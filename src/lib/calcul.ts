@@ -12,6 +12,11 @@
  * - A calculation missed comes back a little later in the same level.
  * - Single-fact levels (+3, ×4…) start in order (×4: 4×1, 4×2…) for the
  *   first ten, like a Kumon sheet, then go random.
+ * - By default (« Mélange »), the calculations come in series of 10, like a
+ *   Kumon page: mostly the current level, with about one in three taken from
+ *   the levels before it (the closest ones most often), so what was learned
+ *   keeps being practised. The parent can switch to « Seulement ce niveau ».
+ *   Only the current level's answers count to open the next level.
  *
  * Kept in localStorage under `mounas_calcul` (follows the parent between
  * devices through src/lib/progress-snapshot.ts). Every access is wrapped:
@@ -183,8 +188,12 @@ export type LevelStats = {
   mastered?: string;
 };
 
+export type CalcMode = 'melange' | 'niveau';
+
 export type CalculState = {
   level: string;
+  /** « Mélange » (default): the level plus earlier ones; « niveau »: the level only. */
+  mode: CalcMode;
   /** Since entering the current level: how many, and the last 20 answers. */
   since: number;
   recent: { ok: boolean; ms: number }[];
@@ -197,13 +206,15 @@ export type CalculState = {
   updated: number;
 };
 
+/** Calculations per series (a « page »). */
+export const SERIES = 10;
 export const WINDOW = 20;
 export const MASTER_OK = 18;
 const BACK_WINDOW = 10;
 const BACK_MISSES = 5;
 const MAX_RETRY = 10;
 
-export const emptyCalcul = (): CalculState => ({ level: LEVELS[0].id, since: 0, recent: [], stats: {}, days: {}, retry: [], updated: 0 });
+export const emptyCalcul = (): CalculState => ({ level: LEVELS[0].id, mode: 'melange', since: 0, recent: [], stats: {}, days: {}, retry: [], updated: 0 });
 
 const LS_CALCUL = 'mounas_calcul';
 const EVENT = 'mounas-calcul';
@@ -238,6 +249,7 @@ export function parseCalcul(v: unknown): CalculState {
   }
   return {
     level,
+    mode: v.mode === 'niveau' ? 'niveau' : 'melange',
     since: num(v.since),
     recent: (Array.isArray(v.recent) ? v.recent : [])
       .filter(isObject)
@@ -304,10 +316,37 @@ export function setLevel(state: CalculState, id: string): CalculState {
   return { ...state, level: levelById(id).id, since: 0, recent: [], retry: [], updated: Date.now() };
 }
 
-/** The next calculation: a missed one now and then, else a new one (never the same twice in a row). */
+export function setMode(state: CalculState, mode: CalcMode): CalculState {
+  return { ...state, mode, updated: Date.now() };
+}
+
+const pick = <T,>(xs: T[]) => xs[Math.floor(Math.random() * xs.length)];
+
+/**
+ * In « Mélange »: a level before the current one. Earlier levels of the same
+ * operation most often (×2 while on ×3), else one of the five levels just
+ * before, now and then any earlier one.
+ */
+function reviewLevel(index: number): CalcLevel | null {
+  if (index === 0) return null;
+  const before = LEVELS.slice(0, index);
+  const sameOp = before.filter((l) => l.op === LEVELS[index].op).slice(-4);
+  const r = Math.random();
+  if (sameOp.length > 0 && r < 0.6) return pick(sameOp);
+  return r < 0.85 ? pick(before.slice(-5)) : pick(before);
+}
+
+/**
+ * The next calculation: in « Mélange », about one in three from an earlier
+ * level; otherwise a missed one now and then, else a new one of the level
+ * (never the same twice in a row).
+ */
 export function nextProblem(state: CalculState, previous?: Problem | null): Problem {
-  const level = levelById(state.level);
+  const current = levelById(state.level);
+  const review = state.mode === 'melange' && Math.random() < 0.3 ? reviewLevel(LEVELS.indexOf(current)) : null;
+  const level = review ?? current;
   const make = (): Pair => {
+    if (review) return review.make(null);
     const due = state.retry.filter((k) => !previous || k !== keyOf(previous));
     if (due.length > 0 && Math.random() < 0.3) {
       const [a, b] = due[0].split(',').map(Number);
@@ -347,6 +386,8 @@ export function recordAnswer(state: CalculState, p: Problem, ok: boolean, ms: nu
   const stats = { ...state.stats, [p.level]: { ...prev, answered: prev.answered + 1, firstTry: prev.firstTry + (ok ? 1 : 0), ms: prev.ms + clipped } };
   const day = state.days[today] ?? { done: 0, ok: 0 };
   const days = { ...state.days, [today]: { done: day.done + 1, ok: day.ok + (ok ? 1 : 0) } };
+  // A calculation from an earlier level (« Mélange »): counted for that level, the current one doesn't move.
+  if (p.level !== state.level) return { state: { ...state, stats, days, updated: Date.now() }, change: null };
   const key = keyOf(p);
   const retry = ok ? state.retry.filter((k) => k !== key) : [...state.retry.filter((k) => k !== key), key].slice(-MAX_RETRY);
   const recent = [...state.recent, { ok, ms: clipped }].slice(-WINDOW);

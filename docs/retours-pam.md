@@ -39,3 +39,12 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   (le mode enfant ne doit pas pouvoir partir ailleurs). Les cartes « Encore plus » de l'accueil restent.
 - [x] **Suivi du calcul dans Airtable** (LES MOUNAS — App → Familles) : nouvelles colonnes « Niveau calcul »,
   « Calculs faits » et « Calcul · derniers jours ».
+
+## 26 octobre 2026 (retours sur le lien de test)
+
+- [x] **« 👀 Je lis / 👂 J'écoute »** : le choix était caché au niveau 1 depuis le 9 octobre ; il est maintenant proposé à tous les niveaux.
+- [x] **Calcul en « Mélange » par défaut** : séries de 10 calculs comme une page Kumon, surtout le niveau de l'enfant
+  avec environ un calcul sur trois déjà vu (même opération d'abord). Le parent peut choisir « Seulement son niveau » et le niveau.
+- [x] **Nouveau design du calcul** : fini le pavé de calculatrice. Le calcul en très gros, la réponse sur une ligne en pointillés,
+  des jetons ronds 1 à 0, vérification dès que la réponse a le bon nombre de chiffres, puis calcul suivant.
+  Brouillon à côté (sous le calcul sur téléphone) pour faire des ronds, des bâtons…

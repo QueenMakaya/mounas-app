@@ -129,14 +129,15 @@ export default function ActivityFlow({
   // Step 1: did the child read the word alone before hearing it?
   const [attempt, setAttempt] = useState<Attempt>(null);
   const [revealed, setRevealed] = useState(false);
-  // How the word is discovered: the child reads it (new word), or hears it and
-  // spells it before turning the cards (a word already learned). Level 1 only
-  // reads; from level 2 the parent can switch, and the choice is kept once the
-  // cards are turned so finishing the word doesn't change it.
+  // How the word is discovered: the child reads it (👀 Je lis), or hears it and
+  // spells it before turning the cards (👂 J'écoute). The choice is offered at
+  // every level, level 1 included (Pam, 26 Oct.). By default a new word is
+  // read and, from level 2, a word already learned is heard; the choice is
+  // kept once the cards are turned so finishing the word doesn't change it.
   const level = parseInt(activity.difficulty, 10) || 1;
   const known = useSyncExternalStore(subscribeNoop, () => learnedWords().some((l) => l.id === activity.id), () => false);
   const [chosenMode, setChosenMode] = useState<DiscoverMode | null>(null);
-  const mode: DiscoverMode = level < 2 ? 'lire' : (chosenMode ?? (known ? 'ecoute' : 'lire'));
+  const mode: DiscoverMode = chosenMode ?? (known && level >= 2 ? 'ecoute' : 'lire');
   const containerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
@@ -330,7 +331,7 @@ export default function ActivityFlow({
                 setRevealed(true);
               }}
               mode={mode}
-              onModeChange={level < 2 ? undefined : setChosenMode}
+              onModeChange={setChosenMode}
               mission={mission}
             />
           </div>
