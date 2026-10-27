@@ -56,8 +56,8 @@ function sayTts(text: string, rate: number, voice: SpeechSynthesisVoice | null):
 }
 
 /** Say `text` once, unless a newer cut happens first. */
-async function say(text: string, rate: number, voice: SpeechSynthesisVoice | null, gen: number) {
-  const clips = clipsFor(text);
+async function say(text: string, rate: number, voice: SpeechSynthesisVoice | null, gen: number, sound?: string) {
+  const clips = clipsFor(text, sound);
   if (!clips) return gen === generation ? sayTts(text, rate, voice) : undefined;
   for (const src of clips) {
     if (gen !== generation) return;
@@ -94,14 +94,17 @@ export function useSpeech() {
     };
   }, []);
 
-  /** Speak `text`. `rate` < 1 slows down — children need slower speech. */
+  /**
+   * Speak `text`. `rate` < 1 slows down — children need slower speech.
+   * For a sound, pass its key in `SOUNDS` as `sound` (and its `say` as `text`).
+   */
   const speak = useCallback(
-    (text: string, rate = 0.8) => {
+    (text: string, rate = 0.8, sound?: string) => {
       if (!supported || !text) return;
       cut();
       const gen = generation;
       setSpeaking(text);
-      chain = say(text, rate, voice, gen).then(() => setSpeaking((s) => (s === text ? null : s)));
+      chain = say(text, rate, voice, gen, sound).then(() => setSpeaking((s) => (s === text ? null : s)));
     },
     [supported, voice],
   );
@@ -112,7 +115,7 @@ export function useSpeech() {
    * so the screen can highlight exactly what is being heard.
    */
   const speakSeries = useCallback(
-    (pieces: { text: string; rate?: number }[], onStep: (i: number | null) => void) => {
+    (pieces: { text: string; rate?: number; sound?: string }[], onStep: (i: number | null) => void) => {
       if (!supported || pieces.length === 0) return;
       cut();
       const gen = generation;
@@ -120,7 +123,7 @@ export function useSpeech() {
         for (const [i, p] of pieces.entries()) {
           if (gen !== generation) break;
           onStep(i);
-          await say(p.text, p.rate ?? 0.7, voice, gen);
+          await say(p.text, p.rate ?? 0.7, voice, gen, p.sound);
         }
         onStep(null);
       })();

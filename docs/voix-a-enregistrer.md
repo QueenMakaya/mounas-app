@@ -1,5 +1,9 @@
 # Voix de Pam : ce qu'il reste à enregistrer
 
+**État au 27 oct. 2026** : les parties A, B, C et D sont enregistrées, découpées dans `public/voix/`
+et branchées dans `src/lib/voice-clips.ts`. Les 37 sons du 13 oct. aussi. Il reste les mots et
+les syllabes du 13 oct., à découper dès que le fichier est récupéré.
+
 Ces phrases sont dites par l'app, mais pour l'instant avec la voix du navigateur.
 
 Comment enregistrer :

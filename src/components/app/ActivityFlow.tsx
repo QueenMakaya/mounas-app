@@ -397,8 +397,8 @@ type BodyProps = {
   step: StepDef;
   activity: Activity;
   canSpeak: boolean;
-  speak: (text: string, rate?: number) => void;
-  speakSeries: (pieces: { text: string; rate?: number }[], onStep: (i: number | null) => void) => void;
+  speak: (text: string, rate?: number, sound?: string) => void;
+  speakSeries: (pieces: { text: string; rate?: number; sound?: string }[], onStep: (i: number | null) => void) => void;
   library: WordCard[];
   attempt: Attempt;
   setAttempt: (a: Attempt) => void;
@@ -554,7 +554,7 @@ function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library, o
       setLit(i);
       return;
     }
-    speakSeries([{ text: SOUNDS[s.key].say }], (step) => setLit(step === null ? null : i));
+    speakSeries([{ text: SOUNDS[s.key].say, sound: s.key }], (step) => setLit(step === null ? null : i));
   };
 
   // Sound by sound, then the whole word: the child hears the sounds blend.
@@ -562,7 +562,7 @@ function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library, o
     const heard = sounds.map((s, i) => ({ s, i })).filter(({ s }) => s.kind !== 'silent' && s.kind !== 'separator' && s.key);
     if (canSpeak) {
       speakSeries(
-        [...heard.map(({ s }) => ({ text: SOUNDS[s.key].say, rate: 0.6 })), { text: a.frenchWord, rate: 0.8 }],
+        [...heard.map(({ s }) => ({ text: SOUNDS[s.key].say, rate: 0.6, sound: s.key })), { text: a.frenchWord, rate: 0.8 }],
         (step) => setLit(step === null ? null : step < heard.length ? heard[step].i : -1),
       );
       return;
@@ -708,7 +708,7 @@ function SoundSlider({
     }
     const { s, i } = tiles[k];
     onLit(i);
-    if (canSpeak && !muted && s.kind !== 'silent' && s.key) speak(SOUNDS[s.key].say, 0.7);
+    if (canSpeak && !muted && s.kind !== 'silent' && s.key) speak(SOUNDS[s.key].say, 0.7, s.key);
   };
 
   // The ball lights a tile once its centre reaches the tile's left half.
@@ -888,7 +888,7 @@ function BuildTiles({ activity: a, canSpeak, speak, onDone }: { activity: Activi
         playChime();
         onDone?.();
       } else if (tile.key && canSpeak) {
-        speak(SOUNDS[tile.key].say, 0.7);
+        speak(SOUNDS[tile.key].say, 0.7, tile.key);
       }
     } else {
       setWrong(p);
@@ -900,7 +900,7 @@ function BuildTiles({ activity: a, canSpeak, speak, onDone }: { activity: Activi
   const hint = () => {
     if (!next) return;
     if (next.kind === 'silent' || !next.key) setWrong(-1);
-    else if (canSpeak) speak(SOUNDS[next.key].say, 0.6);
+    else if (canSpeak) speak(SOUNDS[next.key].say, 0.6, next.key);
   };
 
   return (
@@ -1113,7 +1113,7 @@ function SoundReminders({ activity: a, library, canSpeak, speak }: { activity: A
             <li key={`${text}-${s.key}`} className="flex items-center gap-3 rounded-2xl bg-white p-3 ring-1 ring-ink/10">
               <button
                 type="button"
-                onClick={() => canSpeak && speak(SOUNDS[s.key].say, 0.7)}
+                onClick={() => canSpeak && speak(SOUNDS[s.key].say, 0.7, s.key)}
                 aria-label={`Écouter le son ${SOUNDS[s.key].hint}`}
                 className="flex h-14 min-w-14 flex-col items-center justify-center rounded-xl bg-[#FEF3E2] px-2 active:scale-95"
               >
