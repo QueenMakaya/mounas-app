@@ -56,11 +56,11 @@ export function fishingPond(a: Activity, library: WordCard[]) {
   // the first one other words of the app share.
   const candidates: Sound[] = [...trickySounds(a.frenchWord, a.graphemes), ...heard.filter((s) => s.kind === 'vowel'), ...heard];
   for (const sound of candidates) {
-    const withSound = wordsWithSound(sound, library, a.id, 3).map(({ card, text }) => ({ card, text, has: true }));
+    const withSound = wordsWithSound(sound, library, a.id, 3).map(({ card, text, at }) => ({ card, text, at, has: true }));
     const without = seeded(library, a.id)
       .filter((w) => w.id !== a.id && !wordSounds(w.word, w.graphemes).some((s) => s.key === sound.key))
       .slice(0, Math.max(2, 5 - withSound.length))
-      .map((card) => ({ card, text: '', has: false }));
+      .map((card) => ({ card, text: '', at: -1, has: false }));
     if (withSound.length >= 1 && without.length >= 2) return { sound, fish: seeded([...withSound, ...without], `${a.id}-peche`) };
   }
   return null;
