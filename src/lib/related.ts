@@ -30,10 +30,18 @@ export function trickySounds(word: string, graphemes = ''): Sound[] {
   });
 }
 
-/** How `card` writes this sound (e.g. "eill" in oreille for the "eil" of soleil), if it has it. */
-function spellingOf(card: WordCard, sound: Sound): string | null {
-  const hit = wordSounds(card.word, card.graphemes).find((s) => s.key === sound.key);
-  return hit ? lower(hit.text) : null;
+/**
+ * How `card` writes this sound (e.g. "eill" in oreille for the "eil" of
+ * soleil), and where: `at` is its position in the word, so the right letters
+ * light up (the « c » of ciel in arc-en-ciel, not the « c » of arc).
+ */
+function spellingOf(card: WordCard, sound: Sound): { text: string; at: number } | null {
+  let at = 0;
+  for (const s of wordSounds(card.word, card.graphemes)) {
+    if (s.key === sound.key) return { text: lower(s.text), at };
+    at += s.text.length;
+  }
+  return null;
 }
 
 const byLevel = (a: WordCard, b: WordCard) => a.level.localeCompare(b.level) || a.word.localeCompare(b.word, 'fr');
@@ -43,12 +51,13 @@ const byLevel = (a: WordCard, b: WordCard) => a.level.localeCompare(b.level) || 
  * other spellings of the same sound; easiest levels first. `text` is how each
  * word writes it, so it can be highlighted.
  */
-export function wordsWithSound(sound: Sound, library: WordCard[], excludeId: string, limit = 3): { card: WordCard; text: string }[] {
+export function wordsWithSound(sound: Sound, library: WordCard[], excludeId: string, limit = 3): { card: WordCard; text: string; at: number }[] {
   const mine = lower(sound.text);
   return library
     .filter((w) => w.id !== excludeId)
-    .map((card) => ({ card, text: spellingOf(card, sound) }))
-    .filter((x): x is { card: WordCard; text: string } => x.text !== null)
+    .map((card) => ({ card, hit: spellingOf(card, sound) }))
+    .filter((x): x is { card: WordCard; hit: { text: string; at: number } } => x.hit !== null)
+    .map(({ card, hit }) => ({ card, ...hit }))
     .sort((a, b) => Number(b.text === mine) - Number(a.text === mine) || byLevel(a.card, b.card))
     .slice(0, limit);
 }

@@ -80,7 +80,7 @@ export default function SoundFishing({ activity: a, library, canSpeak, speak, on
                 style={{ transform: isCaught ? undefined : `rotate(${i % 2 ? 2 : -2}deg)` }}
               >
                 <span aria-hidden="true" className="text-xl">{isCaught ? '✓' : '🐟'}</span>
-                {isCaught && f.text ? <Highlight word={word} text={f.text} /> : word}
+                {isCaught && f.text ? <Highlight word={word} text={f.text} at={f.at} /> : word}
                 {handOn === f.card.id && <HintHand />}
               </button>
             );
@@ -94,8 +94,9 @@ export default function SoundFishing({ activity: a, library, canSpeak, speak, on
   );
 }
 
-function Highlight({ word, text }: { word: string; text: string }) {
-  const at = word.indexOf(text);
+/** Lights up the sound where it is heard: `found` is its position in the word (see wordsWithSound). */
+function Highlight({ word, text, at: found }: { word: string; text: string; at: number }) {
+  const at = word.slice(found, found + text.length) === text ? found : word.indexOf(text);
   if (at < 0) return <span>{word}</span>;
   // One element: the button is a flex row, loose text would be spaced out.
   return (

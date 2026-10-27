@@ -24,7 +24,20 @@ export default async function ActivityPage({
     getActivitiesByFilters(),
   ]);
   // The other finished words: for sound reminders and "what next?" ideas.
-  const library: WordCard[] = all.map((a) => ({
+  // One card per word: a word entered twice in Airtable (ARC-EN-CIEL) would
+  // otherwise show up twice in the games, and the current word's twin would
+  // swim in its own pond. The current record wins its word.
+  const key = (w: string) => w.trim().toLocaleLowerCase('fr');
+  const taken = new Set(activity ? [key(activity.frenchWord)] : []);
+  const library: WordCard[] = all
+    .filter((a) => {
+      if (a.id === activity?.id) return true;
+      const k = key(a.frenchWord);
+      if (!k || taken.has(k)) return false;
+      taken.add(k);
+      return true;
+    })
+    .map((a) => ({
     id: a.id,
     word: a.frenchWord,
     level: a.difficulty,

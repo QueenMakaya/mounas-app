@@ -5,15 +5,14 @@ import type { Activity } from '@/lib/airtable';
 import { readPref, writePref } from '@/lib/progress';
 
 /*
- * « Ma phrase et ma poésie » (it was « Chanson »; the Airtable texts are
- * really short poems). Two parts:
+ * « Ma phrase et ma comptine » (it was « Chanson »), on one screen:
  *
  * 1. Ma phrase: the child invents a sentence with the word (the example
  *    sentence is there for inspiration), the parent writes it down, the app
- *    can read it back. Then the child says it, sung or recited. The sentence
- *    is kept on the device (`mounas_phrases`, one per word).
- * 2. La poésie (when the word has one): read it, sing it or recite it; from
- *    level 3, « Par cœur » hides more and more words so the child learns it.
+ *    can read it back. Kept on the device (`mounas_phrases`, one per word).
+ * 2. La comptine, right under it: recited (default) or sung; from level 3,
+ *    « Par cœur » hides more and more words so the child learns it. A word
+ *    with no poem in Airtable gets « Dis ta phrase » instead, sung or recited.
  */
 
 type Say = (text: string, rate?: number) => void;
@@ -39,8 +38,8 @@ function savePhrase(id: string, text: string): void {
 }
 
 const HOW = {
-  chanson: { label: '🎵 En chanson', tip: 'Invente un petit air et tape dans tes mains à chaque syllabe.' },
-  reciter: { label: '🗣️ En récitant', tip: 'Dis-la bien fort, lentement, comme un vrai poète.' },
+  reciter: { label: '🗣️ La réciter', tip: 'Dis-la bien fort, lentement, comme un vrai poète.' },
+  chanter: { label: '🎵 La chanter', tip: 'Invente un petit air et tape dans tes mains à chaque syllabe.' },
 } as const;
 
 export default function PhrasePoem({
@@ -62,90 +61,95 @@ export default function PhrasePoem({
   const word = a.frenchWord.toLocaleLowerCase('fr');
   // Read once, when the step opens (client only: the flow renders after hydration).
   const [phrase, setPhrase] = useState(() => (typeof window === 'undefined' ? '' : savedPhrase(a.id)));
-  const [how, setHow] = useState<keyof typeof HOW | null>(null);
-  const [said, setSaid] = useState(false);
+  const [how, setHow] = useState<keyof typeof HOW>('reciter');
+  const [done, setDone] = useState(false);
+  const poem = a.songLyrics.trim();
 
   return (
     <>
-      <div className="rounded-3xl p-5 text-left sm:p-6" style={{ backgroundColor: tint }}>
+      <div className="rounded-3xl p-4 text-left sm:p-5" style={{ backgroundColor: tint }}>
         <h3 className="font-display text-xl font-bold text-ink">✍️ Ma phrase</h3>
         <p className="mt-1 text-ink">
           Invente une phrase avec le mot <strong className="font-display text-lg">{word}</strong>.
+          {a.exampleSentence && (
+            <span className="block text-sm text-ink-soft">
+              Par exemple : « {a.exampleSentence} »{' '}
+              {canSpeak && (
+                <button type="button" onClick={() => speak(a.exampleSentence, 0.8)} aria-label="Écouter l’exemple" className="align-middle">
+                  🔈
+                </button>
+              )}
+            </span>
+          )}
         </p>
-        {a.exampleSentence && (
-          <p className="mt-3 text-sm text-ink-soft">
-            Par exemple : « {a.exampleSentence} »{' '}
-            {canSpeak && (
-              <button type="button" onClick={() => speak(a.exampleSentence, 0.8)} aria-label="Écouter l’exemple" className="align-middle text-lg">
-                🔈
-              </button>
-            )}
-          </p>
-        )}
-        <label htmlFor="ma-phrase" className="mt-4 block text-xs font-extrabold uppercase tracking-widest text-ink-soft">
-          Le parent écrit la phrase de l’enfant
-        </label>
-        <textarea
-          id="ma-phrase"
-          value={phrase}
-          onChange={(e) => {
-            setPhrase(e.target.value);
-            savePhrase(a.id, e.target.value);
-          }}
-          rows={2}
-          placeholder={`Mon ${word}…`}
-          className="mt-1 w-full rounded-2xl bg-white p-3 font-display text-xl text-ink ring-1 ring-ink/15 focus:outline-none focus:ring-2"
-          style={{ ['--tw-ring-color' as string]: accent }}
-        />
-        {canSpeak && phrase.trim() && (
-          <button
-            type="button"
-            onClick={() => speak(phrase, 0.8)}
-            className="mt-2 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-4 font-bold text-ink ring-1 ring-ink/15"
-          >
-            🔈 Écouter ma phrase
-          </button>
-        )}
-
-        <p className="mt-5 font-bold text-ink">Et maintenant, dis-la :</p>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {(Object.keys(HOW) as (keyof typeof HOW)[]).map((k) => (
+        <div className="mt-3 flex items-start gap-2">
+          <textarea
+            id="ma-phrase"
+            aria-label="La phrase de l’enfant (le parent l’écrit)"
+            value={phrase}
+            onChange={(e) => {
+              setPhrase(e.target.value);
+              savePhrase(a.id, e.target.value);
+            }}
+            rows={2}
+            placeholder={`Le parent écrit la phrase de l’enfant : « Mon ${word}… »`}
+            className="min-w-0 flex-1 rounded-2xl bg-white p-3 font-display text-lg text-ink ring-1 ring-ink/15 placeholder:font-body placeholder:text-sm focus:outline-none focus:ring-2"
+            style={{ ['--tw-ring-color' as string]: accent }}
+          />
+          {canSpeak && phrase.trim() && (
             <button
-              key={k}
               type="button"
-              onClick={() => setHow(k)}
-              aria-pressed={how === k}
-              className={`min-h-12 rounded-full px-5 font-bold ring-1 ${how === k ? 'text-cream ring-transparent' : 'bg-white text-ink ring-ink/15'}`}
-              style={how === k ? { backgroundColor: accent } : undefined}
+              onClick={() => speak(phrase, 0.8)}
+              aria-label="Écouter ma phrase"
+              className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-white text-xl ring-1 ring-ink/15"
             >
-              {HOW[k].label}
+              🔈
             </button>
-          ))}
+          )}
         </div>
-        {how && (
-          <div className="animate-rise mt-3">
-            <p className="text-ink">{HOW[how].tip}</p>
-            {!said ? (
-              <button
-                type="button"
-                onClick={() => {
-                  setSaid(true);
-                  onSuccess();
-                }}
-                className="mt-3 min-h-12 rounded-full bg-[#2D9B6F] px-6 font-extrabold text-cream shadow-md active:scale-95"
-              >
-                ✓ Je l’ai dite !
-              </button>
-            ) : (
-              <p className="mt-3 font-display text-xl font-bold text-[#2D9B6F]" aria-live="polite">
-                Bravo, c’est ta phrase à toi ! 🌟
-              </p>
-            )}
-          </div>
-        )}
       </div>
 
-      {a.songLyrics.trim() && <Poem title={a.songTitle} text={a.songLyrics} level={level} accent={accent} canSpeak={canSpeak} speak={speak} />}
+      {poem ? (
+        <Poem title={a.songTitle} text={poem} level={level} accent={accent} canSpeak={canSpeak} speak={speak} />
+      ) : (
+        <div className="mt-4 rounded-3xl bg-white p-4 text-left ring-1 ring-ink/10 sm:p-5">
+          <h3 className="font-display text-xl font-bold text-ink">🗣️ Dis ta phrase</h3>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {(Object.keys(HOW) as (keyof typeof HOW)[]).map((k) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setHow(k)}
+                aria-pressed={how === k}
+                className={`min-h-11 rounded-full px-4 text-sm font-bold ring-1 ${how === k ? 'text-cream ring-transparent' : 'bg-cream text-ink ring-ink/10'}`}
+                style={how === k ? { backgroundColor: accent } : undefined}
+              >
+                {HOW[k].label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-2 text-sm text-ink-soft">{HOW[how].tip}</p>
+        </div>
+      )}
+
+      <div className="mt-4 text-center">
+        {!done ? (
+          <button
+            type="button"
+            onClick={() => {
+              setDone(true);
+              onSuccess();
+            }}
+            className="min-h-12 rounded-full bg-[#2D9B6F] px-6 font-extrabold text-cream shadow-md active:scale-95"
+          >
+            {poem ? '✓ Ma phrase est faite, la comptine est dite !' : '✓ J’ai dit ma phrase !'}
+          </button>
+        ) : (
+          <p className="font-display text-xl font-bold text-[#2D9B6F]" aria-live="polite">
+            Bravo, quel beau travail ! 🌟
+          </p>
+        )}
+      </div>
     </>
   );
 }
@@ -153,7 +157,7 @@ export default function PhrasePoem({
 /** The word's little poem: read, sung or recited; « Par cœur » from level 3. */
 function Poem({ title, text, level, accent, canSpeak, speak }: { title: string; text: string; level: number; accent: string; canSpeak: boolean; speak: Say }) {
   const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
-  const [how, setHow] = useState<'lire' | 'chanson' | 'reciter' | 'coeur'>('lire');
+  const [how, setHow] = useState<'reciter' | 'chanson' | 'coeur'>('reciter');
   // « Par cœur »: 0 = everything shown, then more and more words hidden.
   const [hide, setHide] = useState(0);
   const advanced = level >= 3;
@@ -166,17 +170,16 @@ function Poem({ title, text, level, accent, canSpeak, speak }: { title: string; 
     return (j + i) % 3 !== 2;
   };
 
-  type How = 'lire' | 'chanson' | 'reciter' | 'coeur';
+  type How = 'reciter' | 'chanson' | 'coeur';
   const modes: [How, string][] = [
-    ['lire', '📖 La lire'],
-    ['chanson', '🎵 La chanter'],
     ['reciter', '🗣️ La réciter'],
+    ['chanson', '🎵 La chanter'],
     ...(advanced ? ([['coeur', '🧠 Par cœur']] as [How, string][]) : []),
   ];
 
   return (
-    <div className="mt-5 rounded-3xl bg-white p-5 text-left ring-1 ring-ink/10 sm:p-6">
-      <h3 className="font-display text-xl font-bold text-ink">📜 La poésie{title ? ` · ${title}` : ''}</h3>
+    <div className="mt-4 rounded-3xl bg-white p-4 text-left ring-1 ring-ink/10 sm:p-5">
+      <h3 className="font-display text-xl font-bold text-ink">📜 La comptine{title ? ` · ${title}` : ''}</h3>
       <div className="mt-3 flex flex-wrap gap-2">
         {modes.map(([k, label]) => (
           <button
@@ -195,10 +198,9 @@ function Poem({ title, text, level, accent, canSpeak, speak }: { title: string; 
         ))}
       </div>
       <p className="mt-3 text-sm text-ink-soft">
-        {how === 'lire' && 'Lisez-la ensemble, une ligne à la fois. Touche une ligne pour l’entendre.'}
         {how === 'chanson' && 'Chantez-la ensemble en tapant dans les mains. Inventez des gestes pour chaque ligne !'}
-        {how === 'reciter' && 'Récite-la bien fort, en regardant le parent, comme au spectacle.'}
-        {how === 'coeur' && 'Les mots se cachent petit à petit : redis la poésie de mémoire, puis cache-en encore plus.'}
+        {how === 'reciter' && 'Lisez-la ensemble, puis récite-la bien fort, comme au spectacle. Touche une ligne pour l’entendre.'}
+        {how === 'coeur' && 'Les mots se cachent petit à petit : redis la comptine de mémoire, puis cache-en encore plus.'}
       </p>
       <ol className="mt-4 space-y-2">
         {lines.map((line, i) => (
