@@ -6,7 +6,11 @@
  * Keys go through `clipKey`: case, accents' Unicode form, apostrophes and
  * punctuation don't matter, so « Un autre mot ? » matches "un autre mot".
  */
+import { SYLLABLE_CLIPS, WORD_CLIPS } from './voice-clips-words';
+
 const CLIPS: Record<string, string> = {
+  ...WORD_CLIPS,
+  ...SYLLABLE_CLIPS,
   // Consignes (prompts.ts)
   'Touche les cartes, puis lis le mot tout seul.': 'consignes/decouvrir-lire.mp3',
   'Écoute bien le mot, puis écris-le avec les sons.': 'consignes/decouvrir-ecoute.mp3',

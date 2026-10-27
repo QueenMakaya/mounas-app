@@ -1,8 +1,27 @@
 # Voix de Pam : ce qu'il reste à enregistrer
 
-**État au 27 oct. 2026** : les parties A, B, C et D sont enregistrées, découpées dans `public/voix/`
-et branchées dans `src/lib/voice-clips.ts`. Les 37 sons du 13 oct. aussi. Il reste les mots et
-les syllabes du 13 oct., à découper dès que le fichier est récupéré.
+**État au 27 oct. 2026** : tout est enregistré, découpé dans `public/voix/` et branché dans
+`src/lib/voice-clips.ts` et `src/lib/voice-clips-words.ts` : consignes, petites phrases, bravos,
+calcul (0 à 100), les 37 sons, les 182 mots d'Airtable et 167 syllabes sur 219.
+**Il reste seulement la partie E** (syllabes). Tout ce qui n'est pas enregistré est lu par la
+voix du navigateur.
+
+## E. Syllabes à refaire (52)
+
+Dans le fichier du 13 oct., ces syllabes sont trop proches les unes des autres pour être
+rangées sans risque d'erreur (par ex. bo, bog, bol, bou, bour). Les dire dans cet ordre, une par une :
+
+bo · bog · bou · bour · bre · bé · ca · cail · co · con · cou · cre · cu · dan · de · den · di ·
+din · djem · do · dou · e · en · mie · mil · mo · nier · no · nom · nou · nours · pe · per ·
+phant · pi · ran · reil · rer · ri · rieux · ril · ris · ro · rou · ru · vo · voi · vre · vé ·
+xi · ye · yeux
+
+Les mots ajoutés plus tard dans Airtable : enregistrer le mot et ses syllabes de la même façon,
+ou laisser le clone de voix s'en charger.
+
+---
+
+Parties A à D (faites) :
 
 Ces phrases sont dites par l'app, mais pour l'instant avec la voix du navigateur.
 
