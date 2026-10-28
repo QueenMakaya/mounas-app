@@ -1,6 +1,6 @@
 ---
 title: L'expérience du riz (bon, mauvais, neutre) : pourquoi la faire avec ton enfant, même si elle ne prouve pas ce qu'on croit
-date: 2026-10-28
+date: 2026-12-21
 excerpt: Trois bocaux de riz, un « merci », un « t'es nul » et un oublié. La vidéo est virale, la science est fragile. Et pourtant, c'est une des plus belles expériences à faire avec un enfant de 3 à 6 ans.
 author: Les Mounas
 ---

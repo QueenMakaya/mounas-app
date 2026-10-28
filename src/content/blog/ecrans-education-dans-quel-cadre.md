@@ -1,6 +1,6 @@
 ---
 title: Les écrans pour l'éducation des enfants : pas une question de pour ou contre, mais plutôt dans quel cadre
-date: 2026-10-28
+date: 2026-11-09
 excerpt: « Encore un dessin animé ! » « Je peux appeler Mamie ? » Derrière le mot « écran », il y a mille usages différents. La vraie question n'est pas oui ou non : c'est quoi, quand, avec qui, combien et où.
 author: Les Mounas
 ---

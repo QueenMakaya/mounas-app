@@ -1,6 +1,6 @@
 ---
 title: Ton enfant tape, mord, pousse… est-ce normal ? Ce que disent la science et nos cultures
-date: 2026-10-28
+date: 2026-11-30
 excerpt: « Il a mordu son cousin. » « Elle m'a tapé au visage ! » Avant de paniquer, sache ceci : vers 2 ans, presque tous les enfants frappent. Ce qui compte, c'est comment ils apprennent à arrêter.
 author: Les Mounas
 ---

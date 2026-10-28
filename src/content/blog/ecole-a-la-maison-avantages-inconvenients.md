@@ -1,6 +1,6 @@
 ---
 title: L'école à la maison : liberté, protection ou isolement ? Ce que disent les faits, les lois et nos cultures
-date: 2026-10-28
+date: 2026-11-02
 excerpt: « Et si je le gardais à la maison ? » Beaucoup de parents se posent la question, surtout depuis la pandémie. Avant de choisir, voici ce que la recherche, les lois et nos traditions nous apprennent.
 author: Les Mounas
 ---

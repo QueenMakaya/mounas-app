@@ -1,6 +1,6 @@
 ---
 title: Les métiers de demain : ce que nos enfants peuvent apprendre dès maintenant, entre jeu, langues et sagesse du village
-date: 2026-10-28
+date: 2026-11-16
 excerpt: « Maman, c'est quoi ton travail ? » Personne ne sait quels métiers feront nos enfants. Mais on sait déjà quelles compétences les aideront, et beaucoup s'apprennent à la maison, avant 6 ans.
 author: Les Mounas
 ---

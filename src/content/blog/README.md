@@ -23,6 +23,9 @@ Each article is a single Markdown file in this folder (`src/content/blog/`).
 
    - `title` — the headline shown on the page and in the list.
    - `date` — `YYYY-MM-DD`. Posts are sorted newest-first by this date.
+     A future date schedules the post: it stays hidden on the site until that
+     day (Montréal time) and appears on its own within the hour. In local dev,
+     scheduled posts are always visible so you can proofread them.
    - `excerpt` — one-line summary for the blog index.
    - `author` — optional; defaults to "Les Mounas".
 

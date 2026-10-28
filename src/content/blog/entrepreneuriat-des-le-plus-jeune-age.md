@@ -1,6 +1,6 @@
 ---
 title: L'entrepreneuriat se développe très tôt : guide pour y exposer ton enfant
-date: 2026-10-28
+date: 2026-11-23
 excerpt: « Maman, je vends mon dessin 1 $ ! » Avant 7 ans, ton enfant pose déjà les bases de son rapport à l'argent, à l'effort et à l'échec. Voici comment l'y exposer en jouant, sans jamais le faire travailler.
 author: Les Mounas
 ---

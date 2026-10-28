@@ -1,6 +1,6 @@
 ---
 title: Ton enfant a-t-il des super-pouvoirs ? Ce que la science (et nos cultures) disent des forces de chaque enfant
-date: 2026-10-28
+date: 2026-12-14
 excerpt: Il entend des sons que tu n'entends plus. Il remarque tout ce que tu ne vois pas. Il aide sans qu'on lui demande. Ton enfant a de vrais super-pouvoirs : voici comment les repérer, et les faire grandir.
 author: Les Mounas
 ---

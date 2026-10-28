@@ -1,6 +1,6 @@
 ---
 title: Famille recomposée et éducation : les défis et nos conseils
-date: 2026-10-28
+date: 2026-12-07
 excerpt: « T'es pas ma mère ! » Une phrase qui fait mal, et qui est presque normale. Dans une famille recomposée, l'amour ne se décrète pas : il se construit, lentement. Voici ce que disent la recherche, la loi et nos cultures.
 author: Les Mounas
 ---
