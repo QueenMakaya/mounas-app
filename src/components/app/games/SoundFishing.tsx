@@ -48,7 +48,7 @@ export default function SoundFishing({ activity: a, library, canSpeak, speak, on
         <p className="font-bold text-ink">Le son</p>
         <button
           type="button"
-          onClick={() => canSpeak && speak(SOUNDS[sound.key].say, 0.6)}
+          onClick={() => canSpeak && speak(SOUNDS[sound.key].say, 0.6, sound.key)}
           aria-label={`Écouter le son ${hint}`}
           className="flex min-h-14 min-w-16 flex-col items-center justify-center rounded-2xl bg-white px-3 shadow-[0_3px_0_rgba(26,26,26,0.15)] ring-1 ring-ink/10 active:scale-95"
         >

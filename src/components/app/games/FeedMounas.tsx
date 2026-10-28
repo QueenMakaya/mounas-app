@@ -49,7 +49,7 @@ export default function FeedMounas({ activity: a, canSpeak, speak, onSuccess }: 
       if (canSpeak) speak(a.frenchWord);
       onSuccess(true);
     } else if (canSpeak && tile.key) {
-      speak(SOUNDS[tile.key].say, 0.7);
+      speak(SOUNDS[tile.key].say, 0.7, tile.key);
     }
   };
 

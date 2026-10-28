@@ -121,7 +121,7 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
   const dictateSounds = () => {
     if (!word) return;
     const heard = wordSounds(word).filter((s) => s.kind !== 'silent' && s.kind !== 'separator' && s.key);
-    speakSeries([...heard.map((s) => ({ text: SOUNDS[s.key].say, rate: 0.6 })), { text: word, rate: 0.7 }], () => {});
+    speakSeries([...heard.map((s) => ({ text: SOUNDS[s.key].say, rate: 0.6, sound: s.key })), { text: word, rate: 0.7 }], () => {});
   };
 
   const savePng = () => {
