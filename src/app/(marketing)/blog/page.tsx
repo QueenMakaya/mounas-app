@@ -4,6 +4,9 @@ import DiamondIcon from '@/components/brand/DiamondIcon';
 import { getAllPosts, formatDate } from '@/lib/blog';
 import { COLORS } from '@/lib/config';
 
+// Re-check hourly so scheduled posts appear on their date without a redeploy.
+export const revalidate = 3600;
+
 export const metadata: Metadata = {
   title: 'Blog — Les Mounas',
   description:
