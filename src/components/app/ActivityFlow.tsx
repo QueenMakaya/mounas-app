@@ -41,7 +41,7 @@ import FeedMounas from '@/components/app/games/FeedMounas';
  * scroll of eight coloured blocks.
  */
 
-type StepKey = 'decouvrir' | 'lire' | 'syllabes' | 'prononcer' | 'epeler' | 'ecrire' | 'activite' | 'chanson' | 'mission' | GameKey;
+type StepKey = 'decouvrir' | 'lire' | 'syllabes' | 'epeler' | 'ecrire' | 'activite' | 'chanson' | 'mission' | GameKey;
 
 type StepDef = {
   key: StepKey;
@@ -57,14 +57,16 @@ type StepDef = {
 
 /*
  * The order follows how a parent actually teaches the word (tested with a
- * child): see it, count its syllables, read its sounds, say it; then an
- * optional chat/activity and the song; then spell it with sounds and write
- * it. Spelling and writing start at level 2 — level 1 is for the youngest.
+ * child): see it, count its syllables, read its sounds; then an optional
+ * chat/activity and « Ma phrase et ma comptine » (the child's own sentence
+ * and the word's poem, together); then spell it with sounds and write it.
+ * (« Le dire », saying the word three times, was removed on 27 Oct. at
+ * Pam's request.) Spelling and writing start at level 2 — level 1 is for the youngest.
  * A linked mission (calcul, problème) comes last, as an optional bonus.
  *
  * Around that fixed order, the day adds variety: one or two mini-games slot
  * in where they fit: the sound fishing after reading the sounds, the picture
- * and the sentence after saying the word, and « Nourris le Mounas » replaces
+ * and « Trouve le mot » after the sounds, and « Nourris le Mounas » replaces
  * « Épeler » on its days. The day always opens on the mystery word; words
  * learned before (« Les mots qui reviennent ») are an option offered under it
  * and again at the end, never a step of their own.
@@ -78,13 +80,12 @@ function buildSteps(a: Activity, hasMission: boolean, games: GameKey[] = []): St
     { key: 'syllabes', emoji: '👏', name: 'Syllabes', heading: 'On compte les syllabes', minutes: 1, accent: '#0E8C80', tint: '#E3F8F5' },
     { key: 'lire', emoji: '📖', name: 'Les sons', heading: 'On lit les sons ensemble', minutes: 2, accent: '#E08A1E', tint: '#FEF3E2' },
     game('jeu-peche') && { key: 'jeu-peche', emoji: '🎣', name: 'La pêche', heading: 'La pêche aux sons', minutes: 1, accent: '#1D6FA4', tint: '#E4F0F8' },
-    { key: 'prononcer', emoji: '🗣️', name: 'Le dire', heading: 'On le dit à voix haute', minutes: 1, accent: '#5B1F8C', tint: '#F1E9F8' },
     game('jeu-image') && { key: 'jeu-image', emoji: '🖼️', name: 'L’image', heading: 'Trouve l’image', minutes: 1, accent: '#D4530C', tint: '#FCEBDD' },
     game('jeu-phrase') && { key: 'jeu-phrase', emoji: '🧩', name: 'La phrase', heading: 'Le mot qui manque', minutes: 1, accent: '#2D9B6F', tint: '#E5F4EC' },
     game('jeu-mot') && { key: 'jeu-mot', emoji: '🔎', name: 'Trouve le mot', heading: 'Trouve le mot', minutes: 1, accent: '#2D9B6F', tint: '#E5F4EC' },
     { key: 'activite', emoji: '💬', name: 'On en parle', heading: a.activityTitle ? `On en parle · ${a.activityTitle}` : 'On en parle', minutes: 3, accent: '#1D6FA4', tint: '#E4F0F8', optional: true },
     // « Ma phrase » (and the poem when the word has one): for every word.
-    { key: 'chanson', emoji: '🎤', name: 'Ma phrase', heading: a.songLyrics.trim() ? 'Ma phrase et ma poésie' : 'Ma phrase', minutes: 2, accent: '#D4530C', tint: '#FCEBDD' },
+    { key: 'chanson', emoji: '🎤', name: 'Ma phrase', heading: a.songLyrics.trim() ? 'Ma phrase et ma comptine' : 'Ma phrase', minutes: 2, accent: '#D4530C', tint: '#FCEBDD' },
     writing && !game('jeu-nourris') && { key: 'epeler', emoji: '🔤', name: 'Épeler', heading: 'Construis le mot avec les sons', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
     writing && game('jeu-nourris') && { key: 'jeu-nourris', emoji: '😋', name: 'Le Mounas', heading: 'Nourris le Mounas', minutes: 1, accent: '#E63946', tint: '#FDECEE' },
     writing && { key: 'ecrire', emoji: '✍️', name: 'Écrire', heading: 'On écrit le mot', minutes: 2, accent: '#2D9B6F', tint: '#E5F4EC' },
@@ -481,9 +482,6 @@ function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, at
     case 'syllabes':
       return <SyllableClap step={step} activity={a} speak={speak} onSuccess={onSuccess} />;
 
-    case 'prononcer':
-      return <SayItThree step={step} activity={a} canSpeak={canSpeak} speak={speak} onSuccess={onSuccess} />;
-
     case 'epeler':
       return <BuildWord step={step} activity={a} canSpeak={canSpeak} speak={speak} onSuccess={onSuccess} />;
 
@@ -497,7 +495,12 @@ function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, at
       return (
         <>
           <PhrasePoem activity={a} accent={step.accent} tint={step.tint} canSpeak={canSpeak} speak={speak} onSuccess={() => onSuccess()} />
-          <ParentTip>Laisse ton enfant inventer sa phrase, même toute simple, et écris-la pour lui. Il la dit ensuite en chantant ou en récitant. Les plus grands apprennent la poésie par cœur.</ParentTip>
+          <ParentTip>
+            Laisse ton enfant inventer sa phrase, même toute simple, et écris-la pour lui.{' '}
+            {a.songLyrics.trim()
+              ? 'Puis récitez ou chantez la comptine ensemble. Les plus grands l’apprennent par cœur.'
+              : 'Puis il la dit bien fort, en récitant ou en chantant.'}
+          </ParentTip>
         </>
       );
   }
@@ -1125,10 +1128,10 @@ function SoundReminders({ activity: a, library, canSpeak, speak }: { activity: A
                 {examples.length > 0 && (
                   <>
                     , comme dans{' '}
-                    {examples.map(({ card, text: spelled }, i) => (
+                    {examples.map(({ card, text: spelled, at }, i) => (
                       <span key={card.id}>
                         {i > 0 && (i === examples.length - 1 ? ' et ' : ', ')}
-                        <HighlightSound word={card.word} text={spelled} />
+                        <HighlightSound word={card.word} text={spelled} at={at} />
                       </span>
                     ))}
                   </>
@@ -1144,9 +1147,10 @@ function SoundReminders({ activity: a, library, canSpeak, speak }: { activity: A
 }
 
 /** The word in lowercase with the reminded letters in bold colour. */
-function HighlightSound({ word, text }: { word: string; text: string }) {
+/** The sound lit up where it is heard: `found` is its position (the « c » of ciel in arc-en-ciel, not of arc). */
+function HighlightSound({ word, text, at: found }: { word: string; text: string; at: number }) {
   const w = word.toLocaleLowerCase('fr');
-  const at = w.indexOf(text);
+  const at = w.slice(found, found + text.length) === text ? found : w.indexOf(text);
   if (at < 0) return <strong>{w}</strong>;
   return (
     <strong>
@@ -1189,15 +1193,24 @@ function SoundTile({ sound, lit, onTap }: { sound: Sound; lit: boolean; onTap: (
   );
 }
 
+/*
+ * Syllables in three moments: the child first writes how many syllables he
+ * hears in the word (a box with a « ? », filled with the number tokens or the
+ * keyboard), then claps them one by one to check, and only then the number is
+ * revealed, next to his guess.
+ */
 function SyllableClap({ step, activity: a, speak, onSuccess }: { step: StepDef; activity: Activity; speak: BodyProps['speak']; onSuccess: BodyProps['onSuccess'] }) {
   // Clap the syllables as they are written in Airtable, even when they are
   // spelled differently from the word — never silently collapse to one.
   const written = syllableParts(a.syllables);
   const parts = written.length > 0 ? written : [a.frenchWord];
+  const [guess, setGuess] = useState('');
+  const [checking, setChecking] = useState(false);
   const [claps, setClaps] = useState<number[]>([]);
   const count = claps.length;
   const total = parts.length;
   const done = count >= total;
+  const said = Number(guess);
 
   const clap = (i: number) => {
     speak(parts[i], 0.7);
@@ -1206,9 +1219,57 @@ function SyllableClap({ step, activity: a, speak, onSuccess }: { step: StepDef; 
     if (claps.length + 1 >= total) onSuccess();
   };
 
+  if (!checking) {
+    return (
+      <>
+        <Stage tint={step.tint}>
+          <p className="font-display text-5xl font-bold text-ink sm:text-6xl">{a.frenchWord.toLocaleLowerCase('fr')}</p>
+          <label htmlFor="nb-syllabes" className="mt-6 block font-display text-2xl font-bold text-ink">
+            Combien de syllabes ?
+          </label>
+          <input
+            id="nb-syllabes"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={1}
+            value={guess}
+            placeholder="?"
+            onChange={(e) => setGuess(e.target.value.replace(/\D/g, '').slice(-1))}
+            className="mx-auto mt-3 block h-20 w-20 rounded-2xl bg-white text-center font-display text-5xl font-bold text-ink ring-2 ring-mteal-ink/40 placeholder:text-mteal-ink/50 focus:outline-none focus:ring-4"
+          />
+          <div className="mt-4 flex justify-center gap-2">
+            {['1', '2', '3', '4', '5', '6'].map((n) => (
+              <button
+                key={n}
+                type="button"
+                onClick={() => setGuess(n)}
+                aria-pressed={guess === n}
+                className={`h-12 w-12 rounded-full font-display text-2xl font-bold shadow-[0_3px_0_rgba(26,26,26,0.12)] ring-1 ring-ink/10 active:translate-y-0.5 ${guess === n ? 'bg-mteal-ink text-cream' : 'bg-white text-ink'}`}
+              >
+                {n}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setChecking(true)}
+            disabled={!guess}
+            className="mt-6 min-h-14 rounded-full bg-mteal-ink px-8 text-lg font-extrabold text-cream shadow-md active:scale-95 disabled:opacity-40"
+          >
+            👏 On vérifie ensemble !
+          </button>
+        </Stage>
+        <ParentTip>Ton enfant dit le mot doucement et écrit combien de syllabes il entend. Ensuite, vous tapez dans les mains ensemble pour vérifier.</ParentTip>
+      </>
+    );
+  }
+
   return (
     <>
       <Stage tint={step.tint}>
+        <p className="mb-4 text-sm font-bold text-ink-soft">
+          Tu as écrit <span className="font-display text-xl text-ink">{guess}</span>. On tape dans les mains pour vérifier !
+        </p>
         <div className="flex flex-wrap justify-center gap-3">
           {parts.map((syl, i) => {
             const on = claps.includes(i);
@@ -1230,72 +1291,32 @@ function SyllableClap({ step, activity: a, speak, onSuccess }: { step: StepDef; 
           })}
         </div>
         <p className="mt-6 font-display text-2xl font-bold text-ink" aria-live="polite">
-          {/* The number of syllables stays a « ? » until the child has clapped them all. */}
-          {done ? (
-            <>Bravo ! {total} syllabe{total > 1 ? 's' : ''} 🎉</>
-          ) : count === 0 ? (
-            <>Combien de syllabes ? <span className="ml-1 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-mteal-ink ring-2 ring-mteal-ink/30">?</span></>
-          ) : (
+          {/* The number of syllables is revealed only once they have all been clapped. */}
+          {!done ? (
             <>👏 {count}… ?</>
+          ) : said === total ? (
+            <>Tu avais dit {said} : bravo, il y a bien {total} syllabe{total > 1 ? 's' : ''} ! 🎉</>
+          ) : (
+            <>
+              Il y a {total} syllabe{total > 1 ? 's' : ''}. Tu avais dit {said} : bien essayé, on recompte ensemble ? 👏
+            </>
           )}
         </p>
         {done && (
-          <button type="button" onClick={() => setClaps([])} className="mt-2 text-sm font-bold text-mteal-ink underline underline-offset-4">
+          <button
+            type="button"
+            onClick={() => {
+              setClaps([]);
+              setChecking(false);
+              setGuess('');
+            }}
+            className="mt-2 text-sm font-bold text-mteal-ink underline underline-offset-4"
+          >
             Recommencer
           </button>
         )}
       </Stage>
       <ParentTip>Tapez dans vos mains à chaque syllabe et comptez ensemble : un, deux… Touchez les bulles pour les entendre.</ParentTip>
-    </>
-  );
-}
-
-function SayItThree({ step, activity: a, canSpeak, speak, onSuccess }: Pick<BodyProps, 'step' | 'activity' | 'canSpeak' | 'speak' | 'onSuccess'>) {
-  const [said, setSaid] = useState(0);
-  return (
-    <>
-      <Stage tint={step.tint}>
-        {a.pronunciation && (
-          <p className="font-display text-4xl italic text-mpurple sm:text-5xl">{a.pronunciation}</p>
-        )}
-        {canSpeak && (
-          <div className="mt-5 flex flex-wrap justify-center gap-3">
-            <SpeakButton text={a.frenchWord} label="Normal" rate={0.9} />
-            <SpeakButton text={a.frenchWord} label="Tout doucement" rate={0.5} tone="soft" />
-          </div>
-        )}
-        <p className="mt-8 mb-3 font-bold text-ink">On le dit 3 fois ensemble :</p>
-        <div className="flex justify-center gap-3">
-          {[0, 1, 2].map((i) => {
-            const on = i < said;
-            return (
-              <button
-                key={i}
-                type="button"
-                onClick={() => {
-                  setSaid(Math.max(said, i + 1));
-                  speak(a.frenchWord);
-                  if (i + 1 >= 3) onSuccess();
-                }}
-                aria-label={`Fois ${i + 1}${on ? ' (dit)' : ''}`}
-                aria-pressed={on}
-                className="flex h-16 w-16 items-center justify-center rounded-full font-display text-2xl font-bold transition-all active:scale-90"
-                style={{ backgroundColor: on ? '#5B1F8C' : '#FFFFFF', color: on ? '#FDF6EC' : '#5B1F8C', boxShadow: '0 3px 0 rgba(26,26,26,0.12)' }}
-              >
-                {on ? <span className="animate-pop">★</span> : i + 1}
-              </button>
-            );
-          })}
-        </div>
-        {said >= 3 && <p className="mt-4 font-bold text-mpurple" aria-live="polite">Super prononciation ! 🌟</p>}
-      </Stage>
-      {a.exampleSentence && (
-        <div className="mt-5 rounded-2xl bg-cream p-4">
-          <p className="mb-1 text-xs font-extrabold uppercase tracking-widest text-ink-soft">Dans une phrase</p>
-          <p className="font-display text-lg italic text-ink">« {a.exampleSentence} »</p>
-          <SpeakButton text={a.exampleSentence} label="Écouter la phrase" tone="soft" className="mt-3" />
-        </div>
-      )}
     </>
   );
 }

@@ -13,11 +13,10 @@ export type Prompt = { icon: KidIconName; say: string };
 export const STEP_PROMPTS: Record<string, Prompt> = {
   'decouvrir-lire': { icon: 'toucher', say: 'Touche les cartes, puis lis le mot tout seul.' },
   'decouvrir-ecoute': { icon: 'ecouter', say: 'Écoute bien le mot, puis écris-le avec les sons.' },
-  syllabes: { icon: 'mains', say: 'Tape dans tes mains à chaque syllabe.' },
+  syllabes: { icon: 'mains', say: 'Combien de syllabes ? Écris le nombre, puis tape dans tes mains pour vérifier.' },
   lire: { icon: 'glisser', say: 'Glisse ton doigt sous le mot.' },
-  prononcer: { icon: 'dire', say: 'Dis le mot trois fois.' },
   activite: { icon: 'dire', say: 'On en parle ensemble.' },
-  chanson: { icon: 'dire', say: 'Invente ta phrase avec le mot, puis dis-la !' },
+  chanson: { icon: 'dire', say: 'Invente ta phrase avec le mot, puis récite la comptine !' },
   epeler: { icon: 'toucher', say: 'Touche les sons dans le bon ordre.' },
   ecrire: { icon: 'ecrire', say: 'Écris le mot avec ton doigt.' },
   mission: { icon: 'ecouter', say: 'Écoute bien la mission.' },

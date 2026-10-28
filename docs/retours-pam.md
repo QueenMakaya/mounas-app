@@ -71,3 +71,17 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   iPhone récent, iPad portrait et paysage.
 - [x] **Répondre avec les jetons ou le clavier** : bouton 🔢 Jetons / ⌨️ Clavier en haut. Le clavier ouvre le pavé
   chiffré du téléphone ou de la tablette (un clavier physique marchait déjà). Le choix est retenu sur l'appareil.
+
+## 27 octobre 2026
+
+- [x] **Syllabes en trois temps** : l'enfant écrit d'abord combien de syllabes il entend (case « ? », jetons 1 à 6
+  ou clavier), puis on vérifie en tapant dans les mains, puis le nombre est dévoilé à côté de sa réponse.
+- [x] **Bug « c » de arc-en-ciel** : dans le « Rappel des sons » et la pêche, l'app surlignait le premier « c »
+  du mot (celui d'*arc*, qui fait « k ») au lieu de celui de *ciel*. Elle surligne maintenant le son là où on l'entend.
+- [x] **Mots en double** : ARC-EN-CIEL existe deux fois dans Airtable (rec1XDVKJyFDIDGdj, Couleurs, sans comptine,
+  et reccCMFTkAkkrDUuG, Nature, avec comptine). L'app n'affiche plus qu'une fois chaque mot dans les jeux et rappels.
+  La fiche en trop reste dans Airtable : à Pam de choisir laquelle garder.
+- [x] **« Le dire » (dire le mot 3 fois) retiré**, à la demande de Pam.
+- [x] **« Ma phrase et ma comptine »** : la phrase de l'enfant et la comptine sur le même écran ; on fait sa phrase
+  et on récite (ou chante) la comptine ; « Par cœur » dès le niveau 3. Les mots sans comptine dans Airtable
+  (28 sur 183, dont CERVEAU) proposent « Dis ta phrase » à la place.
