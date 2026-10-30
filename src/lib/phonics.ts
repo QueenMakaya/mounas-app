@@ -37,6 +37,9 @@ export const SOUNDS: Record<string, { say: string; hint: string; vowel: boolean 
   ou: { say: 'ou', hint: 'ou', vowel: true },
   oi: { say: 'oi', hint: 'oi', vowel: true },
   eu: { say: 'eu', hint: 'euh', vowel: true },
+  // « œu » of cœur, sœur, œuf: its own sound card, so sœur is read s|œu|r
+  // (not s|o|eu|r) and finds cœur as its rhyme.
+  œu: { say: 'eu', hint: 'œu', vowel: true },
   an: { say: 'an', hint: 'an', vowel: true },
   on: { say: 'on', hint: 'on', vowel: true },
   in: { say: 'in', hint: 'in', vowel: true },
@@ -94,7 +97,8 @@ const RULES: Rule[] = [
   { match: 'ein', key: 'in', when: nasalOk },
   { match: 'aim', key: 'in', when: nasalOk },
   { match: 'ill', key: 'ille', when: (_n, p) => !isVowel(p) },
-  { match: 'œu', key: 'eu' },
+  { match: 'oeu', key: 'œu' },
+  { match: 'œu', key: 'œu' },
   { match: 'eu', key: 'eu' },
   { match: 'ou', key: 'ou' },
   { match: 'oi', key: 'oi' },

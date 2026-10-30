@@ -4,6 +4,7 @@ import { useEffect, useEffectEvent, useRef, useState, useSyncExternalStore } fro
 import BackButton from '@/components/app/BackButton';
 import { CalculIcon } from '@/components/app/AppSections';
 import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/DrawingCanvas';
+import KidIcon from '@/components/app/kid/KidIcon';
 import { playChime } from '@/lib/chime';
 import { localDate, readPref, writePref } from '@/lib/progress';
 import { useSpeech } from '@/lib/useSpeech';
@@ -489,8 +490,8 @@ function CalcStage({
             )}
             {!feedback && input && (
               <>
-                <button type="button" onClick={onErase} className="min-h-10 rounded-full bg-white px-4 text-sm font-bold text-ink ring-1 ring-ink/15">
-                  ⌫ Effacer
+                <button type="button" onClick={onErase} className="inline-flex min-h-10 items-center gap-1.5 rounded-full bg-white px-4 text-sm font-bold text-ink ring-1 ring-ink/15">
+                  <KidIcon name="gomme" className="h-5 w-5" /> Effacer
                 </button>
                 <button type="button" onClick={onCheck} className="min-h-10 rounded-full bg-ink px-4 text-sm font-bold text-cream">
                   ✓ C’est ma réponse
@@ -518,8 +519,8 @@ function CalcStage({
         <div className={`${scratchOpen ? 'flex' : 'hidden'} min-h-0 flex-col sm:flex sm:flex-1 ${scratchOpen ? 'basis-[38%] sm:basis-auto' : ''}`}>
           <div className="mb-1 flex flex-shrink-0 items-center justify-between px-1 text-xs font-bold text-ink-soft">
             <span>✏️ Mon brouillon</span>
-            <button type="button" onClick={() => scratch.current?.clear()} className="underline underline-offset-4">
-              Effacer
+            <button type="button" onClick={() => scratch.current?.clear()} className="inline-flex items-center gap-1 underline underline-offset-4">
+              <KidIcon name="gomme" className="h-4 w-4" /> Effacer
             </button>
           </div>
           <div ref={padRef} className="min-h-0 flex-1 overflow-hidden rounded-3xl bg-white ring-1 ring-ink/10">

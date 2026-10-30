@@ -77,6 +77,7 @@ const SOUND_CLIPS: Record<string, string> = {
   ou: 'sons/ou.mp3',
   oi: 'sons/oi.mp3',
   eu: 'sons/eu.mp3',
+  'œu': 'sons/eu.mp3', // until Pam records sons/oeu.mp3
   an: 'sons/an.mp3',
   on: 'sons/on.mp3',
   in: 'sons/in.mp3',

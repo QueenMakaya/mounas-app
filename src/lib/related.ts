@@ -11,6 +11,8 @@ export type WordCard = {
 };
 
 const lower = (s: string) => s.toLocaleLowerCase('fr');
+/** "oeu" and "œu" are the same spelling (sœur, coeur). */
+const sameSpelling = (a: string, b: string) => a.replace(/œ/g, 'oe') === b.replace(/œ/g, 'oe');
 
 /**
  * Sounds worth a reminder: those written with several letters (ou, ch, eil,
@@ -58,7 +60,7 @@ export function wordsWithSound(sound: Sound, library: WordCard[], excludeId: str
     .map((card) => ({ card, hit: spellingOf(card, sound) }))
     .filter((x): x is { card: WordCard; hit: { text: string; at: number } } => x.hit !== null)
     .map(({ card, hit }) => ({ card, ...hit }))
-    .sort((a, b) => Number(b.text === mine) - Number(a.text === mine) || byLevel(a.card, b.card))
+    .sort((a, b) => Number(sameSpelling(b.text, mine)) - Number(sameSpelling(a.text, mine)) || byLevel(a.card, b.card))
     .slice(0, limit);
 }
 

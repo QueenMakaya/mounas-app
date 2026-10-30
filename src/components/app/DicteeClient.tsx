@@ -8,6 +8,7 @@ import { readPref, writePref } from '@/lib/progress';
 import { useSpeech } from '@/lib/useSpeech';
 import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/DrawingCanvas';
 import WritingModePicker, { useWritingMode } from '@/components/app/WritingModePicker';
+import KidIcon from '@/components/app/kid/KidIcon';
 
 /*
  * The dictation notebook: the parent dictates (or lets the app dictate),
@@ -326,7 +327,7 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
                     </button>
                   ))}
                   <span className="mx-1 h-6 w-px bg-ink/15" />
-                  <button type="button" onClick={() => setEraser((v) => !v)} className={`${tool} ${eraser ? '!bg-mamber' : ''}`}>🧽 Gomme</button>
+                  <button type="button" onClick={() => setEraser((v) => !v)} className={`${tool} inline-flex items-center gap-1.5 ${eraser ? '!bg-mamber' : ''}`}><KidIcon name="gomme" className="h-5 w-5" /> Gomme</button>
                   <button type="button" onClick={() => canvas.current?.undo()} className={tool}>↶ Annuler</button>
                   <button type="button" onClick={resetPage} className={tool}>🗑️ Page blanche</button>
                   {writing !== 'blanc' && (

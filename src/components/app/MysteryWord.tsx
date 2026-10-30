@@ -5,11 +5,12 @@ import { playChime } from '@/lib/chime';
 import { SOUNDS, wordSounds } from '@/lib/phonics';
 import { themeEmoji } from '@/lib/themes';
 import MysteryTiles from '@/components/app/MysteryTiles';
-import { coloredLetters, syllableParts } from '@/components/app/SyllableWord';
+import { coloredLetters } from '@/components/app/SyllableWord';
 
 /*
  * The first seconds of the activity: the word is a row of face-down cards.
- * The child can ask for hints (theme, syllables, first sound, first letter),
+ * The child can ask for hints (theme, first sound, first letter; not the
+ * number of syllables, which the syllable step asks the child to find),
  * then taps to reveal — the cards flip one by one with a chime and sparks.
  *
  * Two ways to discover it:
@@ -60,20 +61,11 @@ export default function MysteryWord({ word, syllables, theme, graphemes, reveale
   const letters = coloredLetters(word, syllables);
   const [hints, setHints] = useState(0);
 
-  const syllableCount = Math.max(syllableParts(syllables).length, 1);
   const firstSound = wordSounds(word, graphemes).find((s) => s.kind !== 'silent' && s.kind !== 'separator' && s.key);
   const firstLetterIndex = letters.findIndex((l) => !/[\s'’-]/.test(l.char));
 
   const allHints = [
     theme && { icon: themeEmoji(theme), text: <>C’est un mot du thème <strong>{theme}</strong>.</> },
-    {
-      icon: '👏',
-      text: (
-        <>
-          Il a <strong>{syllableCount} syllabe{syllableCount > 1 ? 's' : ''}</strong> : {'👏'.repeat(syllableCount)}
-        </>
-      ),
-    },
     firstSound && {
       icon: '👂',
       text: (

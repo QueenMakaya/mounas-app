@@ -3,11 +3,11 @@ import type { KidIconName } from '@/lib/prompts';
 /*
  * The child-mode pictograms: one simple drawing per thing to do, readable
  * before reading (écouter, toucher, glisser, écrire, dire, taper des mains,
- * suivant, rejouer), plus the parent lock. Stroked in currentColor so each
+ * suivant, rejouer), plus the parent lock and the eraser. Stroked in currentColor so each
  * step can tint them with its accent.
  */
 
-type Name = KidIconName | 'cadenas';
+type Name = KidIconName | 'cadenas' | 'gomme';
 
 // A finger pointing up, as when touching the screen (24×24, tip at 11.5, 4).
 const FINGER =
@@ -56,6 +56,13 @@ const PATHS: Record<Name, React.ReactNode> = {
     <>
       <path d="M4.5 12a7.5 7.5 0 1 0 2.3-5.4" />
       <path d="M4 3.5V8h4.5" />
+    </>
+  ),
+  // An eraser lying on its side, rubbing a line out.
+  gomme: (
+    <>
+      <path d="M7.5 20 3.4 15.9a1.8 1.8 0 0 1 0-2.6l9.3-9.3a1.8 1.8 0 0 1 2.6 0l4.7 4.7a1.8 1.8 0 0 1 0 2.6L11 20z" />
+      <path d="M8.5 8.2l7.3 7.3M7.5 20H21" />
     </>
   ),
   cadenas: (

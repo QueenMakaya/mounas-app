@@ -5,6 +5,8 @@ import type { Mission } from '@/lib/missions';
 import { saveMission } from '@/lib/mission-progress';
 import { playChime } from '@/lib/chime';
 import SpeakButton from '@/components/app/SpeakButton';
+import KidIcon from '@/components/app/kid/KidIcon';
+import { useSpeech } from '@/lib/useSpeech';
 
 /*
  * One mission: the child hears the problem, answers with a number pad or
@@ -15,7 +17,11 @@ import SpeakButton from '@/components/app/SpeakButton';
  *  - praise the effort and the method, never speed or "being good at maths";
  *    no timer, no score;
  *  - the answer is never shown before 3 tries AND every hint, and even then
- *    behind a button meant for the parent.
+ *    behind a button meant for the parent;
+ *  - a child alone can't read the choices: « Écouter » reads them after the
+ *    problem, and each choice has its own 🔈.
+ *
+ * The harder variant is played the same way: its question, then « ? ».
  */
 
 const MIN_TRIES_BEFORE_ANSWER = 3;
@@ -50,7 +56,52 @@ function expectedNumber(answer: string): number | null {
   return m ? Number(m[0].replace(',', '.')) : null;
 }
 
-export default function MissionPlayer({ mission: m, compact = false }: { mission: Mission; compact?: boolean }) {
+/**
+ * The harder variant is written in Airtable as one text, often with its
+ * answer: "… combien de pattes ? 8 pattes" or "… ? (Réponse : 8)". Split it so
+ * the answer is neither shown nor read before the child has looked for it.
+ */
+export function splitHarder(text: string): { question: string; answer: string } {
+  const labelled = text.match(/^([\s\S]*?)[\s(\[–—-]*(?:réponse|reponse|solution)\s*:\s*([\s\S]+?)[)\]\s.]*$/i);
+  if (labelled) return { question: labelled[1].trim(), answer: labelled[2].trim() };
+  const lastQ = text.lastIndexOf('?');
+  if (lastQ >= 0) {
+    const answer = text.slice(lastQ + 1).replace(/^[\s:→=–—-]+/, '').replace(/[\s.]+$/, '').trim();
+    return { question: text.slice(0, lastQ + 1).trim(), answer };
+  }
+  return { question: text.trim(), answer: '' };
+}
+
+/** The harder variant as a mission of its own (same id: progress goes on the main one). */
+function harderMission(m: Mission): Mission {
+  const { question, answer } = splitHarder(m.harder);
+  const inChoices = m.answerType === 'choix' && m.choices.some((c) => normalize(c) === normalize(answer));
+  return {
+    ...m,
+    title: '',
+    statement: question,
+    parentScript: '',
+    hints: [],
+    answer,
+    // A number → the number pad; one of the choices → the choices; else the parent checks.
+    answerType: inChoices ? 'choix' : expectedNumber(answer) !== null ? 'nombre' : 'photo',
+    choices: inChoices ? m.choices : [],
+    harder: '',
+    materials: '',
+  };
+}
+
+export default function MissionPlayer({
+  mission: m,
+  compact = false,
+  variant = false,
+}: {
+  mission: Mission;
+  compact?: boolean;
+  /** The harder variant: success is saved as `harder` on the main mission. */
+  variant?: boolean;
+}) {
+  const { supported: canSpeak, speak, speaking } = useSpeech();
   const target = m.answerType === 'nombre' ? expectedNumber(m.answer) : null;
   // A number mission whose answer isn't a number, or a photo mission, is
   // checked by the parent in real life.
@@ -64,7 +115,6 @@ export default function MissionPlayer({ mission: m, compact = false }: { mission
   const [lastWrong, setLastWrong] = useState<string | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [showHarder, setShowHarder] = useState(false);
-  const [harderDone, setHarderDone] = useState(false);
 
   const allHints = hints >= m.hints.length;
   const canRevealAnswer = !parentChecks && !solved && tries >= MIN_TRIES_BEFORE_ANSWER && allHints;
@@ -76,7 +126,7 @@ export default function MissionPlayer({ mission: m, compact = false }: { mission
       tries >= 2 ? PRAISE_AFTER_TRIES : hints > 0 ? PRAISE_WITH_HINT : PRAISE[Math.floor(Math.random() * PRAISE.length)],
     );
     playChime();
-    saveMission(m.id, { solved: true, tries, hints });
+    saveMission(m.id, variant ? { harder: true } : { solved: true, tries, hints });
   };
 
   const miss = (value: string) => {
@@ -86,7 +136,7 @@ export default function MissionPlayer({ mission: m, compact = false }: { mission
     setFeedback(
       NOT_YET[(n - 1) % NOT_YET.length] + (hints < m.hints.length ? ' Un indice peut t’aider.' : ''),
     );
-    saveMission(m.id, { tries: n, hints });
+    if (!variant) saveMission(m.id, { tries: n, hints });
   };
 
   const check = (value: string) => {
@@ -110,7 +160,11 @@ export default function MissionPlayer({ mission: m, compact = false }: { mission
         {!compact && m.title && <p className="mb-2 text-xs font-extrabold uppercase tracking-widest text-[#C7600A]">{m.title}</p>}
         <p className="font-display text-xl font-bold leading-snug text-ink sm:text-2xl">{m.statement}</p>
         <div className="mt-4 flex justify-center">
-          <SpeakButton text={m.statement} label="Écouter la mission" rate={0.85} />
+          <SpeakButton
+            text={m.answerType === 'choix' && m.choices.length ? `${m.statement} ${m.choices.map((c) => `${c} ?`).join(' ')}` : m.statement}
+            label={variant ? 'Écouter' : 'Écouter la mission'}
+            rate={0.85}
+          />
         </div>
       </div>
 
@@ -138,16 +192,27 @@ export default function MissionPlayer({ mission: m, compact = false }: { mission
       {!solved && m.answerType === 'choix' && !parentChecks && (
         <div className="grid gap-3 sm:grid-cols-2" role="group" aria-label="Choisis ta réponse">
           {m.choices.map((c) => (
-            <button
-              key={c}
-              type="button"
-              onClick={() => check(c)}
-              className={`min-h-14 rounded-2xl px-4 py-3 text-lg font-bold ring-2 transition-transform active:scale-[0.98] ${
-                lastWrong === c ? 'bg-sand text-ink-soft ring-ink/10' : 'bg-white text-ink ring-mamber hover:bg-[#FEF3E2]'
-              }`}
-            >
-              {c}
-            </button>
+            <div key={c} className="flex items-stretch gap-2">
+              <button
+                type="button"
+                onClick={() => check(c)}
+                className={`min-h-14 flex-1 rounded-2xl px-4 py-3 text-lg font-bold ring-2 transition-transform active:scale-[0.98] ${
+                  lastWrong === c ? 'bg-sand text-ink-soft ring-ink/10' : 'bg-white text-ink ring-mamber hover:bg-[#FEF3E2]'
+                }`}
+              >
+                {c}
+              </button>
+              {canSpeak && (
+                <button
+                  type="button"
+                  onClick={() => speak(c, 0.85)}
+                  aria-label={`Écouter : ${c}`}
+                  className="flex w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-white text-xl ring-1 ring-mpurple/25 active:scale-95"
+                >
+                  <span aria-hidden="true" className={speaking === c ? 'animate-pop' : ''}>{speaking === c ? '🔊' : '🔈'}</span>
+                </button>
+              )}
+            </div>
           ))}
         </div>
       )}
@@ -221,26 +286,13 @@ export default function MissionPlayer({ mission: m, compact = false }: { mission
           </button>
         ))}
 
-      {/* ── Harder variant ── */}
+      {/* ── Harder variant: a question with its own « ? », answer hidden ── */}
       {m.harder &&
+        (solved || parentChecks || showAnswer) &&
         (showHarder ? (
-          <div className="rounded-3xl bg-[#E4F0F8] px-5 py-5">
-            <p className="text-xs font-extrabold uppercase tracking-widest text-[#1D6FA4]">🚀 Plus difficile</p>
-            <p className="mt-2 font-display text-lg font-bold leading-snug text-ink">{m.harder}</p>
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <SpeakButton text={m.harder} label="Écouter" rate={0.85} tone="soft" />
-              <button
-                type="button"
-                disabled={harderDone}
-                onClick={() => {
-                  setHarderDone(true);
-                  saveMission(m.id, { harder: true });
-                }}
-                className="min-h-12 rounded-full bg-white px-5 font-bold text-[#1D6FA4] ring-1 ring-[#1D6FA4]/30 disabled:opacity-70"
-              >
-                {harderDone ? '✅ Défi relevé, bravo pour tes efforts !' : 'On l’a fait !'}
-              </button>
-            </div>
+          <div className="rounded-3xl bg-[#E4F0F8] px-4 py-5 sm:px-5">
+            <p className="mb-3 text-xs font-extrabold uppercase tracking-widest text-[#1D6FA4]">🚀 Plus difficile</p>
+            <MissionPlayer mission={harderMission(m)} compact variant />
           </div>
         ) : (
           <button
@@ -304,10 +356,11 @@ function NumberPad({ value, onChange, onSubmit }: { value: string; onChange: (v:
         <button
           type="button"
           onClick={() => onChange(value.slice(0, -1))}
-          aria-label="Effacer"
-          className="min-h-14 rounded-2xl bg-sand text-xl font-bold text-ink active:scale-95"
+          aria-label="Gomme : effacer le dernier chiffre"
+          className="flex min-h-14 flex-col items-center justify-center rounded-2xl bg-sand text-[11px] font-extrabold text-ink active:scale-95"
         >
-          ⌫
+          <KidIcon name="gomme" className="h-7 w-7" />
+          Gomme
         </button>
         <button
           type="button"

@@ -85,3 +85,18 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 - [x] **« Ma phrase et ma comptine »** : la phrase de l'enfant et la comptine sur le même écran ; on fait sa phrase
   et on récite (ou chante) la comptine ; « Par cœur » dès le niveau 3. Les mots sans comptine dans Airtable
   (28 sur 183, dont CERVEAU) proposent « Dis ta phrase » à la place.
+
+## 30 octobre 2026
+
+- [x] **Le son « œu »** (sœur, cœur, œuf, bœuf) : c'est maintenant une carte-son à part. SŒUR se lit s | œu | r
+  (avant : s | o | eu | r quand le mot est écrit « soeur »), et le « Rappel des sons » propose CŒUR avant les autres
+  mots en « eu ». Pour l'instant l'app joue l'enregistrement du son « eu » ; un `sons/oeu.mp3` pourra le remplacer.
+  À vérifier dans Airtable : si la colonne « Graphèmes » de SŒUR contient `s|o|eu|r`, la changer en `s|oeu|r`.
+- [x] **Mission « Plus difficile »** : la réponse n'est plus écrite ni lue dans la consigne. L'app sépare la question
+  de la réponse (texte après le dernier « ? », ou après « Réponse : ») et l'enfant répond comme dans la mission :
+  « ? » avec les chiffres, ou les choix, ou le parent vérifie. Le défi s'ouvre une fois la mission trouvée.
+- [x] **Effacer = une gomme** : dessin de gomme sur la touche d'effacement des missions, du calcul et de la dictée.
+- [x] **Indices du mot mystère** : plus d'indice « nombre de syllabes », puisque c'est demandé ensuite à l'enfant.
+- [x] **Missions à choix** (ex. le cadeau caché dans une boîte) : « Écouter la mission » lit aussi les réponses
+  possibles, et chaque réponse a son 🔈, pour que l'enfant seul puisse choisir sans savoir lire.
+- [x] **Fin de mission** : boutons « Mission suivante → » et « 🧩 Toutes les missions » sous la mission.
