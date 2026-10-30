@@ -112,3 +112,9 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   - **Trace gardée** : à « Suivant », ce que l'enfant a écrit (au doigt ou au clavier) est gardé. Correction
     **au fur et à mesure** (les mots déjà écrits s'affichent sous la feuille avec la bonne orthographe) ou **à la fin**
     (tout corrigé ensemble sur l'écran de fin). Le parent touche « ✓ Juste » ou « 🔁 À revoir » pour chaque mot.
+- [x] **Dictée, suite** :
+  - « Suivant ⏭ » sur chaque mot, jusqu'au dernier (plus de « Terminer » : l'écran de fin arrive après le dernier mot).
+  - **10 mots par défaut**, et le parent change le nombre pour cette dictée (− / +, ou 5, 10, 15, 20).
+  - **Des phrases dès le niveau 3** : « 🔤 Des mots / 📝 Des phrases ». Les phrases sont les « Example sentence »
+    d'Airtable de ce niveau, de 10 mots au plus. L'app lit la phrase, puis la relit lentement. Au clavier, la correction
+    se fait mot par mot, sans compter la ponctuation. Les phrases « à revoir » sont gardées à part des mots.

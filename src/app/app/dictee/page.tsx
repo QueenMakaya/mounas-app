@@ -23,7 +23,7 @@ async function loadWords(): Promise<DicteeWord[]> {
         seen.add(key);
         return true;
       })
-      .map((a) => ({ word: a.frenchWord.trim(), level: a.difficulty }));
+      .map((a) => ({ word: a.frenchWord.trim(), level: a.difficulty, sentence: a.exampleSentence.trim() }));
   } catch {
     return [];
   }

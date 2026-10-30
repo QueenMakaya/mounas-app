@@ -13,16 +13,20 @@ import KidIcon from '@/components/app/kid/KidIcon';
 
 /*
  * The dictation notebook, in series like the calcul: the parent picks the
- * words (a level or their own list) and how many, then the app dictates one
+ * words (a level or their own list) and how many (10 unless changed for this
+ * series), then the app dictates one
  * word at a time and says it again every few seconds until « Suivant ». The
  * child writes with a finger/stylus on Seyès paper, or types.
  *
  * What the child wrote is kept, word by word: corrected as we go (the
  * correction under each word already written) or all together at the end.
  * Words marked « à revoir » come back first in the next series.
+ *
+ * From level 3, the series can be made of sentences instead: the example
+ * sentence of each word (Airtable « Example sentence »), when it is short.
  */
 
-export type DicteeWord = { word: string; level: string };
+export type DicteeWord = { word: string; level: string; sentence?: string };
 
 const INKS = [
   { name: 'Bleu', value: '#1D3F9E' },
@@ -37,7 +41,11 @@ const SIZES = [
   { name: 'Gros', value: 12 },
 ];
 
-const COUNTS = [5, 10, 20] as const;
+const COUNTS = [5, 10, 15, 20] as const;
+const DEFAULT_COUNT = 10;
+/** Sentences are offered from this level on, and only short ones. */
+const SENTENCE_LEVEL = 3;
+const MAX_SENTENCE_WORDS = 10;
 const REPEATS = [0, 10, 20, 30] as const;
 
 const LS_OWN = 'mounas_dictee_words';
@@ -51,13 +59,21 @@ const OWN = 'mine';
 
 type Mode = 'doigt' | 'clavier';
 type CorrectWhen = 'direct' | 'fin';
-type Settings = { count: number; repeat: number; correct: CorrectWhen };
-const DEFAULTS: Settings = { count: 5, repeat: 20, correct: 'direct' };
+type Kind = 'mots' | 'phrases';
+/** Kept on the device. The number of words is chosen for each series (10 by default). */
+type Settings = { repeat: number; correct: CorrectWhen };
+const DEFAULTS: Settings = { repeat: 20, correct: 'direct' };
 
 /** One word of the series as the child wrote it. */
 type Trace = { word: string; img?: string; typed?: string; right: boolean | null };
 
-const normalize = (s: string) => s.trim().replace(/\s+/g, ' ').toLocaleLowerCase('fr');
+// Punctuation doesn't count: a sentence without its final dot is still right.
+const normalize = (s: string) =>
+  s
+    .replace(/[.,;:!?…«»"]/g, '')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toLocaleLowerCase('fr');
 
 function readJson<T>(key: string, fallback: T): T {
   try {
@@ -111,8 +127,35 @@ function Correction({ word, writing, small = false }: { word: string; writing: W
   );
 }
 
+/** A sentence, word by word: one letter missing must not make the rest of the sentence red. */
+function TypedWords({ sentence, typed }: { sentence: string; typed: string }) {
+  const clean = (w: string) => w.toLocaleLowerCase('fr').replace(/[.,;:!?…«»"]/g, '');
+  const target = sentence.trim().split(/\s+/);
+  const got = typed.trim().split(/\s+/).filter(Boolean);
+  return (
+    <div className="flex flex-wrap justify-center gap-1.5">
+      {Array.from({ length: Math.max(target.length, got.length) }, (_, i) => {
+        const want = target[i] ?? '';
+        const g = got[i] ?? '';
+        const ok = clean(want) === clean(g);
+        return (
+          <span
+            key={i}
+            className={`flex min-h-12 flex-col items-center justify-center rounded-xl px-2.5 py-1 text-xl font-bold text-cream ${ok ? 'bg-[#2D9B6F]' : 'bg-mred'}`}
+            title={ok ? 'juste' : `attendu : ${want || '(rien)'}`}
+          >
+            {g || '_'}
+            {!ok && <span className="text-xs font-normal opacity-90">{want || '–'}</span>}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 /** Typed answer, letter by letter: green when right, red with the expected letter under it. */
 function TypedDiff({ word, typed }: { word: string; typed: string }) {
+  if (word.trim().includes(' ')) return <TypedWords sentence={word} typed={typed} />;
   const target = Array.from(word.trim());
   const got = Array.from(typed.trim());
   return (
@@ -142,6 +185,8 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
   const [own, setOwn] = useState<string[]>([]);
   const [newWord, setNewWord] = useState('');
   const [settings, setSettings] = useState<Settings>(DEFAULTS);
+  const [count, setCount] = useState(DEFAULT_COUNT);
+  const [kind, setKind] = useState<Kind>('mots');
 
   // The series: null before it starts.
   const [series, setSeries] = useState<string[] | null>(null);
@@ -173,7 +218,6 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
       if (LEVELS.some((l) => l.value === lastLevel)) setSource(lastLevel);
       const s = readJson<Partial<Settings>>(LS_SETTINGS, {});
       setSettings({
-        count: COUNTS.includes(s.count as (typeof COUNTS)[number]) ? (s.count as number) : DEFAULTS.count,
         repeat: REPEATS.includes(s.repeat as (typeof REPEATS)[number]) ? (s.repeat as number) : DEFAULTS.repeat,
         correct: s.correct === 'fin' ? 'fin' : 'direct',
       });
@@ -186,10 +230,31 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
     };
   }, []);
 
-  const list = useMemo(
-    () => (source === OWN ? own : [...new Set(words.filter((w) => w.level === source).map((w) => w.word.toLocaleLowerCase('fr')))]),
-    [source, own, words],
+  const sentences = useMemo(
+    () =>
+      [
+        ...new Set(
+          words
+            .filter((w) => w.level === source && Number(w.level) >= SENTENCE_LEVEL && w.sentence)
+            .map((w) => w.sentence!.replace(/\s+/g, ' '))
+            .filter((t) => t.split(' ').length <= MAX_SENTENCE_WORDS),
+        ),
+      ],
+    [source, words],
   );
+  const phrases = kind === 'phrases' && sentences.length > 0;
+  const list = useMemo(
+    () =>
+      source === OWN
+        ? own
+        : phrases
+          ? sentences
+          : [...new Set(words.filter((w) => w.level === source).map((w) => w.word.toLocaleLowerCase('fr')))],
+    [source, own, words, phrases, sentences],
+  );
+  /** Where « seen » and « à revoir » are kept: per level, words and sentences apart. */
+  const memoryKey = phrases ? `${source}:phrases` : source;
+  const n = Math.min(count, list.length);
   const word = series?.[index] ?? '';
   const isLast = !!series && index === series.length - 1;
   const asWeGo = settings.correct === 'direct';
@@ -205,8 +270,13 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
     writePref(LS_OWN, JSON.stringify(next));
   };
 
-  // Like a teacher: the word in a sentence, then once more slowly.
-  const dictate = (w: string) => w && speakSeries([{ text: `Écris : ${w}.`, rate: 0.8 }, { text: w, rate: 0.55 }], () => {});
+  // Like a teacher: the word in a sentence, then once more slowly. A sentence: once, then slowly.
+  const dictate = (w: string) =>
+    w &&
+    speakSeries(
+      w.includes(' ') && /[.!?]$/.test(w) ? [{ text: w, rate: 0.75 }, { text: w, rate: 0.55 }] : [{ text: `Écris : ${w}.`, rate: 0.8 }, { text: w, rate: 0.55 }],
+      () => {},
+    );
   // Sound by sound, then the whole word — never letter names.
   const dictateSounds = () => {
     if (!word) return;
@@ -237,7 +307,7 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
   };
 
   const start = () => {
-    const chosen = source === OWN ? own.slice(0, settings.count) : pickSeries(source, list, settings.count);
+    const chosen = source === OWN ? own.slice(0, count) : pickSeries(memoryKey, list, count);
     if (chosen.length === 0) return;
     resetPage();
     setSeries(chosen);
@@ -271,7 +341,7 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
     if (isLast) {
       setFinished(true);
       playChime();
-      if (source !== OWN) remember(source, all);
+      if (source !== OWN) remember(memoryKey, all);
     } else {
       setIndex(index + 1);
       dictate(series[index + 1]);
@@ -281,7 +351,7 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
   const mark = (i: number, right: boolean) => {
     const all = traces.map((t, j) => (j === i ? { ...t, right: t.right === right ? null : right } : t));
     setTraces(all);
-    if (finished && source !== OWN) remember(source, all);
+    if (finished && source !== OWN) remember(memoryKey, all);
   };
 
   const savePng = () => {
@@ -305,7 +375,7 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
   /** One word already written: the child's trace, and (when correcting) the right spelling and the parent's mark. */
   const traceCard = (t: Trace, i: number, correcting: boolean) => (
     <li key={i} className="rounded-2xl bg-white p-3 ring-1 ring-ink/10">
-      <p className="mb-1 text-xs font-extrabold text-ink-soft">Mot {i + 1}</p>
+      <p className="mb-1 text-xs font-extrabold text-ink-soft">{t.word.includes(' ') ? 'Phrase' : 'Mot'} {i + 1}</p>
       {t.img ? (
         // eslint-disable-next-line @next/next/no-img-element -- a data: URL drawn on the device
         <img src={t.img} alt={`Le mot ${i + 1} écrit par l’enfant`} className="mx-auto max-h-28 w-auto max-w-full rounded-lg" />
@@ -412,11 +482,33 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
 
               {source && (
                 <>
-                  <p className={label}>Combien de mots</p>
-                  <div className="flex flex-wrap gap-2">
-                    {COUNTS.map((n) => (
-                      <button key={n} type="button" onClick={() => changeSettings({ count: n })} aria-pressed={settings.count === n} className={chip(settings.count === n)}>
-                        {n} mots
+                  {sentences.length > 0 && (
+                    <>
+                      <p className={label}>Des mots ou des phrases</p>
+                      <div className="flex flex-wrap gap-2">
+                        <button type="button" onClick={() => setKind('mots')} aria-pressed={!phrases} className={chip(!phrases)}>
+                          🔤 Des mots
+                        </button>
+                        <button type="button" onClick={() => setKind('phrases')} aria-pressed={phrases} className={chip(phrases)}>
+                          📝 Des phrases
+                        </button>
+                      </div>
+                    </>
+                  )}
+                  <p className={label}>{phrases ? 'Combien de phrases' : 'Combien de mots'} pour cette dictée</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex items-center rounded-full bg-cream ring-1 ring-ink/10">
+                      <button type="button" onClick={() => setCount((c) => Math.max(1, c - 1))} aria-label="Un de moins" className="h-11 w-11 rounded-full text-xl font-extrabold text-ink active:scale-90">
+                        −
+                      </button>
+                      <span className="min-w-10 text-center font-display text-xl font-bold text-ink" aria-live="polite">{count}</span>
+                      <button type="button" onClick={() => setCount((c) => Math.min(50, c + 1))} aria-label="Un de plus" className="h-11 w-11 rounded-full text-xl font-extrabold text-ink active:scale-90">
+                        +
+                      </button>
+                    </div>
+                    {COUNTS.map((c) => (
+                      <button key={c} type="button" onClick={() => setCount(c)} aria-pressed={count === c} className={chip(count === c)}>
+                        {c}
                       </button>
                     ))}
                   </div>
@@ -460,11 +552,11 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
                   onClick={start}
                   className="min-h-16 w-full max-w-sm rounded-full bg-mred px-6 text-xl font-extrabold text-cream shadow-lg active:scale-[0.98]"
                 >
-                  ▶️ Commencer · {Math.min(settings.count, list.length)} mots
+                  ▶️ Commencer · {n} {phrases ? (n > 1 ? 'phrases' : 'phrase') : n > 1 ? 'mots' : 'mot'}
                 </button>
                 {source !== OWN && (
                   <p className="mt-2 text-sm text-ink-soft">
-                    {list.length} mots dans ce niveau : les mots « à revoir » d’abord, puis ceux pas encore dictés.
+                    {list.length} {phrases ? 'phrases' : 'mots'} dans ce niveau : ceux « à revoir » d’abord, puis ceux pas encore dictés.
                   </p>
                 )}
               </div>
@@ -478,7 +570,7 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
             <section className="mt-4 rounded-[28px] border-2 border-dashed border-mamber/70 bg-white p-4 sm:p-5">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-mteal-light px-3 py-1.5 text-sm font-bold text-[#115E59]">
-                  Mot {index + 1} / {series.length}
+                  {phrases ? 'Phrase' : 'Mot'} {index + 1} / {series.length}
                 </span>
                 <span className="flex gap-1" aria-hidden="true">
                   {series.map((_, i) => (
@@ -498,9 +590,11 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
                     <button type="button" onClick={() => dictate(word)} className={`${big} bg-mred text-cream shadow-md`}>
                       🔊 Redire
                     </button>
-                    <button type="button" onClick={dictateSounds} className={`${big} bg-mpurple text-cream shadow-md`}>
-                      🔈 Son par son
-                    </button>
+                    {!word.includes(' ') && (
+                      <button type="button" onClick={dictateSounds} className={`${big} bg-mpurple text-cream shadow-md`}>
+                        🔈 Son par son
+                      </button>
+                    )}
                   </>
                 )}
                 {asWeGo && (
@@ -509,7 +603,7 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
                   </button>
                 )}
                 <button type="button" onClick={next} className={`${big} bg-mamber text-ink sm:ml-auto`}>
-                  {isLast ? 'Terminer ✓' : 'Suivant ⏭'}
+                  Suivant ⏭
                 </button>
               </div>
             </section>
@@ -629,7 +723,7 @@ export default function DicteeClient({ words }: { words: DicteeWord[] }) {
             {traces.length > 0 && (
               <section className="mt-6">
                 <p className="mb-2 text-xs font-extrabold uppercase tracking-[0.14em] text-ink-soft">
-                  {asWeGo ? 'Mes mots écrits · on corrige au fur et à mesure' : 'Mes mots écrits · on corrigera à la fin'}
+                  {phrases ? 'Mes phrases écrites' : 'Mes mots écrits'} · {asWeGo ? 'on corrige au fur et à mesure' : 'on corrigera à la fin'}
                 </p>
                 <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{traces.map((t, i) => traceCard(t, i, asWeGo))}</ul>
               </section>
