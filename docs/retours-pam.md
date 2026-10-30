@@ -105,3 +105,10 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   audio sert pour tout (l'iPad démarre lentement chaque nouveau lecteur). La tablette garde les enregistrements en
   cache au lieu de les redemander au serveur avant chaque son. La voix du navigateur n'est plus « annulée » quand elle
   ne dit rien (ce qui retardait le son suivant sur iPad).
+- [x] **Dictée en séries, comme le calcul** : le parent choisit le niveau (ou sa liste), le nombre de mots (5, 10 ou 20),
+  puis « ▶️ Commencer ». Les mots « à revoir » reviennent d'abord, puis ceux pas encore dictés.
+  - L'app dicte le mot tout de suite, puis **le redit toutes les 10, 20 ou 30 s** (ou jamais) tant qu'on ne touche pas
+    « Suivant ». Elle se tait quand la correction est ouverte.
+  - **Trace gardée** : à « Suivant », ce que l'enfant a écrit (au doigt ou au clavier) est gardé. Correction
+    **au fur et à mesure** (les mots déjà écrits s'affichent sous la feuille avec la bonne orthographe) ou **à la fin**
+    (tout corrigé ensemble sur l'écran de fin). Le parent touche « ✓ Juste » ou « 🔁 À revoir » pour chaque mot.

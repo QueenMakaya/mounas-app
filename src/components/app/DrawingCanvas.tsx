@@ -24,8 +24,12 @@ export type DrawingCanvasHandle = {
   undo: () => void;
   clear: () => void;
   isEmpty: () => boolean;
-  /** PNG of paper + ink (or ink only on a white background when `inkOnly`). */
-  toDataURL: (opts?: { inkOnly?: boolean }) => string;
+  /**
+   * PNG of paper + ink (or ink only on a white background when `inkOnly`).
+   * `crop` keeps only the part that was written on (the whole width of the
+   * paper is mostly empty for one word).
+   */
+  toDataURL: (opts?: { inkOnly?: boolean; crop?: boolean }) => string;
 };
 
 type Props = {
@@ -291,19 +295,30 @@ export default function DrawingCanvas({
         onChange?.(0);
       },
       isEmpty: () => strokes.current.length === 0,
-      toDataURL: ({ inkOnly } = {}) => {
+      toDataURL: ({ inkOnly, crop } = {}) => {
         const ink = inkRef.current!;
+        const dpr = ink.width / Math.max(widthRef.current, 1);
+        // Area to keep, in canvas pixels: everything, or the strokes plus a margin.
+        let [x0, y0, x1, y1] = [0, 0, ink.width, ink.height];
+        const drawn = strokes.current.filter((st) => !st.erase).flatMap((st) => st.points.map((pt) => ({ ...pt, r: st.size })));
+        if (crop && drawn.length) {
+          const m = 24;
+          x0 = Math.max(0, Math.floor((Math.min(...drawn.map((pt) => pt.x - pt.r)) - m) * dpr));
+          y0 = Math.max(0, Math.floor((Math.min(...drawn.map((pt) => pt.y - pt.r)) - m) * dpr));
+          x1 = Math.min(ink.width, Math.ceil((Math.max(...drawn.map((pt) => pt.x + pt.r)) + m) * dpr));
+          y1 = Math.min(ink.height, Math.ceil((Math.max(...drawn.map((pt) => pt.y + pt.r)) + m) * dpr));
+        }
         const out = document.createElement('canvas');
-        out.width = ink.width;
-        out.height = ink.height;
+        out.width = x1 - x0;
+        out.height = y1 - y0;
         const g = out.getContext('2d')!;
         if (inkOnly) {
           g.fillStyle = '#FFFFFF';
           g.fillRect(0, 0, out.width, out.height);
         } else {
-          g.drawImage(bgRef.current!, 0, 0);
+          g.drawImage(bgRef.current!, -x0, -y0);
         }
-        g.drawImage(ink, 0, 0);
+        g.drawImage(ink, -x0, -y0);
         return out.toDataURL('image/png');
       },
     }),
