@@ -3,11 +3,15 @@
  * rising notes, like a small xylophone. Silently does nothing where audio
  * isn't available.
  */
+// One context for the whole visit: a new one each time starts late on tablets.
+let shared: AudioContext | null = null;
+
 export function playChime(): void {
   try {
     const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (!Ctx) return;
-    const ctx = new Ctx();
+    const ctx = (shared ??= new Ctx());
+    if (ctx.state === 'suspended') void ctx.resume();
     const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6
     notes.forEach((freq, i) => {
       const t = ctx.currentTime + i * 0.09;
@@ -22,7 +26,6 @@ export function playChime(): void {
       osc.start(t);
       osc.stop(t + 0.65);
     });
-    setTimeout(() => void ctx.close(), 1200);
   } catch {
     /* no audio — the animation is enough */
   }

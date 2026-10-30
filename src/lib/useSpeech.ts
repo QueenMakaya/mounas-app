@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { clipsFor } from './voice-clips';
+import { clipsFor, coreClipUrls } from './voice-clips';
 
 /**
  * Read French aloud: with Pam's recording when there is one
@@ -13,27 +13,78 @@ import { clipsFor } from './voice-clips';
 
 /** Bumped by every cut: whatever was playing for an older value stops. */
 let generation = 0;
-let audio: HTMLAudioElement | null = null;
 /** What `speakQueued` waits for: everything said so far. */
 let chain: Promise<void> = Promise.resolve();
 
+/*
+ * Tablets (Safari on iPad above all) start a new <audio> slowly, fetch the
+ * file only when it is asked for, and won't let a new element play outside
+ * a tap. So: one player, reused for every clip (unlocked by the first tap),
+ * and the clips fetched ahead of time into memory.
+ */
+let player: HTMLAudioElement | null = null;
+/** Ends the clip being played (its promise), so a series never hangs. */
+let finish: (() => void) | null = null;
+/** src → in-memory copy (object URL), filled by `preloadClips`. */
+const loaded = new Map<string, string>();
+const loading = new Map<string, Promise<void>>();
+
 function cut() {
   generation++;
-  audio?.pause();
-  audio = null;
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  player?.pause();
+  finish?.();
+  // Cancelling when nothing is said delays the next utterance on iPad.
+  if ('speechSynthesis' in window && (window.speechSynthesis.speaking || window.speechSynthesis.pending)) window.speechSynthesis.cancel();
   chain = Promise.resolve();
+}
+
+/** Fetch these clips into memory (once each), so they play without waiting for the network. */
+export function preloadClips(srcs: string[]): Promise<void> {
+  if (typeof window === 'undefined') return Promise.resolve();
+  return Promise.all(
+    srcs.map((src) => {
+      if (loaded.has(src)) return undefined;
+      let p = loading.get(src);
+      if (!p) {
+        p = fetch(src)
+          .then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))))
+          .then((b) => void loaded.set(src, URL.createObjectURL(b)))
+          .catch(() => undefined) // played from the network then
+          .finally(() => loading.delete(src));
+        loading.set(src, p);
+      }
+      return p;
+    }),
+  ).then(() => undefined);
+}
+
+/** Preload what `text` (or the sound `sound`) will play, if it is recorded. */
+export function preloadSpeech(items: (string | { text: string; sound?: string })[]): void {
+  const srcs = items.flatMap((it) => (typeof it === 'string' ? clipsFor(it) : clipsFor(it.text, it.sound)) ?? []);
+  void preloadClips(srcs);
 }
 
 function playClip(src: string, rate: number): Promise<void> {
   return new Promise((resolve) => {
-    const a = new Audio(src);
+    finish?.();
+    const a = (player ??= new Audio());
+    // No `pause` listener: the pause from a cut arrives late and would end the next clip.
+    // A cut ends the clip through `finish` instead.
+    const done = () => {
+      if (finish === done) {
+        finish = null;
+        a.onended = a.onerror = null;
+      }
+      resolve();
+    };
+    finish = done;
+    a.onended = a.onerror = done;
+    a.src = loaded.get(src) ?? src;
     // Recordings are already said slowly: only the slowest calls slow them a little.
-    a.playbackRate = Math.min(1, Math.max(0.7, rate / 0.8));
+    // (Changing src resets playbackRate to the default: set both.)
+    a.defaultPlaybackRate = a.playbackRate = Math.min(1, Math.max(0.7, rate / 0.8));
     a.preservesPitch = true;
-    a.onended = a.onerror = a.onpause = () => resolve();
-    audio = a;
-    a.play().catch(() => resolve());
+    a.play().catch(done);
   });
 }
 
@@ -88,6 +139,9 @@ export function useSpeech() {
 
     pickVoice();
     synth.addEventListener('voiceschanged', pickVoice);
+    // The sounds and consignes, fetched while the screen settles.
+    const idle = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 300));
+    idle(() => void preloadClips(coreClipUrls()));
     return () => {
       synth.removeEventListener('voiceschanged', pickVoice);
       cut();

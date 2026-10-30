@@ -100,3 +100,8 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 - [x] **Missions à choix** (ex. le cadeau caché dans une boîte) : « Écouter la mission » lit aussi les réponses
   possibles, et chaque réponse a son 🔈, pour que l'enfant seul puisse choisir sans savoir lire.
 - [x] **Fin de mission** : boutons « Mission suivante → » et « 🧩 Toutes les missions » sous la mission.
+- [x] **Gros délai du son sur la tablette** (pas sur l'ordinateur) : les sons, consignes et bravos sont chargés en
+  avance dans la mémoire, ainsi que le mot du jour et ses syllabes, et les nombres du calcul affiché. Un seul lecteur
+  audio sert pour tout (l'iPad démarre lentement chaque nouveau lecteur). La tablette garde les enregistrements en
+  cache au lieu de les redemander au serveur avant chaque son. La voix du navigateur n'est plus « annulée » quand elle
+  ne dit rien (ce qui retardait le son suivant sur iPad).

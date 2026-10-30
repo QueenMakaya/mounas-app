@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 import type { Activity } from '@/lib/airtable';
 import { levelLabel } from '@/lib/levels';
 import { currentStreak, isCompletedToday, learnedWords, localDate, markCompleted } from '@/lib/progress';
-import { useSpeech } from '@/lib/useSpeech';
+import { preloadSpeech, useSpeech } from '@/lib/useSpeech';
 import { SOUNDS, wordSounds, type Sound } from '@/lib/phonics';
 import { playChime } from '@/lib/chime';
 import SyllableWord, { SYLLABLE_COLORS, syllableParts } from '@/components/app/SyllableWord';
@@ -147,6 +147,10 @@ export default function ActivityFlow({
   const headingRef = useRef<HTMLHeadingElement>(null);
   const moved = useRef(false);
   const { supported: canSpeak, speak, speakSeries, speakQueued } = useSpeech();
+  // The word and its syllables, in memory before the first tap (tablets wait for the network otherwise).
+  useEffect(() => {
+    preloadSpeech([activity.frenchWord, ...syllableParts(activity.syllables)]);
+  }, [activity.frenchWord, activity.syllables]);
   // Child mode: pictures and a voice on top of the parent's guidance.
   const childMode = useChildMode();
   // The step whose success signal fired: its "next" arrow glows.

@@ -109,6 +109,15 @@ const SOUND_CLIPS: Record<string, string> = {
 
 const byKey = new Map(Object.entries(CLIPS).map(([text, file]) => [clipKey(text), `/voix/${file}`]));
 
+/**
+ * The clips said on every screen (sounds, consignes, petites phrases,
+ * bravos): small enough to fetch in advance so they start at once.
+ */
+export function coreClipUrls(): string[] {
+  const core = Object.values(CLIPS).filter((f) => /^(consignes|phrases|bravos)\//.test(f));
+  return [...new Set([...Object.values(SOUND_CLIPS), ...core])].map((f) => `/voix/${f}`);
+}
+
 /** URL of Pam's recording of `text`, if there is one. */
 export const clipFor = (text: string): string | undefined => byKey.get(clipKey(text));
 

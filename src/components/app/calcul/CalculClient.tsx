@@ -7,7 +7,7 @@ import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/Drawin
 import KidIcon from '@/components/app/kid/KidIcon';
 import { playChime } from '@/lib/chime';
 import { localDate, readPref, writePref } from '@/lib/progress';
-import { useSpeech } from '@/lib/useSpeech';
+import { preloadSpeech, useSpeech } from '@/lib/useSpeech';
 import {
   LEVELS,
   MASTER_OK,
@@ -68,6 +68,10 @@ export default function CalculClient() {
   const state = useCalcul();
   const { supported: canSpeak, speak } = useSpeech();
   const [problem, setProblem] = useState<Problem | null>(null);
+  // Each calculation is said number by number: fetch the one on screen ahead of the tap.
+  useEffect(() => {
+    if (problem) preloadSpeech(problemSaid(problem).split(' '));
+  }, [problem]);
   const [input, setInput] = useState('');
   const [tries, setTries] = useState(0);
   const [feedback, setFeedback] = useState<Feedback>(null);
