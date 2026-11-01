@@ -16,8 +16,10 @@ import {
   SESSION_COOKIE,
   sessionCookieOptions,
   signPendingLogin,
+  signDemoSession,
   signSession,
 } from '@/lib/session';
+import { DEMO_CUSTOMER_ID, DEMO_EMAIL, DEMO_MINUTES, demoEnabled, isDemo } from '@/lib/demo';
 import { createPortalUrl, findAccess, findAccessByPhone, normalizePhone, readLoginCode, saveLoginCode } from '@/lib/subscription';
 
 // NOTE: this file is 'use server': it may only export async functions.
@@ -199,10 +201,31 @@ export async function logout(): Promise<void> {
 export async function openBillingPortal(): Promise<void> {
   const session = await readSession((await cookies()).get(SESSION_COOKIE)?.value);
   if (!session) redirect('/connexion?next=/app');
+  if (isDemo(session)) redirect('/abonnement');
 
   const h = await headers();
   const host = h.get('x-forwarded-host') ?? h.get('host') ?? 'www.lesmounas.school';
   const proto = h.get('x-forwarded-proto') ?? (host.startsWith('localhost') ? 'http' : 'https');
   const url = await createPortalUrl(session.customerId, `${proto}://${host}/app`);
   redirect(url ?? '/app/compte?portail=indisponible');
+}
+
+/** /demo: opens the whole app for DEMO_MINUTES, no account (src/lib/demo.ts). */
+export async function startDemo(): Promise<void> {
+  if (!demoEnabled()) redirect('/demo?indisponible=1');
+  const store = await cookies();
+  const current = await readSession(store.get(SESSION_COOKIE)?.value);
+  // A real subscriber keeps their own session.
+  if (current && !isDemo(current)) redirect('/app');
+
+  const token = await signDemoSession(DEMO_EMAIL, DEMO_CUSTOMER_ID, DEMO_MINUTES);
+  if (!token) redirect('/demo?indisponible=1');
+  store.set(SESSION_COOKIE, token, { ...sessionCookieOptions, maxAge: DEMO_MINUTES * 60 });
+  redirect('/app');
+}
+
+/** "Quitter la démo": back to the site, ready for the next family. */
+export async function endDemo(): Promise<void> {
+  (await cookies()).delete(SESSION_COOKIE);
+  redirect('/demo?fin=1');
 }

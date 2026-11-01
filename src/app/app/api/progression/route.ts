@@ -1,4 +1,5 @@
 import { getSession } from '@/lib/auth';
+import { isDemo } from '@/lib/demo';
 import { loadProgress, saveProgress } from '@/lib/family-progress';
 import { parseSnapshot } from '@/lib/progress-snapshot';
 
@@ -14,6 +15,7 @@ const MAX_BODY = 300_000;
 export async function GET() {
   const session = await getSession();
   if (!session) return Response.json({ error: 'not_signed_in' }, { status: 401 });
+  if (isDemo(session)) return Response.json({ error: 'demo' }, { status: 403 });
   const snapshot = await loadProgress(session.email);
   if (!snapshot) return Response.json({ error: 'unavailable' }, { status: 503 });
   return Response.json({ snapshot });
@@ -22,6 +24,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const session = await getSession();
   if (!session) return Response.json({ error: 'not_signed_in' }, { status: 401 });
+  if (isDemo(session)) return Response.json({ error: 'demo' }, { status: 403 });
   const raw = await request.text();
   if (raw.length > MAX_BODY) return Response.json({ error: 'too_large' }, { status: 413 });
   let body: { snapshot?: unknown; today?: unknown };
