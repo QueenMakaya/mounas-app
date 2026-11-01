@@ -68,6 +68,10 @@ export default function LandingPage() {
             <Link href="/app" className="font-bold underline underline-offset-4" style={{ color: COLORS.purple }}>
               Découvrir le mot du jour gratuitement →
             </Link>
+            <br />
+            <Link href="/demo" className="mt-2 inline-block font-bold underline underline-offset-4" style={{ color: COLORS.tealDark }}>
+              👀 Essayer toute l&apos;app en démo, sans inscription →
+            </Link>
           </p>
         </div>
       </section>

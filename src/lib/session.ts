@@ -98,6 +98,12 @@ export function signSession(email: string, customerId: string): Promise<string |
   return sign({ email, customerId, checkedAt: now, exp: now + SESSION_MAX_AGE * 1000 } satisfies Session);
 }
 
+/** A demo session (src/lib/demo.ts): fixed identity, expires after `minutes`. */
+export function signDemoSession(email: string, customerId: string, minutes: number): Promise<string | null> {
+  const now = Date.now();
+  return sign({ email, customerId, checkedAt: now, exp: now + minutes * 60 * 1000 } satisfies Session);
+}
+
 /** Same session, new checkedAt (and current customer); keeps the original 30-day expiry. */
 export function refreshSession(session: Session, customerId: string): Promise<string | null> {
   return sign({ ...session, customerId, checkedAt: Date.now() } satisfies Session);
