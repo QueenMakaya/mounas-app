@@ -41,7 +41,7 @@ import FeedMounas from '@/components/app/games/FeedMounas';
  * scroll of eight coloured blocks.
  */
 
-type StepKey = 'decouvrir' | 'lire' | 'syllabes' | 'epeler' | 'ecrire' | 'activite' | 'chanson' | 'mission' | GameKey;
+type StepKey = 'decouvrir' | 'lire' | 'syllabes' | 'epeler' | 'ecrire' | 'dessiner' | 'activite' | 'chanson' | 'mission' | GameKey;
 
 type StepDef = {
   key: StepKey;
@@ -61,7 +61,9 @@ type StepDef = {
  * chat/activity and « Ma phrase et ma comptine » (the child's own sentence
  * and the word's poem, together); then spell it with sounds and write it.
  * (« Le dire », saying the word three times, was removed on 27 Oct. at
- * Pam's request.) Spelling and writing start at level 2 — level 1 is for the youngest.
+ * Pam's request.) Spelling and writing start at level 2 — level 1 is for the youngest,
+ * who get « Dessiner » instead: the same canvas, opening on the blank page
+ * (the dotted word stays one tap away). Asked by Pam on 2 Nov. after ARBRE.
  * A linked mission (calcul, problème) comes last, as an optional bonus.
  *
  * Around that fixed order, the day adds variety: one or two mini-games slot
@@ -89,6 +91,7 @@ function buildSteps(a: Activity, hasMission: boolean, games: GameKey[] = []): St
     writing && !game('jeu-nourris') && { key: 'epeler', emoji: '🔤', name: 'Épeler', heading: 'Construis le mot avec les sons', minutes: 1, accent: '#993556', tint: '#F8E8EE' },
     writing && game('jeu-nourris') && { key: 'jeu-nourris', emoji: '😋', name: 'Le Mounas', heading: 'Nourris le Mounas', minutes: 1, accent: '#E63946', tint: '#FDECEE' },
     writing && { key: 'ecrire', emoji: '✍️', name: 'Écrire', heading: 'On écrit le mot', minutes: 2, accent: '#2D9B6F', tint: '#E5F4EC' },
+    !writing && { key: 'dessiner', emoji: '🎨', name: 'Dessiner', heading: 'On dessine le mot', minutes: 2, accent: '#2D9B6F', tint: '#E5F4EC' },
     hasMission && { key: 'mission', emoji: '🧩', name: 'Mission', heading: 'La mission du jour', minutes: 3, accent: '#C7600A', tint: '#FEF3E2', optional: true },
   ];
   return steps.filter((x): x is StepDef => Boolean(x));
@@ -487,6 +490,8 @@ function StepBody({ step, activity: a, canSpeak, speak, speakSeries, library, at
 
     case 'ecrire':
       return <TraceWord step={step} activity={a} onSuccess={onSuccess} />;
+    case 'dessiner':
+      return <TraceWord step={step} activity={a} onSuccess={onSuccess} draw />;
 
     case 'activite':
       return <TalkAndDo activity={a} accent={step.accent} />;
@@ -997,13 +1002,14 @@ function BuildWord({ step, activity: a, canSpeak, speak, onSuccess }: { step: St
  * the child goes over it with a finger or stylus, then copies it on real
  * paper. "Feuille blanche" drops the model to write or draw freely.
  */
-function TraceWord({ step, activity: a, onSuccess }: { step: StepDef; activity: Activity; onSuccess: BodyProps['onSuccess'] }) {
+function TraceWord({ step, activity: a, onSuccess, draw = false }: { step: StepDef; activity: Activity; onSuccess: BodyProps['onSuccess']; draw?: boolean }) {
   const canvas = useRef<DrawingCanvasHandle>(null);
   const [strokes, setStrokes] = useState(0);
   const [bravo, setBravo] = useState(false);
   // First over the dotted model, then from memory.
   const [withModel, setWithModel] = useState(true);
-  const [mode, setMode] = useWritingMode();
+  // « Dessiner » (level 1) opens on the blank page; « Écrire » on the dotted word.
+  const [mode, setMode] = useWritingMode(draw ? 'blanc' : 'minuscules');
   // Cursive is taught in lowercase; capitals in the base would read oddly.
   const model = writingModel(mode, a.frenchWord);
   const free = mode === 'blanc';
@@ -1086,11 +1092,18 @@ function TraceWord({ step, activity: a, onSuccess }: { step: StepDef; activity: 
         </div>
       )}
       <Materials items={['Une feuille blanche', 'Un crayon ou un feutre']} />
+      {draw ? (
+        <ParentTip>
+          Ton enfant dessine le mot du jour comme il l’imagine, avec le doigt sur l’écran puis au crayon sur une vraie feuille.
+          Demande-lui de te raconter son dessin. S’il en a envie, les minuscules ou les CAPITALES lui montrent le mot en pointillés à suivre.
+        </ParentTip>
+      ) : (
       <ParentTip>
         D’abord avec le doigt sur l’écran, en suivant les pointillés, puis au crayon sur une vraie feuille.
         Ton enfant peut choisir les minuscules, les CAPITALES ou la feuille blanche pour écrire librement.
         Encourage chaque essai : le but, c’est l’effort, pas la perfection.
       </ParentTip>
+      )}
     </>
   );
 }

@@ -43,10 +43,11 @@ export const metadata: Metadata = {
  * that "forced" tab gets the full-screen app without this menu.
  */
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const member = Boolean(await getSession());
+  const session = await getSession();
+  const member = Boolean(session);
   return (
     <div className={`${andika.variable} ${cursive.variable} flex min-h-screen flex-1 flex-col bg-cream text-ink`}>
-      <SiteHeader member={member} />
+      <SiteHeader member={member} account={session?.email} />
       <AppSections />
       <NavTracker />
       {member && <ProgressSync />}

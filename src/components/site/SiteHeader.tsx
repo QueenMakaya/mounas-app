@@ -14,8 +14,13 @@ const NAV = [
  * `member` is set by the app layout when a subscriber is logged in: the trial
  * button then gives way to "Mon compte". The marketing pages don't read the
  * session (they stay static), so they always show "Se connecter".
+ *
+ * Logged in, the account link shows a round avatar (the first letter of the
+ * account email) with a green dot, so a family sees at a glance that it is
+ * connected: the word of the day also opens without an account. `account` is
+ * that email.
  */
-export default function SiteHeader({ member = false }: { member?: boolean }) {
+export default function SiteHeader({ member = false, account }: { member?: boolean; account?: string }) {
   return (
     <header
       className="sticky top-0 z-40 w-full backdrop-blur"
@@ -35,13 +40,47 @@ export default function SiteHeader({ member = false }: { member?: boolean }) {
               {item.label}
             </Link>
           ))}
-          <Link
-            href={member ? '/app/compte' : '/connexion'}
-            className="text-sm font-semibold underline underline-offset-4 transition-opacity hover:opacity-70"
-            style={{ color: COLORS.purple }}
-          >
-            {member ? 'Mon compte' : 'Se connecter'}
-          </Link>
+          {member ? (
+            <Link
+              href="/app/compte"
+              aria-label={`Mon compte : connecté${account ? ` (${account})` : ''}`}
+              title={account ? `Connecté · ${account}` : 'Connecté'}
+              className="flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-80"
+              style={{ color: COLORS.purple }}
+            >
+              <span className="relative inline-flex">
+                <span
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-sm font-extrabold uppercase shadow-sm"
+                  style={{ backgroundColor: COLORS.purple, color: COLORS.cream }}
+                  aria-hidden="true"
+                >
+                  {account ? account.charAt(0) : <PersonIcon />}
+                </span>
+                {/* Green dot: the family is logged in. */}
+                <span
+                  className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full ring-2 ring-white"
+                  style={{ backgroundColor: '#2D9B6F' }}
+                  aria-hidden="true"
+                />
+              </span>
+              Mon compte
+            </Link>
+          ) : (
+            <Link
+              href="/connexion"
+              className="flex items-center gap-2 text-sm font-semibold transition-opacity hover:opacity-70"
+              style={{ color: COLORS.purple }}
+            >
+              <span
+                className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed"
+                style={{ borderColor: COLORS.purple }}
+                aria-hidden="true"
+              >
+                <PersonIcon />
+              </span>
+              <span className="underline underline-offset-4">Se connecter</span>
+            </Link>
+          )}
           <a
             href={whatsappLink('Bonjour Les Mounas ! Je souhaite en savoir plus sur l’abonnement. 🌍')}
             target="_blank"
@@ -64,5 +103,14 @@ export default function SiteHeader({ member = false }: { member?: boolean }) {
         </nav>
       </div>
     </header>
+  );
+}
+
+function PersonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden="true">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z" />
+    </svg>
   );
 }
