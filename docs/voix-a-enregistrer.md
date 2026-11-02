@@ -3,15 +3,16 @@
 **État au 27 oct. 2026** : tout est enregistré, découpé dans `public/voix/` et branché dans
 `src/lib/voice-clips.ts` et `src/lib/voice-clips-words.ts` : consignes, petites phrases, bravos,
 calcul (0 à 100), les 37 sons (réenregistrés le 2 nov.), les 182 mots d'Airtable et 167 syllabes sur 219.
-**Il reste la partie E** (deux consignes changées depuis l'enregistrement, et 52 syllabes). Tout ce qui n'est pas enregistré est lu par la
+**Il reste la partie E** (trois consignes nouvelles ou changées depuis l'enregistrement, et 52 syllabes). Tout ce qui n'est pas enregistré est lu par la
 voix du navigateur.
 
 ## E. À refaire
 
-Deux consignes ont changé de texte après ton enregistrement :
+Trois consignes ont changé ou sont arrivées après ton enregistrement :
 
 1. Combien de syllabes ? Écris le nombre, puis tape dans tes mains pour vérifier.
 2. Invente ta phrase avec le mot, puis récite la comptine !
+3. Dessine le mot avec ton doigt.
 
 Et 52 syllabes :
 
