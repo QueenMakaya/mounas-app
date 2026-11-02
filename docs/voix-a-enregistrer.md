@@ -2,7 +2,7 @@
 
 **État au 27 oct. 2026** : tout est enregistré, découpé dans `public/voix/` et branché dans
 `src/lib/voice-clips.ts` et `src/lib/voice-clips-words.ts` : consignes, petites phrases, bravos,
-calcul (0 à 100), les 37 sons, les 182 mots d'Airtable et 167 syllabes sur 219.
+calcul (0 à 100), les 37 sons (réenregistrés le 2 nov.), les 182 mots d'Airtable et 167 syllabes sur 219.
 **Il reste la partie E** (deux consignes changées depuis l'enregistrement, et 52 syllabes). Tout ce qui n'est pas enregistré est lu par la
 voix du navigateur.
 
