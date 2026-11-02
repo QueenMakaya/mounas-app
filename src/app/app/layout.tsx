@@ -50,8 +50,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const demo = isDemo(session);
   return (
     <div className={`${andika.variable} ${cursive.variable} flex min-h-screen flex-1 flex-col bg-cream text-ink`}>
-      {/* A demo visit has no real account: no initial in the avatar. */}
-      <SiteHeader member={member} account={demo ? undefined : session?.email} />
+      <SiteHeader member={member} />
       {demo && session && <DemoBanner endsAt={session.exp} />}
       <AppSections />
       <NavTracker />

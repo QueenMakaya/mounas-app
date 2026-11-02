@@ -85,12 +85,3 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 - [x] **« Ma phrase et ma comptine »** : la phrase de l'enfant et la comptine sur le même écran ; on fait sa phrase
   et on récite (ou chante) la comptine ; « Par cœur » dès le niveau 3. Les mots sans comptine dans Airtable
   (28 sur 183, dont CERVEAU) proposent « Dis ta phrase » à la place.
-
-## 2 novembre 2026
-
-- [x] **On voit qu'on est connecté** : en haut de l'app, « Mon compte » a maintenant un rond violet avec l'initiale
-  du compte et un point vert. Déconnecté : un petit bonhomme en pointillés à côté de « Se connecter ».
-  (Le mot du jour s'ouvre aussi sans compte, d'où le besoin de le voir d'un coup d'œil.)
-- [x] **Le dessin à tous les niveaux** : ARBRE (niveau 1) n'avait pas d'étape dessin, car « Écrire » ne commençait
-  qu'au niveau 2. Au niveau 1, il y a maintenant l'étape « 🎨 Dessiner » : la même ardoise, ouverte sur la feuille
-  blanche (les minuscules / CAPITALES en pointillés restent à un tap). « Épeler » reste à partir du niveau 2.
