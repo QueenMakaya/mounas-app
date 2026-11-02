@@ -7,12 +7,13 @@ import { useState } from 'react';
  * or on a blank page with no model. The writing screen always opens on the
  * dotted word in minuscules: the choice is not remembered from one day to
  * the next, so a tap on « Feuille blanche » never hides the model for good.
+ * (Level 1's « Dessiner » step opens on « Feuille blanche » instead.)
  */
 
 export type WritingMode = 'minuscules' | 'capitales' | 'blanc';
 
-export function useWritingMode(): [WritingMode, (mode: WritingMode) => void] {
-  return useState<WritingMode>('minuscules');
+export function useWritingMode(initial: WritingMode = 'minuscules'): [WritingMode, (mode: WritingMode) => void] {
+  return useState<WritingMode>(initial);
 }
 
 /** The tracing model for a word: text, CSS font variable and paper. */
