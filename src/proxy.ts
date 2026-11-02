@@ -8,6 +8,7 @@ import {
   signSession,
 } from '@/lib/session';
 import { checkoutAccess, findAccess } from '@/lib/subscription';
+import { isDemo } from '@/lib/demo';
 
 /**
  * Runs before every /app/* request (Next 16 "proxy", formerly middleware).
@@ -56,8 +57,9 @@ export async function proxy(req: NextRequest) {
   const raw = req.cookies.get(SESSION_COOKIE)?.value;
   const session = await readSession(raw);
 
-  // 2. Daily re-check with Stripe.
-  if (session && Date.now() - session.checkedAt > RECHECK_AFTER_MS) {
+  // 2. Daily re-check with Stripe (demo sessions have no subscription and
+  //    expire on their own, see src/lib/demo.ts).
+  if (session && !isDemo(session) && Date.now() - session.checkedAt > RECHECK_AFTER_MS) {
     const access = await findAccess(session.email);
     if (access.status === 'none') {
       const url = new URL('/abonnement', req.url);

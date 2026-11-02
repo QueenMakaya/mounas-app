@@ -29,7 +29,7 @@ type Props = {
   revealed: boolean;
   onReveal: () => void;
   canSpeak: boolean;
-  speak: (text: string, rate?: number) => void;
+  speak: (text: string, rate?: number, sound?: string) => void;
   mode: DiscoverMode;
   /** Shows the "Je lis / J’écoute" switch (every level). */
   onModeChange?: (mode: DiscoverMode) => void;
@@ -82,7 +82,7 @@ export default function MysteryWord({ word, syllables, theme, graphemes, reveale
           {canSpeak && (
             <button
               type="button"
-              onClick={() => speak(SOUNDS[firstSound.key].say, 0.6)}
+              onClick={() => speak(SOUNDS[firstSound.key].say, 0.6, firstSound.key)}
               className="ml-2 rounded-full bg-white px-2 py-0.5 text-sm ring-1 ring-ink/10"
               aria-label="Écouter le premier son"
             >

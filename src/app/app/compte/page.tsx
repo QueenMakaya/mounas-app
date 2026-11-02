@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
-import { logout, openBillingPortal } from '@/app/auth-actions';
+import { endDemo, logout, openBillingPortal } from '@/app/auth-actions';
 import { requireSession } from '@/lib/auth';
+import { STRIPE_PAYMENT_LINK } from '@/lib/config';
+import { isDemo } from '@/lib/demo';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +14,35 @@ export const metadata: Metadata = {
 export default async function ComptePage({ searchParams }: { searchParams: Promise<{ portail?: string }> }) {
   const session = await requireSession('/app/compte');
   const { portail } = await searchParams;
+
+  if (isDemo(session)) {
+    return (
+      <main className="flex-1 bg-cream font-body">
+        <div className="mx-auto max-w-xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
+          <h1 className="font-display text-3xl font-bold text-ink">Mode démo</h1>
+          <p className="mt-2 text-ink-soft">
+            Tu découvres l&apos;app sans compte. Les progrès restent sur cet appareil et ne sont pas enregistrés.
+          </p>
+          <div className="mt-8 grid gap-3">
+            <a
+              href={STRIPE_PAYMENT_LINK}
+              className="flex min-h-14 w-full items-center justify-center rounded-full bg-mred px-6 text-lg font-extrabold text-cream shadow-lg hover:bg-mred-dark"
+            >
+              Commencer l&apos;essai gratuit
+            </a>
+            <form action={endDemo} className="mt-4">
+              <button
+                type="submit"
+                className="flex min-h-12 w-full items-center justify-center rounded-full bg-white px-6 font-extrabold text-ink ring-1 ring-ink/10 hover:bg-sand"
+              >
+                Quitter la démo
+              </button>
+            </form>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="flex-1 bg-cream font-body">

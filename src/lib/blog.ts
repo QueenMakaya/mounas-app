@@ -65,8 +65,24 @@ function toMeta(slug: string, data: Record<string, string>): PostMeta {
   };
 }
 
-/** All post slugs (used for static generation). */
+/**
+ * A post goes live on its `date` (Montréal time). Future-dated posts stay
+ * hidden in production, so articles can be scheduled ahead; in local dev
+ * they're always visible for proofreading.
+ */
+function isPublished(date: string): boolean {
+  if (process.env.NODE_ENV === 'development') return true;
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Montreal' });
+  return !date || date <= today;
+}
+
+/** Slugs of every published post (used for static generation). */
 export function getPostSlugs(): string[] {
+  return getAllPosts().map((p) => p.slug);
+}
+
+/** Every post file on disk, published or not. */
+function getAllSlugs(): string[] {
   if (!fs.existsSync(BLOG_DIR)) return [];
   return fs
     .readdirSync(BLOG_DIR)
@@ -78,19 +94,19 @@ export function getPostSlugs(): string[] {
 
 /** Post metadata for every article, newest first. */
 export function getAllPosts(): PostMeta[] {
-  return getPostSlugs()
+  return getAllSlugs()
     .map((slug) => {
       const parsed = readPostFile(slug);
       return parsed ? toMeta(slug, parsed.data) : null;
     })
-    .filter((p): p is PostMeta => p !== null)
+    .filter((p): p is PostMeta => p !== null && isPublished(p.date))
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
 /** A single rendered post, or null if the slug doesn't exist. */
 export function getPost(slug: string): Post | null {
   const parsed = readPostFile(slug);
-  if (!parsed) return null;
+  if (!parsed || !isPublished(parsed.data.date || '')) return null;
   const contentHtml = marked.parse(parsed.body, { async: false }) as string;
   return { ...toMeta(slug, parsed.data), contentHtml };
 }

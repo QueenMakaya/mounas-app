@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import LoginForm from '@/components/account/LoginForm';
 import { getSession } from '@/lib/auth';
+import { isDemo } from '@/lib/demo';
 import { COLORS } from '@/lib/config';
 import { safeNext } from '@/lib/session';
 
@@ -12,7 +13,9 @@ export const metadata: Metadata = {
 
 export default async function ConnexionPage({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const next = safeNext((await searchParams).next);
-  if (await getSession()) redirect(next);
+  // A demo visitor can still log in with their real account.
+  const session = await getSession();
+  if (session && !isDemo(session)) redirect(next);
 
   return (
     <main className="px-4 pb-20 pt-16 sm:px-6 sm:pt-24">

@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation';
 import { getPost, getPostSlugs, formatDate } from '@/lib/blog';
 import { COLORS } from '@/lib/config';
 
+// Re-check hourly so scheduled posts go live on their date without a redeploy.
+export const revalidate = 3600;
+
 export function generateStaticParams() {
   return getPostSlugs().map((slug) => ({ slug }));
 }

@@ -5,6 +5,8 @@ import NavTracker from '@/components/app/NavTracker';
 import ProgressSync from '@/components/app/ProgressSync';
 import AppSections from '@/components/app/AppSections';
 import { getSession } from '@/lib/auth';
+import { isDemo } from '@/lib/demo';
+import DemoBanner from '@/components/app/DemoBanner';
 
 // Andika was designed for children learning to read (single-storey "a",
 // clear b/d/p/q). Playwrite FR Trad is the French school cursive taught in
@@ -45,12 +47,15 @@ export const metadata: Metadata = {
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession();
   const member = Boolean(session);
+  const demo = isDemo(session);
   return (
     <div className={`${andika.variable} ${cursive.variable} flex min-h-screen flex-1 flex-col bg-cream text-ink`}>
-      <SiteHeader member={member} account={session?.email} />
+      {/* A demo visit has no real account: no initial in the avatar. */}
+      <SiteHeader member={member} account={demo ? undefined : session?.email} />
+      {demo && session && <DemoBanner endsAt={session.exp} />}
       <AppSections />
       <NavTracker />
-      {member && <ProgressSync />}
+      {member && !demo && <ProgressSync />}
       {children}
     </div>
   );
