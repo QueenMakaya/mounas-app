@@ -301,7 +301,7 @@ say(globe(eq=False), "Mais attention : il n'y a pas quatre saisons partout sur l
 say(globe(), "Au milieu de la Terre, il y a une ligne imaginaire qui fait le tour : on l'appelle l'équateur.", 'pop')
 say(bg(africa(200, 180, 10.5, 0) + sun(1450, 380, 130) + text(1450, 720, 'Souvent chaud', 66, RED) + text(1450, 800, "toute l'année !", 66, RED), 'PRÈS DE L\'ÉQUATEUR', YEL),
     "Près de l'équateur, dans beaucoup d'endroits, il fait chaud toute l'année, et il ne neige pas.", 'pop')
-say(bg(africa(200, 180, 10.5, 2) + palm(1450, 900, 1.3) + sun(1650, 260, 80), 'PRÈS DE L\'ÉQUATEUR', YEL),
+say(bg(africa(200, 180, 10.5, 1) + palm(1450, 900, 1.3) + sun(1650, 260, 80), 'PRÈS DE L\'ÉQUATEUR', YEL),
     "Par exemple, à Abidjan, en Côte d'Ivoire, ou à Kinshasa, en RD Congo.", 'pop')
 
 
@@ -309,7 +309,7 @@ def two_seasons(n=2):
     c = card(260, 220, 640, 640, sun(580, 470, 110) + text(580, 720, 'La saison sèche', 52, '#C77700') + text(580, 790, 'il pleut peu', 40, PUR, FN), stroke=YEL)
     if n > 1:
         c += card(1020, 220, 640, 640, rain(1340, 430, 1.4) + text(1340, 720, 'La saison des pluies', 50, '#1F7FA8') + text(1340, 790, 'il pleut beaucoup', 40, PUR, FN), stroke=TEAL)
-    return bg(c, 'À ABIDJAN ET À KINSHASA', YEL)
+    return bg(c, 'À ABIDJAN', YEL)
 
 
 say(two_seasons(1), "Là-bas, on parle plutôt de deux saisons. La saison sèche, quand il pleut peu...", 'pop')

@@ -1,6 +1,7 @@
 """Remplace la voix TTS par la voix de Pam : une plage de l'enregistrement par réplique.
 
 ORDER : une entrée par appel say/anim(text=...), dans l'ordre du script.
+Règle de Pam : « on reprend » = erreur, on garde toujours la prise qui suit le DERNIER « on reprend ».
 Chaque entrée = (segments, depuis, jusqu'à) ; seuls les morceaux de parole
 (transcription non vide, pas un bruit) entre ces bornes sont gardés.
 """
@@ -26,7 +27,7 @@ ORDER = [
     S(26, t0=162.1), S(27), S(28), S(30), S(31), S(32), S(33), S(34), S('35f', t1=208.1), S('35f', t0=209.1),  # 31-40
     S(36, 37), S(39), S(40, t1=239.7), S(40, t0=239.9), S(41), S(43), S(44, t1=263.8), S(44, t0=264.5), S(45), S(46),  # 41-50
     S(47, 48), S(49), S(50, 51), S(52, 53), S(54), S(55, t0=330.3), S(56), S(57), S(58), S(59, t1=351.2),  # 51-60
-    S(59, t0=351.4), S(60), S(63), S(64, 65), S(66), S(67), S('68f', t0=394), S(70), S(71), S(72),          # 61-70
+    S(59, t0=351.4), S(60), S(63), S(64, 65), S(66), S(67), S(69, t0=402), S(70), S(71), S(72),          # 61-70
     S(73), S(74), S(75, 76), S(77, t1=446.4), S(77, t0=447.9), S(79), S(81), S(83), S(84), S(85),          # 71-80
     S(86), S(87), S(88), S(89, 90), S(91), S(92), S(93), S(94), S(95), S(97, 98),                          # 81-90
     S(100, 101), S(102, 103), S(104, 105), S(106), S(107), S(108), S(109), S(111), S(112), S(114, t0=668.8),  # 91-100
