@@ -150,6 +150,18 @@ class Timeline:
         self.fx = []
         self.lines = []  # texte à enregistrer
         self.music_off = []  # (t0, t1) sans musique
+        # voix enregistrée : MOUNAS_VOICE = dossier de 000.wav, 001.wav... (une par réplique)
+        self.voice_dir = os.environ.get('MOUNAS_VOICE')
+        self.k = 0
+
+    def _voice(self, text):
+        self.lines.append(text)
+        if self.voice_dir:
+            a = sf.read(f'{self.voice_dir}/{self.k:03d}.wav', dtype='float32')[0]
+        else:
+            a = tts(text)
+        self.k += 1
+        return a
 
     def _add(self, png, d):
         nf = max(1, round(d * FPS))
@@ -158,8 +170,7 @@ class Timeline:
         return nf / FPS
 
     def say(self, svg, text, sfx_=None, pad=PAD):
-        a = tts(text)
-        self.lines.append(text)
+        a = self._voice(text)
         if sfx_:
             self.fx.append((self.t, sfx(sfx_)))
         self.voice.append((self.t + .15, a))
@@ -179,8 +190,7 @@ class Timeline:
     def anim(self, fn, s, fps=12, text=None, sfx_=None):
         t0 = self.t
         if text:
-            a = tts(text)
-            self.lines.append(text)
+            a = self._voice(text)
             self.voice.append((t0 + .15, a))
             s = max(s, .15 + len(a) / SR + PAD)
         if sfx_:
@@ -210,7 +220,7 @@ class Timeline:
         f = int(2 * SR)
         mix[-f:] *= np.linspace(1, 0, f)
         mix = np.clip(mix, -1, 1)
-        wav = f'{OUT}/{self.name}_mix.wav'
+        wav = f'{OUT}/{self.name}{os.environ.get("MOUNAS_SUFFIX", "")}_mix.wav'
         sf.write(wav, mix, SR)
         cc = f'{OUT}/{self.name}.ffconcat'
         with open(cc, 'w') as fh:
@@ -218,7 +228,7 @@ class Timeline:
             for png, nf in self.frames:
                 fh.write(f"file '{png}'\nduration {nf / FPS:.6f}\n")
             fh.write(f"file '{self.frames[-1][0]}'\n")
-        mp4 = f'{OUT}/{self.name}.mp4'
+        mp4 = f'{OUT}/{self.name}{os.environ.get("MOUNAS_SUFFIX", "")}.mp4'
         cmd = ['ffmpeg', '-y', '-v', 'error', '-f', 'concat', '-safe', '0', '-i', cc, '-i', wav,
                '-vf', f'fps={FPS},format=yuv420p', '-c:v', 'libx264', '-preset', 'medium', '-crf', '20',
                '-tune', 'stillimage', '-af', 'loudnorm=I=-16:TP=-1.5:LRA=11', '-c:a', 'aac', '-b:a', '160k',
