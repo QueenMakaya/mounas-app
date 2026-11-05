@@ -46,32 +46,40 @@ export default function LandingPage() {
           </p>
 
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a
-              href={STRIPE_PAYMENT_LINK}
+            <Link
+              href="/demo"
               className="rounded-full px-8 py-4 text-lg font-bold shadow-md transition-opacity hover:opacity-90"
               style={{ backgroundColor: COLORS.red, color: COLORS.cream }}
             >
-              Commencer l&apos;essai gratuit
+              👀 Essayer l&apos;app gratuitement
+            </Link>
+            <a
+              href={STRIPE_PAYMENT_LINK}
+              className="rounded-full px-8 py-4 text-lg font-bold transition-opacity hover:opacity-80"
+              style={{ color: COLORS.purple, border: `2px solid ${COLORS.purple}` }}
+            >
+              Essai gratuit 14 jours
             </a>
+          </div>
+          <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
+            La démo s&apos;ouvre tout de suite : pas de compte, pas de carte.
+            <br />
+            Puis 14 jours gratuits, et 10 $/mois sans engagement.
+          </p>
+          <p className="mt-3 text-sm">
+            <Link href="/app" className="font-bold underline underline-offset-4" style={{ color: COLORS.purple }}>
+              Découvrir le mot du jour gratuitement →
+            </Link>
+            <span className="mx-2" aria-hidden="true">·</span>
             <a
               href={whatsappLink('Bonjour Les Mounas ! J’ai une question sur l’abonnement. 🌍')}
               target="_blank"
               rel="noopener noreferrer"
-              className="rounded-full px-8 py-4 text-lg font-bold transition-opacity hover:opacity-80"
-              style={{ color: COLORS.tealDark, border: `2px solid ${COLORS.teal}` }}
+              className="font-bold underline underline-offset-4"
+              style={{ color: COLORS.tealDark }}
             >
-              💬 Une question ? WhatsApp
+              💬 Une question ?
             </a>
-          </div>
-          <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
-            10 $/mois après 14 jours gratuits.{' '}
-            <Link href="/app" className="font-bold underline underline-offset-4" style={{ color: COLORS.purple }}>
-              Découvrir le mot du jour gratuitement →
-            </Link>
-            <br />
-            <Link href="/demo" className="mt-2 inline-block font-bold underline underline-offset-4" style={{ color: COLORS.tealDark }}>
-              👀 Essayer toute l&apos;app en démo, sans inscription →
-            </Link>
           </p>
         </div>
       </section>

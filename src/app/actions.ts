@@ -1,5 +1,7 @@
 'use server';
 
+import { track } from '@vercel/analytics/server';
+import { sendGuideEmail } from '@/lib/email';
 import { saveSignup, type SignupSource } from '@/lib/signups';
 import type { FormState } from '@/lib/form-state';
 
@@ -20,6 +22,18 @@ async function handleSignup(source: SignupSource, formData: FormData, successMes
   const result = await saveSignup(email, source);
 
   if (result.ok) {
+    await trackEvent(source === 'ebook' ? 'Guide demandé' : 'Newsletter');
+    if (source === 'ebook') {
+      // The form promises the guide by email: send it now. The signup is
+      // already saved, so a failed send only changes the message.
+      const sent = await sendGuideEmail(email);
+      if (!sent.ok) {
+        return {
+          status: 'success',
+          message: "C'est noté ! Notre email a du retard : écris-nous sur WhatsApp et on t'envoie le guide tout de suite. 📖",
+        };
+      }
+    }
     return { status: 'success', message: successMessage };
   }
 
@@ -36,6 +50,15 @@ async function handleSignup(source: SignupSource, formData: FormData, successMes
   };
 }
 
+/** A Vercel Web Analytics event; never lets analytics break a signup. */
+async function trackEvent(name: string): Promise<void> {
+  try {
+    await track(name);
+  } catch (err) {
+    console.warn('[analytics] event not recorded:', name, err);
+  }
+}
+
 /** Newsletter / "Suivez-nous" capture. */
 export async function subscribeNewsletter(_prev: FormState, formData: FormData): Promise<FormState> {
   return handleSignup('newsletter', formData, 'Merci ! Tu es bien inscrit·e à la newsletter. 💌');
@@ -43,5 +66,5 @@ export async function subscribeNewsletter(_prev: FormState, formData: FormData):
 
 /** Free e-book request delivered by email. */
 export async function requestEbookByEmail(_prev: FormState, formData: FormData): Promise<FormState> {
-  return handleSignup('ebook', formData, "C'est noté ! Ton guide arrive par email très vite. 📖");
+  return handleSignup('ebook', formData, "C'est noté ! Ton guide vient de partir : regarde ta boîte mail (et les spams). 📖");
 }
