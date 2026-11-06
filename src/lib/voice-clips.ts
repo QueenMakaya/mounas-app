@@ -9,15 +9,19 @@
 import { SYLLABLE_CLIPS, WORD_CLIPS } from './voice-clips-words';
 
 const CLIPS: Record<string, string> = {
-  ...WORD_CLIPS,
+  // A word that is also a syllable (« yeux ») plays the word.
   ...SYLLABLE_CLIPS,
+  ...WORD_CLIPS,
   // Consignes (prompts.ts)
   'Touche les cartes, puis lis le mot tout seul.': 'consignes/decouvrir-lire.mp3',
   'Écoute bien le mot, puis écris-le avec les sons.': 'consignes/decouvrir-ecoute.mp3',
+  'Combien de syllabes ? Écris le nombre, puis tape dans tes mains pour vérifier.': 'consignes/syllabes.mp3',
   'Glisse ton doigt sous le mot.': 'consignes/lire.mp3',
   'Dis le mot trois fois.': 'consignes/prononcer.mp3',
   'On en parle ensemble.': 'consignes/activite.mp3',
+  'Invente ta phrase avec le mot, puis récite la comptine !': 'consignes/chanson.mp3',
   'Touche les sons dans le bon ordre.': 'consignes/epeler.mp3',
+  'Dessine le mot avec ton doigt.': 'consignes/dessiner.mp3',
   'Écris le mot avec ton doigt.': 'consignes/ecrire.mp3',
   'Écoute bien la mission.': 'consignes/mission.mp3',
   'Écoute le mot, puis touche la bonne image.': 'consignes/jeu-image.mp3',
