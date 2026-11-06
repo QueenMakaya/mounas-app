@@ -1,7 +1,7 @@
 'use server';
 
 import { track } from '@vercel/analytics/server';
-import { sendGuideEmail } from '@/lib/email';
+import { notifyOwner, sendGuideEmail } from '@/lib/email';
 import { saveSignup, type SignupSource } from '@/lib/signups';
 import type { FormState } from '@/lib/form-state';
 
@@ -23,6 +23,15 @@ async function handleSignup(source: SignupSource, formData: FormData, successMes
 
   if (result.ok) {
     await trackEvent(source === 'ebook' ? 'Guide demandé' : 'Newsletter');
+    await notifyOwner(
+      source === 'ebook' ? `📖 Nouvelle demande du guide : ${email}` : `💌 Nouvelle inscription newsletter : ${email}`,
+      [
+        source === 'ebook'
+          ? `${email} vient de demander le guide « Ta maison est déjà une école ». Le guide lui a été envoyé automatiquement.`
+          : `${email} vient de s'inscrire à la newsletter.`,
+        "C'est enregistré dans Airtable (LES MOUNAS — App → Signups). Rien à faire de ton côté.",
+      ],
+    );
     if (source === 'ebook') {
       // The form promises the guide by email: send it now. The signup is
       // already saved, so a failed send only changes the message.

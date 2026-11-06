@@ -75,25 +75,46 @@ export async function sendLoginCode(to: string, code: string): Promise<SendResul
 
 const SITE = 'https://www.lesmounas.school';
 
+/** The guide's public link: GUIDE_URL overrides the PDF served by the site. */
+export const DEFAULT_GUIDE_URL = `${SITE}/guide/ta-maison-est-deja-une-ecole.pdf`;
+
+/**
+ * Tells Pam something happened (a new trial, a guide request…), by email to
+ * NOTIFY_EMAIL (read at call-time; comma-separated for several people).
+ * Never throws: a missing address or a failed send is only logged.
+ */
+export async function notifyOwner(subject: string, lines: string[]): Promise<void> {
+  const to = (process.env.NOTIFY_EMAIL ?? '')
+    .split(/[,;\s]+/)
+    .map((e) => e.trim())
+    .filter(Boolean);
+  if (to.length === 0) {
+    console.warn(`[notify] NOTIFY_EMAIL is not set, not sent: ${subject}`);
+    return;
+  }
+  const escape = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const text = lines.join('\n');
+  const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1A1A1A;line-height:1.6">${lines
+    .map((l) => `<p style="margin:0 0 8px">${escape(l)}</p>`)
+    .join('')}</div>`;
+  for (const address of to) {
+    const sent = await sendEmail(address, subject, text, html).catch(() => null);
+    if (!sent?.ok) console.error(`[notify] could not send: ${subject}`);
+  }
+}
+
 /**
  * The free guide « Ta maison est déjà une école », sent right after the form.
- * GUIDE_URL (read at call-time) is the guide's public link, e.g. a PDF shared
- * from Drive. Without it the email still goes out, with the demo and a
- * WhatsApp link to get the guide in the conversation.
+ * The PDF lives in public/guide/; GUIDE_URL (read at call-time) can point the
+ * email at another copy, e.g. an updated version shared from Drive.
  */
 export async function sendGuideEmail(to: string): Promise<SendResult> {
-  const guideUrl = (process.env.GUIDE_URL ?? '').trim();
+  const guideUrl = (process.env.GUIDE_URL ?? '').trim() || DEFAULT_GUIDE_URL;
   const demoUrl = `${SITE}/demo?utm_source=email&utm_medium=guide&utm_campaign=guide`;
-  const whatsappUrl = whatsappLink('Bonjour Les Mounas ! Je voudrais recevoir le guide gratuit « Ta maison est déjà une école ». 📖');
 
-  const guideText = guideUrl
-    ? `Voici ton guide « Ta maison est déjà une école » :\n${guideUrl}\n\n`
-    : `Pour recevoir ton guide « Ta maison est déjà une école », écris-nous sur WhatsApp, on te l'envoie tout de suite :\n${whatsappUrl}\n\n`;
-  const guideHtml = guideUrl
-    ? `<p>Voici ton guide <b>« Ta maison est déjà une école »</b> :</p>
-  <p><a href="${guideUrl}" style="display:inline-block;background:#E63946;color:#FDF6EC;padding:12px 24px;border-radius:999px;font-weight:bold;text-decoration:none">📖 Ouvrir le guide</a></p>`
-    : `<p>Pour recevoir ton guide <b>« Ta maison est déjà une école »</b>, écris-nous sur WhatsApp, on te l'envoie tout de suite :</p>
-  <p><a href="${whatsappUrl}" style="display:inline-block;background:#25D366;color:#FFFFFF;padding:12px 24px;border-radius:999px;font-weight:bold;text-decoration:none">💬 Recevoir le guide sur WhatsApp</a></p>`;
+  const guideText = `Voici ton guide « Ta maison est déjà une école » :\n${guideUrl}\n\n`;
+  const guideHtml = `<p>Voici ton guide <b>« Ta maison est déjà une école »</b> :</p>
+  <p><a href="${guideUrl}" style="display:inline-block;background:#E63946;color:#FDF6EC;padding:12px 24px;border-radius:999px;font-weight:bold;text-decoration:none">📖 Ouvrir le guide</a></p>`;
 
   const text =
     `Bonjour !\n\nMerci de rejoindre Les Mounas 💜\n\n${guideText}` +
