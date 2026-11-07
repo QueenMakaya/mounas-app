@@ -3,6 +3,7 @@
 import { randomInt, timingSafeEqual } from 'node:crypto';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { track } from '@vercel/analytics/server';
 import { sendLoginCode } from '@/lib/email';
 import type { LoginState } from '@/lib/login-state';
 import {
@@ -221,6 +222,11 @@ export async function startDemo(): Promise<void> {
   const token = await signDemoSession(DEMO_EMAIL, DEMO_CUSTOMER_ID, DEMO_MINUTES);
   if (!token) redirect('/demo?indisponible=1');
   store.set(SESSION_COOKIE, token, { ...sessionCookieOptions, maxAge: DEMO_MINUTES * 60 });
+  try {
+    await track('Démo lancée');
+  } catch (err) {
+    console.warn('[analytics] event not recorded: Démo lancée', err);
+  }
   redirect('/app');
 }
 

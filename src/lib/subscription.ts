@@ -29,7 +29,7 @@ type CheckoutSession = {
   created: number;
   status: string | null;
   customer: string | null;
-  customer_details: { email: string | null } | null;
+  customer_details: { email: string | null; name?: string | null; phone?: string | null } | null;
   subscription: Subscription | string | null;
 };
 
@@ -181,13 +181,17 @@ export async function hasAccess(email: string): Promise<boolean> {
  * Right after a Payment Link checkout: who paid, and do they have access?
  * Only recent, completed sessions count, so an old URL can't log anyone in.
  */
-export async function checkoutAccess(sessionId: string): Promise<{ email: string; customerId: string } | null> {
+export type CheckoutAccess = { email: string; customerId: string; name: string | null; phone: string | null };
+
+export async function checkoutAccess(sessionId: string): Promise<CheckoutAccess | null> {
   if (!/^cs_[A-Za-z0-9_]+$/.test(sessionId)) return null;
   try {
     const session = await stripe<CheckoutSession>(
       `/checkout/sessions/${encodeURIComponent(sessionId)}?expand[]=subscription`,
     );
     const email = session.customer_details?.email;
+    const name = session.customer_details?.name ?? null;
+    const phone = session.customer_details?.phone ?? null;
     if (session.status !== 'complete' || !email || !session.customer) return null;
     if (Date.now() / 1000 - session.created > CHECKOUT_LOGIN_WINDOW_S) return null;
 
@@ -195,10 +199,10 @@ export async function checkoutAccess(sessionId: string): Promise<{ email: string
     // customer search index to catch up with a brand-new customer.
     const sub = session.subscription;
     if (sub && typeof sub === 'object' && ACCESS_STATUSES.has(sub.status)) {
-      return { email: email.toLowerCase(), customerId: session.customer };
+      return { email: email.toLowerCase(), customerId: session.customer, name, phone };
     }
     const access = await findAccess(email);
-    return access.status === 'active' ? { email: email.toLowerCase(), customerId: access.customerId } : null;
+    return access.status === 'active' ? { email: email.toLowerCase(), customerId: access.customerId, name, phone } : null;
   } catch {
     return null;
   }
