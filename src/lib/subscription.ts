@@ -11,8 +11,11 @@
  *
  * Access = ANY subscription of ANY customer with that email is `active` or
  * `trialing`, whatever the price, so the founding members keep access.
- * Emails listed in ACCESS_EMAILS always have access (testing, gifted access).
+ * Emails listed in ACCESS_EMAILS, or ticked in the Airtable « Accès offerts »
+ * table, always have access (testing, gifted access).
  */
+
+import { airtableToken } from '@/lib/airtable-token';
 
 const STRIPE_API = 'https://api.stripe.com/v1';
 const ACCESS_STATUSES = new Set(['active', 'trialing']);
@@ -149,6 +152,36 @@ function isAllowlisted(email: string): boolean {
   return allowlist().includes(email.trim().toLowerCase());
 }
 
+/**
+ * Gifted access managed in Airtable: the « Accès offerts » table (same base as
+ * the families), one row per email, « Actif » ticked. Adding a row gives
+ * access at the next login, with no redeploy. Any failure counts as « no ».
+ */
+const DEFAULT_GIFTS_TABLE = 'tbl0xr6jCtLuGrbQA'; // Accès offerts
+async function isGifted(email: string): Promise<boolean> {
+  const token = airtableToken();
+  const baseId = process.env.AIRTABLE_BASE_ID;
+  if (!token || !baseId) return false;
+  const table = process.env.AIRTABLE_GIFTS_TABLE || DEFAULT_GIFTS_TABLE;
+  const safe = email.trim().toLowerCase().replace(/["\\]/g, '');
+  const formula = `AND({Actif}, LOWER(TRIM({Email})) = "${safe}")`;
+  try {
+    const res = await fetch(
+      `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(table)}?maxRecords=1&filterByFormula=${encodeURIComponent(formula)}`,
+      { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' },
+    );
+    if (!res.ok) {
+      console.error(`[subscription] Airtable gifts responded ${res.status}: ${await res.text().catch(() => '')}`);
+      return false;
+    }
+    const data = (await res.json()) as { records?: unknown[] };
+    return (data.records?.length ?? 0) > 0;
+  } catch (err) {
+    console.error('[subscription] Airtable gifts request failed:', err);
+    return false;
+  }
+}
+
 /** Which customer (if any) gives this email access. */
 export async function findAccess(email: string): Promise<AccessResult> {
   try {
@@ -156,7 +189,7 @@ export async function findAccess(email: string): Promise<AccessResult> {
     for (const customer of customers) {
       if (await customerHasAccess(customer.id)) return { status: 'active', customerId: customer.id };
     }
-    if (isAllowlisted(email)) {
+    if (isAllowlisted(email) || (await isGifted(email))) {
       // The login code lives in a Stripe customer's metadata, so an allowed
       // email without one gets a (subscription-free) customer created once.
       const customerId =
