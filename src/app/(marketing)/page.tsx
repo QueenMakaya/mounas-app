@@ -4,7 +4,7 @@ import DiamondIcon from '@/components/brand/DiamondIcon';
 import EbookSignup from '@/components/marketing/EbookSignup';
 import NewsletterSignup from '@/components/marketing/NewsletterSignup';
 import BookingSection from '@/components/marketing/BookingSection';
-import { COLORS, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
+import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: 'Les Mounas — Le français en s’amusant, sur WhatsApp',
@@ -65,6 +65,8 @@ export default function LandingPage() {
             La démo s&apos;ouvre tout de suite : pas de compte, pas de carte.
             <br />
             Puis 14 jours gratuits, et 10 $/mois sans engagement.
+            <br />
+            🛡️ {GUARANTEE}.
           </p>
           <p className="mt-3 text-sm">
             <Link href="/app" className="font-bold underline underline-offset-4" style={{ color: COLORS.purple }}>

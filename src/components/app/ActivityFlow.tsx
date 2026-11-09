@@ -27,7 +27,7 @@ import { gamesOfTheDay, type GameKey } from '@/lib/games';
 import { useReviewChoice } from '@/lib/review';
 import { ReviewOption } from '@/components/app/ReviewWords';
 import { CalculIcon } from '@/components/app/AppSections';
-import { MONTHLY_PRICE, STRIPE_PAYMENT_LINK, TRIAL_DAYS } from '@/lib/config';
+import { GUARANTEE, MONTHLY_PRICE, STRIPE_PAYMENT_LINK, TRIAL_DAYS } from '@/lib/config';
 import FindImage from '@/components/app/games/FindImage';
 import SoundFishing from '@/components/app/games/SoundFishing';
 import MissingWord from '@/components/app/games/MissingWord';
@@ -1744,6 +1744,7 @@ function TrialOffer({ kind }: { kind: TrialOfferKind }) {
         {TRIAL_DAYS} jours gratuits · 0 $ aujourd’hui · annule avant la fin de l’essai et rien n’est prélevé. Ensuite{' '}
         {MONTHLY_PRICE}/mois, sans engagement.
       </p>
+      <p className="mt-2 text-center text-sm font-extrabold">🛡️ {GUARANTEE}</p>
       {kind === 'visitor' && (
         <Link href="/demo" className="mt-3 block text-center text-sm font-bold text-cream underline underline-offset-4">
           Ou essaie toute l’app en démo, sans inscription
