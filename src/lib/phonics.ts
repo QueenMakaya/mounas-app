@@ -78,6 +78,18 @@ const SOUNDED_FINALS: Record<string, true> = {
 };
 const SILENT_FINALS = 'stdxzpg';
 
+/**
+ * Y between two vowels counts as two i (« i + i ») : it lends one i to the
+ * vowel before it. jo|y|eux → « joi-yeu », cra|y|on → « crè-yon ». The words
+ * below keep their plain vowel (yoyo, goyave, papaye…).
+ */
+const PLAIN_BEFORE_Y: Record<string, true> = {
+  yoyo: true, yoyos: true, coyote: true, coyotes: true, goyave: true, goyaves: true, goyavier: true,
+  mayonnaise: true, mayo: true, papaye: true, papayes: true, cobaye: true, cobayes: true, bayou: true, kayak: true, kayaks: true,
+};
+/** The vowel before y lends it an i: o → « oi », a → « è » (only before y + vowel). */
+const yLendsI = (w: string, i: number) => w[i + 1] === 'y' && isVowel(w[i + 2]) && !PLAIN_BEFORE_Y[w];
+
 type Rule = { match: string; key: string; when?: (next: string | undefined, prev: string | undefined) => boolean };
 
 const nasalOk = (next: string | undefined) => !isVowel(next) && next !== 'n' && next !== 'm';
@@ -103,7 +115,7 @@ const RULES: Rule[] = [
   { match: 'au', key: 'o' },
   { match: 'an', key: 'an', when: nasalOk },
   { match: 'am', key: 'an', when: nasalOk },
-  { match: 'en', key: 'in', when: (n, p) => p === 'i' && nasalOk(n) }, // chien, bien
+  { match: 'en', key: 'in', when: (n, p) => (p === 'i' || p === 'y') && nasalOk(n) }, // chien, bien, moyen
   { match: 'en', key: 'an', when: nasalOk },
   { match: 'em', key: 'an', when: nasalOk },
   { match: 'on', key: 'on', when: nasalOk },
@@ -134,11 +146,13 @@ function singleLetter(w: string, i: number): string {
   const next = w[i + 1];
   const prev = w[i - 1];
   switch (c) {
-    case 'a': case 'à': case 'â': case 'ä': return 'a';
+    case 'a': return yLendsI(w, i) ? 'è' : 'a'; // crayon, payer
+    case 'à': case 'â': case 'ä': return 'a';
     case 'é': return 'é';
     case 'è': case 'ê': case 'ë': return 'è';
     case 'i': case 'î': case 'ï': return 'i';
-    case 'o': case 'ô': case 'ö': return 'o';
+    case 'o': return yLendsI(w, i) ? 'oi' : 'o'; // joyeux, noyau, voyage
+    case 'ô': case 'ö': return 'o';
     case 'u': case 'ù': case 'û': case 'ü': return 'u';
     case 'y': return isVowel(next) && (i === 0 || isVowel(prev)) ? 'y' : 'i';
     case 'e': {
