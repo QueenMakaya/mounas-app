@@ -6,6 +6,7 @@ import { themeEmoji } from '@/lib/themes';
 import WeekProgress from '@/components/app/WeekProgress';
 import ChildStart from '@/components/app/kid/ChildStart';
 import { CalculIcon } from '@/components/app/AppSections';
+import PieceIcon from '@/components/app/echecs/PieceIcon';
 
 export const dynamic = 'force-dynamic';
 
@@ -163,6 +164,19 @@ export default async function HomePage() {
             <span className="flex-1">
               <span className="block font-extrabold text-ink">Les missions</span>
               <span className="block text-sm text-ink-soft">Compter, chercher, résoudre des petits problèmes</span>
+            </span>
+            <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
+          </Link>
+          <Link
+            href="/app/echecs"
+            className="group flex items-center gap-4 rounded-3xl bg-white p-4 ring-1 ring-ink/5 transition-colors hover:bg-sand"
+          >
+            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#E4F0F8]" aria-hidden="true">
+              <PieceIcon kind="n" camp="s" className="h-10 w-10" />
+            </span>
+            <span className="flex-1">
+              <span className="block font-extrabold text-ink">Les échecs de Mounaville</span>
+              <span className="block text-sm text-ink-soft">La Reine, la Gazelle, l’Éléphant… le Soleil contre la Lune</span>
             </span>
             <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
           </Link>

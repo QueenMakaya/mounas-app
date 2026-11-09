@@ -94,3 +94,14 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 - [x] **Le dessin à tous les niveaux** : ARBRE (niveau 1) n'avait pas d'étape dessin, car « Écrire » ne commençait
   qu'au niveau 2. Au niveau 1, il y a maintenant l'étape « 🎨 Dessiner » : la même ardoise, ouverte sur la feuille
   blanche (les minuscules / CAPITALES en pointillés restent à un tap). « Épeler » reste à partir du niveau 2.
+
+## 9 novembre 2026
+
+- [x] **Les échecs de Mounaville** (/app/echecs) : les échecs plutôt que les dames, mais rendus faciles et inspirés de l'Afrique.
+  Le camp du Soleil (commence) contre le camp de la Lune. Le Roi (Mansa), la Reine (Nzinga), la Gazelle (cavalier),
+  l'Éléphant (fou, comme dans le tout premier jeu d'échecs), le Rhinocéros (tour, il fonce tout droit) et les Mounas (pions :
+  « mouna » = enfant ; celui qui traverse la savane devient Reine). Cinq chapitres : 1. La famille royale (chaque pièce, son
+  histoire, on la fait bouger) · 2. La cueillette des mangues (12 défis, une pièce seule, 1 à 3 étoiles) · 3. La course des Mounas
+  (que des pions) · 4. Attrape le Roi ! (8 mats en un coup) · 5. La grande partie (contre Mounaville « tout doux » / « malin »
+  ou contre un ami sur le même écran, bouton « Oups, je reviens »). Les coups possibles s'allument toujours ; toutes les vraies règles.
+  Nouvelle icône « Échecs » dans la rangée des rubriques, carte sur l'accueil et dans la démo.

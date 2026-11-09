@@ -46,6 +46,11 @@ const TOUR = [
     text: 'Des petits problèmes à résoudre ensemble : compter, chercher, trier.',
   },
   {
+    emoji: '♟️',
+    title: 'Les échecs de Mounaville',
+    text: 'Le Roi, la Reine, la Gazelle, l’Éléphant, le Rhinocéros et les petits Mounas : les échecs appris en jouant, chapitre par chapitre.',
+  },
+  {
     emoji: '📊',
     title: 'Les progrès',
     text: 'Les mots appris, les sons connus, les jours d’affilée : le parent voit tout d’un coup d’œil.',

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import PieceIcon from '@/components/app/echecs/PieceIcon';
 
 /*
  * The app's sections, always one tap away: a row of big picture buttons at
@@ -16,6 +17,7 @@ const SECTIONS = [
   { href: '/app/dictee', label: 'Dictée', icon: '📒', tint: '#E3F8F5' },
   { href: '/app/calcul', label: 'Calcul', icon: '1+2', tint: '#F1E9F8' },
   { href: '/app/missions', label: 'Missions', icon: '🧩', tint: '#FEF3E2' },
+  { href: '/app/echecs', label: 'Échecs', icon: '♚', tint: '#E4F0F8' },
   { href: '/app/progres', label: 'Progrès', icon: '📊', tint: '#FFF1E0' },
 ];
 
@@ -38,7 +40,7 @@ export default function AppSections() {
 
   return (
     <nav aria-label="Les rubriques de l’app" className="border-b border-ink/5 bg-cream">
-      <ul className="mx-auto grid max-w-xl grid-cols-5 gap-1.5 px-3 py-2.5 sm:gap-3 sm:px-6">
+      <ul className="mx-auto grid max-w-xl grid-cols-6 gap-1 px-2 py-2.5 sm:gap-2 sm:px-6">
         {SECTIONS.map((s) => {
           const active = s.match ? s.match(pathname) : pathname === s.href || pathname.startsWith(`${s.href}/`);
           return (
@@ -48,8 +50,14 @@ export default function AppSections() {
                 aria-current={active ? 'page' : undefined}
                 className={`flex flex-col items-center gap-1 rounded-2xl px-1 py-1.5 transition-colors ${active ? 'bg-white shadow-sm ring-2 ring-ink/80' : 'hover:bg-white/70'}`}
               >
-                <span className="flex h-12 w-12 items-center justify-center rounded-2xl text-2xl" style={{ backgroundColor: s.tint }}>
-                  {s.icon === '1+2' ? <CalculIcon className="text-lg" /> : <span aria-hidden="true">{s.icon}</span>}
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl text-2xl sm:h-12 sm:w-12" style={{ backgroundColor: s.tint }}>
+                  {s.icon === '1+2' ? (
+                    <CalculIcon className="text-lg" />
+                  ) : s.icon === '♚' ? (
+                    <PieceIcon kind="k" camp="l" className="h-9 w-9" />
+                  ) : (
+                    <span aria-hidden="true">{s.icon}</span>
+                  )}
                 </span>
                 <span className={`text-center text-[11px] leading-tight sm:text-xs ${active ? 'font-extrabold text-ink' : 'font-bold text-ink-soft'}`}>{s.label}</span>
               </Link>
