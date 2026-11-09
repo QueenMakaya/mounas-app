@@ -55,6 +55,9 @@ export const SOCIAL_LINKS = [
 // already logged in.
 export const TRIAL_URL = process.env.NEXT_PUBLIC_TRIAL_URL || STRIPE_PAYMENT_LINK;
 export const TRIAL_DAYS = 14;
+/** Money-back guarantee shown next to every trial button (Pam, Nov 2026). */
+export const GUARANTEE_DAYS = 30;
+export const GUARANTEE = `Satisfait ou remboursé ${GUARANTEE_DAYS} jours`;
 export const MONTHLY_PRICE = '10 $';
 
 /** Build a wa.me link, optionally pre-filling the first message. */

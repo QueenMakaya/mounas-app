@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { startDemo } from '@/app/auth-actions';
 import { getSession } from '@/lib/auth';
-import { COLORS, STRIPE_PAYMENT_LINK, TRIAL_DAYS, whatsappLink } from '@/lib/config';
+import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, TRIAL_DAYS, whatsappLink } from '@/lib/config';
 import { DEMO_AGES, DEMO_MINUTES, demoEnabled, isDemo } from '@/lib/demo';
 
 export const dynamic = 'force-dynamic';
@@ -166,7 +166,7 @@ export default async function DemoPage({
           </div>
           <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
             Pendant la démo, rien n&apos;est enregistré sur un compte. {TRIAL_DAYS} jours gratuits ensuite, puis 10 $/mois, sans
-            engagement.
+            engagement. 🛡️ {GUARANTEE}.
           </p>
         </div>
 
