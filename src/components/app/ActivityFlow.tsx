@@ -642,6 +642,17 @@ function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library, o
         (ou fais rouler la boule rouge sous le mot), puis colle-les ensemble pour dire le mot.
         {canSpeak && ' Touche un son pour l’entendre.'}
       </ParentTip>
+      {/y/i.test(a.frenchWord) && (
+        <Link
+          href="/app/sons/y"
+          className="mt-4 flex items-center justify-between gap-3 rounded-3xl bg-[#F1E9F8] px-5 py-4 font-bold text-mpurple ring-1 ring-mpurple/10"
+        >
+          <span>
+            <span aria-hidden="true">🔤 </span>Le Y est un son piège ! Voir la leçon spéciale du Y
+          </span>
+          <span aria-hidden="true">→</span>
+        </Link>
+      )}
     </>
   );
 }
