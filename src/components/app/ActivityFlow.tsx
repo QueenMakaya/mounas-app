@@ -27,6 +27,7 @@ import { gamesOfTheDay, type GameKey } from '@/lib/games';
 import { useReviewChoice } from '@/lib/review';
 import { ReviewOption } from '@/components/app/ReviewWords';
 import { CalculIcon } from '@/components/app/AppSections';
+import { MONTHLY_PRICE, STRIPE_PAYMENT_LINK, TRIAL_DAYS } from '@/lib/config';
 import FindImage from '@/components/app/games/FindImage';
 import SoundFishing from '@/components/app/games/SoundFishing';
 import MissingWord from '@/components/app/games/MissingWord';
@@ -122,10 +123,13 @@ export default function ActivityFlow({
   activity,
   library,
   mission = null,
+  trialOffer = null,
 }: {
   activity: Activity;
   library: WordCard[];
   mission?: Mission | null;
+  /** Who sees the free-trial card when the word is done: demo families and visitors, never subscribers. */
+  trialOffer?: TrialOfferKind | null;
 }) {
   // The day (client only: it must be the parent's date) picks the games, and
   // this device's history the words offered for review.
@@ -286,6 +290,7 @@ export default function ActivityFlow({
           speak={speak}
           canSpeak={canSpeak}
           review={review}
+          trialOffer={trialOffer}
         />
       ) : (
         <section
@@ -1564,7 +1569,9 @@ function FinishCard({
   speak,
   canSpeak,
   review,
+  trialOffer,
 }: {
+  trialOffer: TrialOfferKind | null;
   activity: Activity;
   library: WordCard[];
   readAlone: boolean;
@@ -1667,6 +1674,7 @@ function FinishCard({
                 {streak === 1 ? 'Premier jour ! Reviens demain pour continuer.' : `${streak} jours de suite — bravo !`}
               </p>
             )}
+            {trialOffer && <TrialOffer kind={trialOffer} />}
             {childMode && <AnotherWord activity={a} library={library} />}
             <div className="mx-auto mt-6 max-w-sm">
               <ReviewOption key="fin" {...review} library={library} canSpeak={canSpeak} speak={speak} where="fin" />
@@ -1707,6 +1715,40 @@ function FinishCard({
           </>
         )}
       </div>
+    </section>
+  );
+}
+
+export type TrialOfferKind = 'demo' | 'visitor';
+
+/**
+ * Right after the badge, when the parent has just seen their child play:
+ * the moment to offer the free trial (demo families and visitors only).
+ */
+function TrialOffer({ kind }: { kind: TrialOfferKind }) {
+  return (
+    <section aria-labelledby="trial-title" className="mx-auto mt-8 max-w-sm rounded-[28px] bg-mpurple p-6 text-left text-cream shadow-lg">
+      <h3 id="trial-title" className="font-display text-2xl font-bold leading-tight">
+        Ton enfant a aimé ? Continue chaque jour 💜
+      </h3>
+      <p className="mt-2 text-sm text-cream/90">
+        Un nouveau mot chaque jour, la dictée, le calcul, les missions et le suivi de ses progrès.
+      </p>
+      <a
+        href={STRIPE_PAYMENT_LINK}
+        className="mt-5 flex min-h-14 items-center justify-center rounded-full bg-cream px-6 text-center text-lg font-extrabold text-mpurple shadow-md active:scale-[0.98]"
+      >
+        Commencer l’essai gratuit
+      </a>
+      <p className="mt-3 text-center text-xs font-semibold text-cream/90">
+        {TRIAL_DAYS} jours gratuits · 0 $ aujourd’hui · annule avant la fin de l’essai et rien n’est prélevé. Ensuite{' '}
+        {MONTHLY_PRICE}/mois, sans engagement.
+      </p>
+      {kind === 'visitor' && (
+        <Link href="/demo" className="mt-3 block text-center text-sm font-bold text-cream underline underline-offset-4">
+          Ou essaie toute l’app en démo, sans inscription
+        </Link>
+      )}
     </section>
   );
 }

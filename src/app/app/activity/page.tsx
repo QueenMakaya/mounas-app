@@ -5,6 +5,7 @@ import ActivityFlow from '@/components/app/ActivityFlow';
 import { getMissionForWord } from '@/lib/missions';
 import { getSession, paywallUrl } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { isDemo } from '@/lib/demo';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,8 +15,11 @@ export default async function ActivityPage({
   searchParams: Promise<{ id?: string }>;
 }) {
   const { id } = await searchParams;
+  const session = await getSession();
+  // Families without a subscription (demo, free word of the day) see the trial offer at the end.
+  const trialOffer = !session ? 'visitor' : isDemo(session) ? 'demo' : null;
   // Today's word is free; any other word needs a subscription.
-  if (id && !(await getSession())) {
+  if (id && !session) {
     const today = await getTodayActivity();
     if (today?.id !== id) redirect(paywallUrl(`/app/activity?id=${encodeURIComponent(id)}`));
   }
@@ -72,7 +76,7 @@ export default async function ActivityPage({
     <main className="flex-1 bg-cream font-body">
       <div className="mx-auto max-w-2xl px-4 pt-6 sm:px-6 sm:pt-10">
         {/* Keyed by word: « Un autre mot ? » starts the next one from step 1. */}
-        <ActivityFlow key={activity.id} activity={activity} library={library} mission={mission} />
+        <ActivityFlow key={activity.id} activity={activity} library={library} mission={mission} trialOffer={trialOffer} />
       </div>
     </main>
   );
