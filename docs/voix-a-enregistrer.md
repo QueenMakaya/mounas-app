@@ -1,9 +1,9 @@
 # Voix de Pam : ce qu'il reste à enregistrer
 
-**État au 27 oct. 2026** : tout est enregistré, découpé dans `public/voix/` et branché dans
+**État au 9 nov. 2026** : tout est enregistré, découpé dans `public/voix/` et branché dans
 `src/lib/voice-clips.ts` et `src/lib/voice-clips-words.ts` : consignes, petites phrases, bravos,
-calcul (0 à 100), les 37 sons, les 182 mots d'Airtable et 167 syllabes sur 219.
-**Il reste la partie E** (deux consignes changées depuis l'enregistrement, et 52 syllabes). Tout ce qui n'est pas enregistré est lu par la
+calcul (0 à 100), les 40 sons (avec les 3 sons du y du 9 nov.), les 182 mots d'Airtable et 186 syllabes sur 219.
+**Il reste la partie E** (deux consignes changées depuis l'enregistrement, et 33 syllabes). Tout ce qui n'est pas enregistré est lu par la
 voix du navigateur.
 
 ## E. À refaire
@@ -13,18 +13,19 @@ Deux consignes ont changé de texte après ton enregistrement :
 1. Combien de syllabes ? Écris le nombre, puis tape dans tes mains pour vérifier.
 2. Invente ta phrase avec le mot, puis récite la comptine !
 
-Et 52 syllabes :
+Et 33 syllabes :
 
 Dans le fichier du 13 oct., ces syllabes sont trop proches les unes des autres pour être
 rangées sans risque d'erreur (par ex. bo, bog, bol, bou, bour). Les dire dans cet ordre, une par une :
 
 bo · bog · bou · bour · bre · bé · ca · cail · co · con · cou · cre · cu · dan · de · den · di ·
-din · djem · do · dou · e · en · mie · mil · mo · nier · no · nom · nou · nours · pe · per ·
-phant · pi · ran · reil · rer · ri · rieux · ril · ris · ro · rou · ru · vo · voi · vre · vé ·
-xi · ye · yeux
+din · djem · do · dou · e · en · mie · mil · mo · nier · no · nom · nou · nours · pe · per
 
-Nouveaux sons du y (9 nov.) : « oi-y » (le son de *joy*eux, noyau), « ui-y » (tuyau),
-et la syllabe « joi » (jo-yeux). Le son « è-y » de crayon reprend l'enregistrement de « eille ».
+(Enregistrées le 9 nov., fichier « Son app 9nov2026 » : phant · pi · ran · reil · rer · ri · rieux ·
+ril · ris · ro · rou · ru · vo · voi · vre · vé · xi · ye · yeux.)
+
+Sons du y : « oi-y » (joyeux), « è-y » (crayon), « ui-y » (tuyau) et la syllabe « joi » (jo-yeux),
+enregistrés le 9 nov. et branchés. À la fin du fichier, un « a » de plus (vers 52 s) n'a pas été utilisé.
 
 Les mots ajoutés plus tard dans Airtable : enregistrer le mot et ses syllabes de la même façon,
 ou laisser le clone de voix s'en charger.
