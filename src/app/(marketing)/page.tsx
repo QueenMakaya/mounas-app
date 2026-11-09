@@ -7,9 +7,14 @@ import BookingSection from '@/components/marketing/BookingSection';
 import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
 
 export const metadata: Metadata = {
-  title: 'Les Mounas — Le français en s’amusant, sur WhatsApp',
+  title: 'Les Mounas : l’app pour apprendre à lire en français, 10 minutes par jour',
   description:
-    'Un abonnement WhatsApp pour transmettre le français aux enfants de 0 à 6 ans des familles de la diaspora. 10 minutes par jour, avec amour et culture.',
+    'Chaque jour, un mot mystère : syllabes, sons, écriture, dictée et calcul pour les enfants de 0 à 6 ans, avec une touche de culture afro. Démo sans inscription et 14 jours gratuits.',
+  openGraph: {
+    title: 'Les Mounas : l’app pour apprendre à lire en français, 10 minutes par jour',
+    description:
+      'Chaque jour, un mot mystère : syllabes, sons, écriture, dictée et calcul pour les 0 à 6 ans, avec une touche de culture afro. Démo sans inscription et 14 jours gratuits.',
+  },
 };
 
 export default function LandingPage() {
