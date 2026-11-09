@@ -84,6 +84,8 @@ const SOUND_CLIPS: Record<string, string> = {
   eille: 'sons/eille.mp3',
   aille: 'sons/aille.mp3',
   ouille: 'sons/ouille.mp3',
+  // « ay » (crayon) is the sound of « eille »; « oy » and « uy » are not recorded yet.
+  ay: 'sons/eille.mp3',
   m: 'sons/m.mp3',
   n: 'sons/n.mp3',
   l: 'sons/l.mp3',

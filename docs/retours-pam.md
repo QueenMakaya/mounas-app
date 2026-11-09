@@ -94,3 +94,15 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 - [x] **Le dessin à tous les niveaux** : ARBRE (niveau 1) n'avait pas d'étape dessin, car « Écrire » ne commençait
   qu'au niveau 2. Au niveau 1, il y a maintenant l'étape « 🎨 Dessiner » : la même ardoise, ouverte sur la feuille
   blanche (les minuscules / CAPITALES en pointillés restent à un tap). « Épeler » reste à partir du niveau 2.
+
+## 9 novembre 2026
+
+- [x] **JOYEUX se lisait mal** : l'app découpait j | o | y | eu (« jo-yeu »). Elle lit maintenant
+  j | oy | eu | x muette (« jwa-yeu »). Le y entre deux voyelles vaut deux i : joyeux = joi + yeux.
+  Même règle pour crayon (crai + yon), noyau, tuyau, voyage, payer ; papaye reste « pa-pa-ye ».
+  Dans « Syllabes », la bulle « jo » de jo-yeux se dit « joi ».
+- [x] **Leçon sur le son du y** (« 🦎 Le son du y », dans l'étape « Lire » de chaque mot qui a un y) :
+  ce que fait le y dans ce mot (« Dans joyeux, il y a yeux ! »), puis la leçon complète du y, la lettre caméléon :
+  y = « i » (pyjama, stylo, il y a), y = « ye » au début devant une voyelle (yeux, yaourt, yoyo),
+  y = i + i entre deux voyelles (joyeux, crayon, noyau, tuyau, voyage), les exceptions (pays, kayak)
+  et un petit jeu « À toi ! » : l'enfant dit ce que fait le y dans 6 mots.

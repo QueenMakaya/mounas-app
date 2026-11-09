@@ -23,6 +23,9 @@ din · djem · do · dou · e · en · mie · mil · mo · nier · no · nom · 
 phant · pi · ran · reil · rer · ri · rieux · ril · ris · ro · rou · ru · vo · voi · vre · vé ·
 xi · ye · yeux
 
+Nouveaux sons du y (9 nov.) : « oi-y » (le son de *joy*eux, noyau), « ui-y » (tuyau),
+et la syllabe « joi » (jo-yeux). Le son « è-y » de crayon reprend l'enregistrement de « eille ».
+
 Les mots ajoutés plus tard dans Airtable : enregistrer le mot et ses syllabes de la même façon,
 ou laisser le clone de voix s'en charger.
 

@@ -10,6 +10,8 @@ import { useSpeech } from '@/lib/useSpeech';
 import { SOUNDS, wordSounds, type Sound } from '@/lib/phonics';
 import { playChime } from '@/lib/chime';
 import SyllableWord, { SYLLABLE_COLORS, syllableParts } from '@/components/app/SyllableWord';
+import YLesson from '@/components/app/YLesson';
+import { syllableSay } from '@/lib/y-lesson';
 import SpeakButton from '@/components/app/SpeakButton';
 import MysteryWord, { type DiscoverMode } from '@/components/app/MysteryWord';
 import DrawingCanvas, { type DrawingCanvasHandle } from '@/components/app/DrawingCanvas';
@@ -637,6 +639,7 @@ function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library, o
         </div>
       </Stage>
       <SoundReminders activity={a} library={library} canSpeak={canSpeak} speak={speak} />
+      <YLesson word={a.frenchWord} library={library} canSpeak={canSpeak} speak={speak} />
       <ParentTip>
         On lit les <strong>sons</strong>, pas le nom des lettres : on dit « mmm », pas « èm ». Glisse ton doigt sous chaque son
         (ou fais rouler la boule rouge sous le mot), puis colle-les ensemble pour dire le mot.
@@ -1231,7 +1234,7 @@ function SyllableClap({ step, activity: a, speak, onSuccess }: { step: StepDef; 
   const said = Number(guess);
 
   const clap = (i: number) => {
-    speak(parts[i], 0.7);
+    speak(syllableSay(parts, i), 0.7);
     if (claps.includes(i)) return;
     setClaps([...claps, i]);
     if (claps.length + 1 >= total) onSuccess();

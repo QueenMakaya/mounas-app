@@ -44,6 +44,11 @@ export const SOUNDS: Record<string, { say: string; hint: string; vowel: boolean 
   eille: { say: 'eille', hint: 'èy', vowel: true },
   aille: { say: 'aille', hint: 'ay', vowel: true },
   ouille: { say: 'ouille', hint: 'ouy', vowel: true },
+  // A y between two vowels counts as two i (joyeux = joi + yeux): the first i
+  // goes with the vowel before it, the second says « ye » with the next one.
+  oy: { say: 'ouaille', hint: 'oi-y', vowel: true },
+  ay: { say: 'eille', hint: 'è-y', vowel: true },
+  uy: { say: 'uille', hint: 'ui-y', vowel: true },
   m: { say: 'me', hint: 'mmm', vowel: false },
   n: { say: 'ne', hint: 'nnn', vowel: false },
   l: { say: 'le', hint: 'lll', vowel: false },
@@ -78,13 +83,24 @@ const SOUNDED_FINALS: Record<string, true> = {
 };
 const SILENT_FINALS = 'stdxzpg';
 
-type Rule = { match: string; key: string; when?: (next: string | undefined, prev: string | undefined) => boolean };
+type Rule = { match: string; key: string; when?: (next: string | undefined, prev: string | undefined, after: string) => boolean };
 
 const nasalOk = (next: string | undefined) => !isVowel(next) && next !== 'n' && next !== 'm';
+
+/**
+ * y between two vowels (joyeux, crayon, tuyau), but not before a final mute e:
+ * papaye reads « pa-pa-ye », not « pa-pè-ye ».
+ */
+const yBridge = (next: string | undefined, _prev: string | undefined, after: string) =>
+  isVowel(next) && !/^e(?!\p{L})/u.test(after);
 
 // Longest first. `when` guards context (next letter after the match, previous letter before it).
 const RULES: Rule[] = [
   { match: 'ouill', key: 'ouille' },
+  { match: 'oy', key: 'oy', when: yBridge },
+  { match: 'ay', key: 'ay', when: yBridge },
+  { match: 'ey', key: 'ay', when: yBridge },
+  { match: 'uy', key: 'uy', when: yBridge },
   { match: 'eill', key: 'eille' },
   { match: 'aill', key: 'aille' },
   { match: 'eil', key: 'eille', when: (n) => !isLetter(n) },
@@ -198,7 +214,7 @@ function splitWord(original: string): Sound[] {
     }
 
     const rule = RULES.find(
-      (r) => rest.startsWith(r.match) && (!r.when || r.when(w[i + r.match.length], prev)),
+      (r) => rest.startsWith(r.match) && (!r.when || r.when(w[i + r.match.length], prev, w.slice(i + r.match.length))),
     );
     if (rule) {
       out.push({ text: original.slice(i, i + rule.match.length), kind: SOUNDS[rule.key].vowel ? 'vowel' : 'consonant', key: rule.key });
