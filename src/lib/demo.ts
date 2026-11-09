@@ -27,3 +27,14 @@ export function demoEnabled(): boolean {
 export function isDemo(session: Pick<Session, 'customerId'> | null | undefined): boolean {
   return session?.customerId === DEMO_CUSTOMER_ID;
 }
+
+/** The ages offered on /demo and the level (Airtable « Difficulty ») each one starts with. */
+export const DEMO_AGES = [
+  { value: '0-2', label: '0–2 ans', emoji: '🍼', level: '1' },
+  { value: '3-4', label: '3–4 ans', emoji: '🧸', level: '2' },
+  { value: '5-6', label: '5–6 ans', emoji: '🎒', level: '3' },
+] as const;
+
+export function demoLevelForAge(age: string): string | null {
+  return DEMO_AGES.find((a) => a.value === age)?.level ?? null;
+}
