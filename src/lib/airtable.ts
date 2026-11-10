@@ -47,6 +47,8 @@ export type Activity = {
   questions: string;
   /** Optional traps for « Trouve le mot », comma-separated (else generated, src/lib/games.ts). */
   traps: string;
+  /** Optional « Nature » column: Verbe / Nom / Adjectif (src/lib/verbs.ts). */
+  nature: string;
 };
 
 const recordToActivity = (record: Records<FieldSet>[number]): Activity => ({
@@ -72,6 +74,10 @@ const recordToActivity = (record: Records<FieldSet>[number]): Activity => ({
   graphemes: (record.get('Graphèmes') as string) || '',
   questions: (record.get('Questions') as string) || '',
   traps: (record.get('Mots pièges') as string) || '',
+  nature: (() => {
+    const v = record.get('Nature') as string | { name?: string } | undefined;
+    return (typeof v === 'string' ? v : v?.name) || '';
+  })(),
 });
 
 // Only finished activities reach parents. Rows still being written

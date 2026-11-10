@@ -175,6 +175,23 @@ function singleLetter(w: string, i: number): string {
   }
 }
 
+/**
+ * Final « er », « ez », « ed » (→ é) and « et » (→ è), read as one sound:
+ * dan|s|er, n|ez, p|i|ed, v|i|o|l|et. Short words keep their « è » + sounded
+ * consonant (mer, fer, fier) — hence the position guards.
+ */
+const ENDINGS: Record<string, { key: string; minAt: number }> = {
+  er: { key: 'é', minAt: 3 },
+  ez: { key: 'é', minAt: 1 },
+  ed: { key: 'é', minAt: 1 },
+  et: { key: 'è', minAt: 2 },
+};
+function finalEnding(w: string, i: number): string | null {
+  const two = w.slice(i, i + 2);
+  const e = ENDINGS[two];
+  return e && i >= e.minAt && !isLetter(w[i + 2]) ? e.key : null;
+}
+
 /** Splits one word (no spaces) into sounds using the rules. */
 function splitWord(original: string): Sound[] {
   const w = original.toLocaleLowerCase('fr');
@@ -189,24 +206,13 @@ function splitWord(original: string): Sound[] {
     }
     const prev = w[i - 1];
 
-    // Word endings that read "é"/"è" and hide their last letter: nez, pied, violet, rocher.
+    // Word endings that read "é"/"è" as ONE sound: nez, pied, danser, violet.
+    // The ending stays on one card (« er » fait é) — never « e » + a mute « r »:
+    // a child reads « er » as a whole, like « ou » or « an ».
     const rest = w.slice(i);
-    const atEnd = (len: number) => !isLetter(w[i + len]);
-    if ((rest.startsWith('ez') || rest.startsWith('ed')) && atEnd(2) && i > 0) {
-      out.push({ text: original.slice(i, i + 1), kind: 'vowel', key: 'é' });
-      out.push({ text: original.slice(i + 1, i + 2), kind: 'silent', key: '' });
-      i += 2;
-      continue;
-    }
-    if (rest.startsWith('et') && atEnd(2) && i > 1) {
-      out.push({ text: original.slice(i, i + 1), kind: 'vowel', key: 'è' });
-      out.push({ text: original.slice(i + 1, i + 2), kind: 'silent', key: '' });
-      i += 2;
-      continue;
-    }
-    if (rest.startsWith('er') && atEnd(2) && i > 2) {
-      out.push({ text: original.slice(i, i + 1), kind: 'vowel', key: 'é' });
-      out.push({ text: original.slice(i + 1, i + 2), kind: 'silent', key: '' });
+    const ending = finalEnding(w, i);
+    if (ending) {
+      out.push({ text: original.slice(i, i + 2), kind: 'vowel', key: ending });
       i += 2;
       continue;
     }
@@ -268,8 +274,9 @@ function parseManual(word: string, manual: string): Sound[] | null {
     const text = silent ? p.slice(0, -1) : p;
     if (silent) return { text, kind: 'silent', key: '' };
     // Classify the grapheme with the same rules, in isolation.
+    const lowered = text.toLocaleLowerCase('fr');
     const auto = splitWord(text);
-    const key = auto.length === 1 ? auto[0].key : text.toLocaleLowerCase('fr');
+    const key = ENDINGS[lowered] ? ENDINGS[lowered].key : auto.length === 1 ? auto[0].key : lowered;
     const known = SOUNDS[key];
     return { text, kind: known ? (known.vowel ? 'vowel' : 'consonant') : 'consonant', key: known ? key : '' };
   });

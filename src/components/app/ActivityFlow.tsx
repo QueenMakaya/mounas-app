@@ -33,6 +33,7 @@ import SoundFishing from '@/components/app/games/SoundFishing';
 import MissingWord from '@/components/app/games/MissingWord';
 import FindWord from '@/components/app/games/FindWord';
 import PhrasePoem from '@/components/app/PhrasePoem';
+import VerbReminder from '@/components/app/VerbReminder';
 import FeedMounas from '@/components/app/games/FeedMounas';
 
 /*
@@ -1466,6 +1467,7 @@ function ReadItAlone({
           </>
         )}
       </ParentTip>
+      {revealed && attempt !== null && <VerbReminder word={a.frenchWord} nature={a.nature} canSpeak={canSpeak} speak={speak} />}
       {a.culturalNote && (
         <aside className="mt-4 rounded-2xl border-2 border-dashed border-mamber/70 bg-[#FFF8EC] p-4">
           <p className="mb-1 text-xs font-extrabold uppercase tracking-widest text-morange-ink">🌍 Le savais-tu ?</p>

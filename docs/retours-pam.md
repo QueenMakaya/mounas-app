@@ -94,3 +94,11 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 - [x] **Le dessin à tous les niveaux** : ARBRE (niveau 1) n'avait pas d'étape dessin, car « Écrire » ne commençait
   qu'au niveau 2. Au niveau 1, il y a maintenant l'étape « 🎨 Dessiner » : la même ardoise, ouverte sur la feuille
   blanche (les minuscules / CAPITALES en pointillés restent à un tap). « Épeler » reste à partir du niveau 2.
+
+## 10 novembre 2026
+
+- [x] **« er » fait « é », on ne le sépare plus** (vu sur DANSER) : les fins de mots *er*, *ez*, *ed* (→ é) et *et* (→ è)
+  restent sur une seule carte dans « On lit les sons », les jeux et la dictée. MER et FIER gardent leur « r ».
+- [x] **Rappel verbe / nom** : quand le mot est un verbe, petit encadré après la lecture du mot mystère :
+  ce qu'est un verbe, le nom de la même famille (danser → la danse) et « je danse ». Colonne Airtable « Nature » (facultative).
+- [ ] **Refaire tous les sons** : liste complète des 37 sons dans `docs/sons-a-refaire.md`.

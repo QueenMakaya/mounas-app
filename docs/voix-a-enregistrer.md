@@ -1,5 +1,7 @@
 # Voix de Pam : ce qu'il reste à enregistrer
 
+> **10 nov. 2026 :** on refait tous les sons. La liste complète est dans `docs/sons-a-refaire.md`.
+
 **État au 27 oct. 2026** : tout est enregistré, découpé dans `public/voix/` et branché dans
 `src/lib/voice-clips.ts` et `src/lib/voice-clips-words.ts` : consignes, petites phrases, bravos,
 calcul (0 à 100), les 37 sons, les 182 mots d'Airtable et 167 syllabes sur 219.
