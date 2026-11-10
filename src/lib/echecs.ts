@@ -114,7 +114,7 @@ export const PIECES: Record<Kind, PieceInfo> = {
     name: 'le Mouna',
     classic: 'le pion',
     moves: 'Le Mouna avance d’un pas tout droit (deux pas la première fois). Pour attraper, il fait un pas en diagonale. S’il arrive tout au bout, il devient une Reine !',
-    story: '« Mouna » veut dire « enfant » en lingala. Les petits avancent pas à pas… et celui qui traverse toute la savane devient une Reine !',
+    story: '« Mouna » veut dire « enfant ». Les petits avancent pas à pas… et celui qui traverse toute la savane devient une Reine !',
     value: 1,
     tint: '#FFF1E0',
   },
