@@ -97,7 +97,7 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 
 ## 9 novembre 2026
 
-- [x] **Les échecs de Mounaville** (/app/echecs) : les échecs plutôt que les dames, mais rendus faciles et inspirés de l'Afrique.
+- [x] **Les échecs de Mounaville** (/app/echecs, en bêta ; promo la semaine du 16 novembre) : les échecs plutôt que les dames, mais rendus faciles et inspirés de l'Afrique.
   Le camp du Soleil (commence) contre le camp de la Lune. Le Roi (Mansa), la Reine (Nzinga), la Gazelle (cavalier),
   l'Éléphant (fou, comme dans le tout premier jeu d'échecs), le Rhinocéros (tour, il fonce tout droit) et les Mounas (pions :
   « mouna » = enfant ; celui qui traverse la savane devient Reine). Cinq chapitres : 1. La famille royale (chaque pièce, son

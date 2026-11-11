@@ -181,7 +181,10 @@ function Hub({ saved, open }: { saved: Saved; open: (s: Screen) => void }) {
         <div className="h-2 bg-gradient-to-r from-mamber via-mred to-mpurple" />
         <div className="p-6 text-center">
           <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-mpurple">☀️ Le Soleil contre la Lune 🌙</p>
-          <h2 className="mt-2 font-display text-2xl font-bold text-ink sm:text-3xl">Les échecs de Mounaville</h2>
+          <h2 className="mt-2 font-display text-2xl font-bold text-ink sm:text-3xl">
+            Les échecs de Mounaville
+            <span className="ml-2 inline-block rounded-full bg-mamber px-2 py-0.5 align-middle font-body text-[11px] font-extrabold uppercase tracking-wider text-ink">Bêta</span>
+          </h2>
           <div className="mx-auto mt-4 flex max-w-sm justify-center gap-1">
             {ORDER.map((k) => (
               <PieceIcon key={k} kind={k} camp={k === 'k' || k === 'q' ? 'l' : 's'} className="h-12 w-12" />
