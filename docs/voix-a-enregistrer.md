@@ -3,57 +3,16 @@
 **État au 11 nov. 2026** : tout est enregistré, découpé dans `public/voix/` et branché dans
 `src/lib/voice-clips.ts` et `src/lib/voice-clips-words.ts` : consignes, petites phrases, bravos,
 calcul (0 à 100), les 37 sons (réenregistrés le 2 nov.), les 182 mots d'Airtable et les 219 syllabes.
-**Au 11 nov. 2026, il reste (par priorité) :**
+**Au 11 nov. 2026, il reste seulement :**
 
-## F. La lettre Y (vidéo prévue jeudi 16 h + leçon de l'app)
+## F. La lettre Y, fichier B (leçon de l'app)
 
-Script complet : `docs/script-video-lettre-y.md` (branche `claude/loving-mayer-li2v85`).
-Fichier A : les 46 répliques de la vidéo (règles du Y tout seul et du Y qui fait « in » ajoutées le 11 nov.). Fichier B, pour l'app, un mot à la fois :
+Le fichier A (voix de la vidéo) est enregistré et la vidéo est montée. Pour l'app, un mot à la fois :
 
 stylo · cygne · yaourt · yoga · crayon · noyau · voyage · yoyo · goyave · sympa · symbole · olympique · synonyme · il y a · Bravo !
 
-## G. Les échecs de Mounaville (18 phrases)
-
-1. Voici le Roi !
-2. Voici la Reine !
-3. Voici le Rhinocéros !
-4. Voici l'Éléphant !
-5. Voici la Gazelle !
-6. Voici le Mouna !
-7. Parfait ! Trois étoiles !
-8. Bravo, toutes les mangues sont ramassées !
-9. Le Soleil a gagné la course !
-10. La Lune a gagné la course !
-11. Échec ! Attention au Roi !
-12. Échec… mais le Roi peut encore s'échapper. Essaie autre chose !
-13. Pas encore. Essaie un autre coup !
-14. Échec et mat ! Bravo, tu as attrapé le Roi !
-15. Échec et mat ! Le Soleil a gagné !
-16. Échec et mat ! La Lune a gagné !
-17. Match nul ! Personne ne gagne.
-18. Le Mouna est arrivé au bout : il devient une Reine !
-
-## H. Les 37 nouveaux mots d'Airtable (statut « À produire »)
-
-Dans cet ordre (thème puis alphabet) :
-
-- Animaux : abeille
-- Corps : bras · dent · doigt · jambe · langue · voix
-- Couleurs : argenté · couleur · doré · gris · indigo · marron
-- Cuisine Afro : cacao
-- Émotions : amour · déçu · espoir · gentil · inquiet · rire
-- Famille : enfant · ensemble
-- Maison : maison
-- Musique : chanson · chorale · guitare · rythme · trompette
-- Nature : montagne · neige · vent
-- Nourriture : haricot · maïs · soupe
-- Quotidien : fête · merci · village
-
-Puis leurs 29 syllabes qui n'ont pas encore ta voix (le champ « Syllables » est encore vide dans
-Airtable ; découpage proposé : a-beil-le, en-sem-ble, trom-pet-te…) :
-
-beil · ci · cot · dé · es · fant · fê · gen · gui · ha · in · jam · leur · mai · mon · mour · nei ·
-pet · poir · quiet · ron · ryth · sem · til · trom · té · vil · çu · ïs
+Faits le 11 nov. : les 18 phrases des échecs, les 37 nouveaux mots d'Airtable et 29 syllabes
+(découpage proposé, à garder dans le champ « Syllables » d'Airtable : a-beil-le, en-sem-ble, trom-pet-te…).
 
 Les mots ajoutés plus tard dans Airtable : enregistrer le mot et ses syllabes de la même façon,
 ou laisser le clone de voix s'en charger.
