@@ -24,7 +24,7 @@ import { notifyOwner } from '@/lib/email';
  *    only Airtable knows which word is today's (free) one.
  */
 
-const PAID_PREFIXES = ['/app/select', '/app/dictee', '/app/progres', '/app/compte', '/app/missions', '/app/calcul'];
+const PAID_PREFIXES = ['/app/select', '/app/dictee', '/app/progres', '/app/compte', '/app/missions', '/app/calcul', '/app/echecs'];
 
 function isPaid(pathname: string): boolean {
   return PAID_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
