@@ -6,6 +6,7 @@ import { themeEmoji } from '@/lib/themes';
 import WeekProgress from '@/components/app/WeekProgress';
 import ChildStart from '@/components/app/kid/ChildStart';
 import { CalculIcon } from '@/components/app/AppSections';
+import PieceIcon from '@/components/app/echecs/PieceIcon';
 
 export const dynamic = 'force-dynamic';
 
@@ -115,6 +116,19 @@ export default async function HomePage() {
         <h2 className="mb-3 mt-8 font-display text-xl font-bold text-ink">Encore plus</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
+            href="/app/sons/y"
+            className="group flex items-center gap-4 rounded-3xl bg-white p-4 ring-1 ring-ink/5 transition-colors hover:bg-sand"
+          >
+            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-mpurple text-2xl font-bold text-cream" aria-hidden="true">
+              Y
+            </span>
+            <span className="flex-1">
+              <span className="block font-extrabold text-ink">Leçon spéciale : le Y</span>
+              <span className="block text-sm text-ink-soft">Stylo, yeux, joyeux : 3 façons de le lire</span>
+            </span>
+            <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
+          </Link>
+          <Link
             href="/app/dictee"
             className="group flex items-center gap-4 rounded-3xl bg-white p-4 ring-1 ring-ink/5 transition-colors hover:bg-sand"
           >
@@ -150,6 +164,22 @@ export default async function HomePage() {
             <span className="flex-1">
               <span className="block font-extrabold text-ink">Les missions</span>
               <span className="block text-sm text-ink-soft">Compter, chercher, résoudre des petits problèmes</span>
+            </span>
+            <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
+          </Link>
+          <Link
+            href="/app/echecs"
+            className="group flex items-center gap-4 rounded-3xl bg-white p-4 ring-1 ring-ink/5 transition-colors hover:bg-sand"
+          >
+            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-[#E4F0F8]" aria-hidden="true">
+              <PieceIcon kind="n" camp="s" className="h-10 w-10" />
+            </span>
+            <span className="flex-1">
+              <span className="block font-extrabold text-ink">
+                Les échecs de Mounaville
+                <span className="ml-1.5 inline-block rounded-full bg-mamber px-2 py-0.5 align-middle font-body text-[11px] font-extrabold uppercase tracking-wider text-ink">Bêta</span>
+              </span>
+              <span className="block text-sm text-ink-soft">La Reine, la Gazelle, l’Éléphant… le Soleil contre la Lune</span>
             </span>
             <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
           </Link>

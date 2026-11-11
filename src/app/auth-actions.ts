@@ -3,6 +3,7 @@
 import { randomInt, timingSafeEqual } from 'node:crypto';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { track } from '@vercel/analytics/server';
 import { sendLoginCode } from '@/lib/email';
 import type { LoginState } from '@/lib/login-state';
 import {
@@ -19,7 +20,8 @@ import {
   signDemoSession,
   signSession,
 } from '@/lib/session';
-import { DEMO_CUSTOMER_ID, DEMO_EMAIL, DEMO_MINUTES, demoEnabled, isDemo } from '@/lib/demo';
+import { DEMO_CUSTOMER_ID, DEMO_EMAIL, DEMO_MINUTES, demoEnabled, demoLevelForAge, isDemo } from '@/lib/demo';
+import { getActivitiesByFilters, getTodayActivity } from '@/lib/airtable';
 import { createPortalUrl, findAccess, findAccessByPhone, normalizePhone, readLoginCode, saveLoginCode } from '@/lib/subscription';
 
 // NOTE: this file is 'use server': it may only export async functions.
@@ -211,7 +213,7 @@ export async function openBillingPortal(): Promise<void> {
 }
 
 /** /demo: opens the whole app for DEMO_MINUTES, no account (src/lib/demo.ts). */
-export async function startDemo(): Promise<void> {
+export async function startDemo(formData?: FormData): Promise<void> {
   if (!demoEnabled()) redirect('/demo?indisponible=1');
   const store = await cookies();
   const current = await readSession(store.get(SESSION_COOKIE)?.value);
@@ -221,7 +223,33 @@ export async function startDemo(): Promise<void> {
   const token = await signDemoSession(DEMO_EMAIL, DEMO_CUSTOMER_ID, DEMO_MINUTES);
   if (!token) redirect('/demo?indisponible=1');
   store.set(SESSION_COOKIE, token, { ...sessionCookieOptions, maxAge: DEMO_MINUTES * 60 });
+  try {
+    await track('Démo lancée');
+  } catch (err) {
+    console.warn('[analytics] event not recorded: Démo lancée', err);
+  }
+  // With an age (the buttons on /demo), the child lands straight in a word of
+  // the right level: no home page, no extra click before playing.
+  const level = demoLevelForAge(String(formData?.get('age') ?? ''));
+  if (level) {
+    const wordId = await demoWordFor(level);
+    if (wordId) redirect(`/app/activity?id=${encodeURIComponent(wordId)}`);
+  }
   redirect('/app');
+}
+
+/** Today's word if it has this level, else a word of this level that changes each day. */
+async function demoWordFor(level: string): Promise<string | null> {
+  try {
+    const today = await getTodayActivity();
+    if (today?.difficulty === level) return today.id;
+    const words = (await getActivitiesByFilters(undefined, level)).filter((a) => a.id && a.frenchWord);
+    if (words.length === 0) return today?.id ?? null;
+    const day = Math.floor(Date.now() / 86_400_000);
+    return words.sort((a, b) => a.id.localeCompare(b.id))[day % words.length].id;
+  } catch {
+    return null;
+  }
 }
 
 /** "Quitter la démo": back to the site, ready for the next family. */

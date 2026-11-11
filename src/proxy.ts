@@ -9,6 +9,7 @@ import {
 } from '@/lib/session';
 import { checkoutAccess, findAccess } from '@/lib/subscription';
 import { isDemo } from '@/lib/demo';
+import { notifyOwner } from '@/lib/email';
 
 /**
  * Runs before every /app/* request (Next 16 "proxy", formerly middleware).
@@ -23,7 +24,7 @@ import { isDemo } from '@/lib/demo';
  *    only Airtable knows which word is today's (free) one.
  */
 
-const PAID_PREFIXES = ['/app/select', '/app/dictee', '/app/progres', '/app/compte', '/app/missions', '/app/calcul'];
+const PAID_PREFIXES = ['/app/select', '/app/dictee', '/app/progres', '/app/compte', '/app/missions', '/app/calcul', '/app/echecs'];
 
 function isPaid(pathname: string): boolean {
   return PAID_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
@@ -44,11 +45,20 @@ export async function proxy(req: NextRequest) {
     const clean = new URL('/app/bienvenue', req.url);
     const paid = await checkoutAccess(checkoutId);
     const token = paid ? await signSession(paid.email, paid.customerId) : null;
-    if (!token) {
+    if (!paid || !token) {
       // Couldn't confirm the payment: they can still log in with their email.
       clean.searchParams.set('connexion', '1');
       return NextResponse.redirect(clean);
     }
+    // Stripe sends each parent here once after checkout (the id is then
+    // dropped from the URL), so this is one alert per new subscriber.
+    await notifyOwner(`🎉 Nouvel essai gratuit : ${paid.name ?? paid.email}`, [
+      'Une nouvelle famille vient de commencer son essai gratuit de 14 jours !',
+      `Nom : ${paid.name ?? '(non indiqué)'}`,
+      `Email : ${paid.email}`,
+      `Téléphone : ${paid.phone ?? '(non indiqué)'}`,
+      "Elle est déjà connectée à l'app. À faire : l'ajouter à ta liste de diffusion WhatsApp pour le rituel du jour (elle va peut-être t'écrire d'elle-même via le bouton « Rejoindre le rituel »).",
+    ]);
     const res = NextResponse.redirect(clean);
     res.cookies.set(SESSION_COOKIE, token, sessionCookieOptions);
     return res;

@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { startDemo } from '@/app/auth-actions';
 import { getSession } from '@/lib/auth';
-import { COLORS, STRIPE_PAYMENT_LINK, TRIAL_DAYS, whatsappLink } from '@/lib/config';
-import { DEMO_MINUTES, demoEnabled, isDemo } from '@/lib/demo';
+import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, TRIAL_DAYS, whatsappLink } from '@/lib/config';
+import { DEMO_AGES, DEMO_MINUTES, demoEnabled, isDemo } from '@/lib/demo';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,6 +44,11 @@ const TOUR = [
     emoji: '🧩',
     title: 'Les missions',
     text: 'Des petits problèmes à résoudre ensemble : compter, chercher, trier.',
+  },
+  {
+    emoji: '♟️',
+    title: 'Les échecs de Mounaville',
+    text: 'Le Roi, la Reine, la Gazelle, l’Éléphant, le Rhinocéros et les petits Mounas : les échecs appris en jouant, chapitre par chapitre.',
   },
   {
     emoji: '📊',
@@ -95,7 +100,7 @@ export default async function DemoPage({
             </p>
           )}
 
-          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <div className="mt-9 flex flex-col items-center justify-center gap-4">
             {member ? (
               <Link
                 href="/app"
@@ -113,15 +118,36 @@ export default async function DemoPage({
                 Reprendre la démo →
               </Link>
             ) : enabled ? (
-              <form action={startDemo}>
-                <button
-                  type="submit"
-                  className="rounded-full px-8 py-4 text-lg font-bold shadow-md transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: COLORS.red, color: COLORS.cream }}
-                >
-                  Lancer la démo →
-                </button>
-              </form>
+              <div className="w-full max-w-md">
+                <p className="text-lg font-bold" style={{ color: COLORS.ink }}>
+                  Quel âge a ton enfant ?
+                </p>
+                <form action={startDemo} className="mt-4 grid grid-cols-3 gap-3">
+                  {DEMO_AGES.map((age) => (
+                    <button
+                      key={age.value}
+                      type="submit"
+                      name="age"
+                      value={age.value}
+                      className="flex flex-col items-center gap-1 rounded-3xl px-2 py-4 text-lg font-extrabold shadow-md transition-transform hover:opacity-90 active:scale-95"
+                      style={{ backgroundColor: COLORS.red, color: COLORS.cream }}
+                    >
+                      <span className="text-3xl" aria-hidden="true">
+                        {age.emoji}
+                      </span>
+                      {age.label}
+                    </button>
+                  ))}
+                </form>
+                <p className="mt-3 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
+                  Un mot à son niveau s&apos;ouvre tout de suite. À vous de jouer !
+                </p>
+                <form action={startDemo} className="mt-2">
+                  <button type="submit" className="text-sm font-bold underline underline-offset-4" style={{ color: COLORS.purple }}>
+                    Ou explorer toute l&apos;app →
+                  </button>
+                </form>
+              </div>
             ) : (
               <a
                 href={whatsappLink('Bonjour Les Mounas ! J’aimerais voir une démo de l’app. 🌍')}
@@ -145,7 +171,7 @@ export default async function DemoPage({
           </div>
           <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
             Pendant la démo, rien n&apos;est enregistré sur un compte. {TRIAL_DAYS} jours gratuits ensuite, puis 10 $/mois, sans
-            engagement.
+            engagement. 🛡️ {GUARANTEE}.
           </p>
         </div>
 

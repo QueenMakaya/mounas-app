@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import MounasLogo from '@/components/brand/MounasLogo';
-import { COLORS, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
+import { COLORS, whatsappLink } from '@/lib/config';
 
 const NAV = [
   { label: 'Accueil', href: '/' },
@@ -92,13 +92,13 @@ export default function SiteHeader({ member = false, account }: { member?: boole
             💬 WhatsApp
           </a>
           {!member && (
-            <a
-              href={STRIPE_PAYMENT_LINK}
+            <Link
+              href="/demo"
               className="rounded-full px-4 py-2 text-sm font-bold shadow-sm transition-opacity hover:opacity-90"
               style={{ backgroundColor: COLORS.red, color: COLORS.cream }}
             >
-              Essai gratuit 14 jours
-            </a>
+              Essayer gratuitement
+            </Link>
           )}
         </nav>
       </div>

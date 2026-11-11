@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import DiamondIcon from '@/components/brand/DiamondIcon';
-import { COLORS, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
+import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
 import { safeNext } from '@/lib/session';
 
 export const metadata: Metadata = {
@@ -69,6 +69,9 @@ export default async function AbonnementPage({
         </p>
         <p className="mt-1 text-base" style={{ color: 'rgba(26,26,26,0.75)' }}>
           14 jours gratuits pour essayer. Sans engagement, résilie quand tu veux.
+        </p>
+        <p className="mt-2 text-base font-bold" style={{ color: COLORS.tealDark }}>
+          🛡️ {GUARANTEE} : si l&apos;app ne te convient pas, écris-nous et on te rembourse.
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-4">
