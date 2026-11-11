@@ -8,9 +8,9 @@ calcul (0 à 100), les 37 sons (réenregistrés le 2 nov.), les 182 mots d'Airta
 ## F. La lettre Y (vidéo prévue jeudi 16 h + leçon de l'app)
 
 Script complet : `docs/script-video-lettre-y.md` (branche `claude/loving-mayer-li2v85`).
-Fichier A : les 40 répliques de la vidéo. Fichier B, pour l'app, un mot à la fois :
+Fichier A : les 46 répliques de la vidéo (règles du Y tout seul et du Y qui fait « in » ajoutées le 11 nov.). Fichier B, pour l'app, un mot à la fois :
 
-stylo · cygne · yaourt · yoga · crayon · noyau · voyage · yoyo · goyave · Bravo !
+stylo · cygne · yaourt · yoga · crayon · noyau · voyage · yoyo · goyave · sympa · symbole · olympique · synonyme · il y a · Bravo !
 
 ## G. Les échecs de Mounaville (18 phrases)
 
