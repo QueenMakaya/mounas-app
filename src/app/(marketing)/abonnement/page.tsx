@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import PriceTag from '@/components/site/PriceTag';
 import DiamondIcon from '@/components/brand/DiamondIcon';
 import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
 import { safeNext } from '@/lib/session';
 
 export const metadata: Metadata = {
   title: 'Abonnement | Les Mounas',
-  description: "Toute l'app Les Mounas et le rituel WhatsApp quotidien. 10 $ par mois, 14 jours gratuits.",
+  description: "Toute l'app Les Mounas et le rituel WhatsApp quotidien. 10 $ CA par mois, 14 jours gratuits.",
 };
 
 const INCLUDED = [
@@ -65,7 +66,7 @@ export default async function AbonnementPage({
         </ul>
 
         <p className="mt-10 text-3xl font-bold" style={{ fontFamily: 'var(--font-fraunces)', color: COLORS.purple }}>
-          10 $/mois
+          <PriceTag />
         </p>
         <p className="mt-1 text-base" style={{ color: 'rgba(26,26,26,0.75)' }}>
           14 jours gratuits pour essayer. Sans engagement, résilie quand tu veux.

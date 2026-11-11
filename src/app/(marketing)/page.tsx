@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import PriceTag from '@/components/site/PriceTag';
 import DiamondIcon from '@/components/brand/DiamondIcon';
 import EbookSignup from '@/components/marketing/EbookSignup';
 import NewsletterSignup from '@/components/marketing/NewsletterSignup';
@@ -69,7 +70,7 @@ export default function LandingPage() {
           <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
             La démo s&apos;ouvre tout de suite : pas de compte, pas de carte.
             <br />
-            Puis 14 jours gratuits, et 10 $/mois sans engagement.
+            Puis 14 jours gratuits, et <PriceTag /> sans engagement.
             <br />
             🛡️ {GUARANTEE}.
           </p>

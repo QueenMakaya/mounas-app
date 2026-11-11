@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import PriceTag from '@/components/site/PriceTag';
 import { startDemo } from '@/app/auth-actions';
 import { getSession } from '@/lib/auth';
 import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, TRIAL_DAYS, whatsappLink } from '@/lib/config';
@@ -170,7 +171,7 @@ export default async function DemoPage({
             )}
           </div>
           <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
-            Pendant la démo, rien n&apos;est enregistré sur un compte. {TRIAL_DAYS} jours gratuits ensuite, puis 10 $/mois, sans
+            Pendant la démo, rien n&apos;est enregistré sur un compte. {TRIAL_DAYS} jours gratuits ensuite, puis <PriceTag />, sans
             engagement. 🛡️ {GUARANTEE}.
           </p>
         </div>

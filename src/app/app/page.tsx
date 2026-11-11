@@ -7,6 +7,7 @@ import WeekProgress from '@/components/app/WeekProgress';
 import ChildStart from '@/components/app/kid/ChildStart';
 import { CalculIcon } from '@/components/app/AppSections';
 import PieceIcon from '@/components/app/echecs/PieceIcon';
+import ShareMotDuJour from '@/components/app/ShareMotDuJour';
 
 export const dynamic = 'force-dynamic';
 
@@ -36,40 +37,43 @@ export default async function HomePage() {
         )}
 
         {todayActivity ? (
-          <section
-            aria-labelledby="today-word"
-            className="overflow-hidden rounded-[28px] bg-white shadow-[0_14px_44px_-14px_rgba(91,31,140,0.35)] ring-1 ring-ink/5"
-          >
-            <div className="h-2 bg-gradient-to-r from-mred via-mamber to-mteal" />
-            <Link href={`/app/activity?id=${todayActivity.id}`} className="block p-6 text-center sm:p-8">
-              <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-mpurple">✨ Le mot mystère du jour</p>
-              <h2 id="today-word" className="sr-only">
-                Un mot mystère de {letterCount(todayActivity.frenchWord)} lettres à découvrir
-              </h2>
-              <MysteryTiles
-                className="mx-auto mt-5 max-w-md"
-                invite
-                letters={Array.from(todayActivity.frenchWord).map((c) => ({ char: /[\s'’-]/.test(c) ? c : '?', color: '#1A1A1A' }))}
-              />
-              <p className="mt-5 font-display text-lg font-bold text-ink">
-                {letterCount(todayActivity.frenchWord)} lettres… qui veut essayer de le lire ?
-              </p>
-              <ul className="mt-4 flex flex-wrap justify-center gap-2 text-sm font-bold">
-                {todayActivity.theme && (
-                  <li className="rounded-full bg-mteal-light px-3 py-1.5 text-[#115E59]">
-                    {themeEmoji(todayActivity.theme)} {todayActivity.theme}
-                  </li>
-                )}
-                {todayActivity.difficulty && (
-                  <li className="rounded-full bg-sand px-3 py-1.5 text-ink">{levelLabel(todayActivity.difficulty)}</li>
-                )}
-                <li className="rounded-full bg-sand px-3 py-1.5 text-ink">⏱ 10 min</li>
-              </ul>
-              <span className="mt-7 flex min-h-14 items-center justify-center rounded-full bg-mred px-6 text-lg font-extrabold text-cream shadow-lg transition-transform hover:bg-mred-dark active:scale-[0.98]">
-                Découvrir le mot <span aria-hidden="true" className="ml-2">→</span>
-              </span>
-            </Link>
-          </section>
+          <>
+            <section
+              aria-labelledby="today-word"
+              className="overflow-hidden rounded-[28px] bg-white shadow-[0_14px_44px_-14px_rgba(91,31,140,0.35)] ring-1 ring-ink/5"
+            >
+              <div className="h-2 bg-gradient-to-r from-mred via-mamber to-mteal" />
+              <Link href={`/app/activity?id=${todayActivity.id}`} className="block p-6 text-center sm:p-8">
+                <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-mpurple">✨ Le mot mystère du jour</p>
+                <h2 id="today-word" className="sr-only">
+                  Un mot mystère de {letterCount(todayActivity.frenchWord)} lettres à découvrir
+                </h2>
+                <MysteryTiles
+                  className="mx-auto mt-5 max-w-md"
+                  invite
+                  letters={Array.from(todayActivity.frenchWord).map((c) => ({ char: /[\s'’-]/.test(c) ? c : '?', color: '#1A1A1A' }))}
+                />
+                <p className="mt-5 font-display text-lg font-bold text-ink">
+                  {letterCount(todayActivity.frenchWord)} lettres… qui veut essayer de le lire ?
+                </p>
+                <ul className="mt-4 flex flex-wrap justify-center gap-2 text-sm font-bold">
+                  {todayActivity.theme && (
+                    <li className="rounded-full bg-mteal-light px-3 py-1.5 text-[#115E59]">
+                      {themeEmoji(todayActivity.theme)} {todayActivity.theme}
+                    </li>
+                  )}
+                  {todayActivity.difficulty && (
+                    <li className="rounded-full bg-sand px-3 py-1.5 text-ink">{levelLabel(todayActivity.difficulty)}</li>
+                  )}
+                  <li className="rounded-full bg-sand px-3 py-1.5 text-ink">⏱ 10 min</li>
+                </ul>
+                <span className="mt-7 flex min-h-14 items-center justify-center rounded-full bg-mred px-6 text-lg font-extrabold text-cream shadow-lg transition-transform hover:bg-mred-dark active:scale-[0.98]">
+                  Découvrir le mot <span aria-hidden="true" className="ml-2">→</span>
+                </span>
+              </Link>
+            </section>
+            <ShareMotDuJour />
+          </>
         ) : (
           <section className="rounded-[28px] bg-white p-8 text-center ring-1 ring-ink/5">
             <p className="text-5xl" aria-hidden="true">🌙</p>

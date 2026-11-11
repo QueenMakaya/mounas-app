@@ -58,7 +58,25 @@ export const TRIAL_DAYS = 14;
 /** Money-back guarantee shown next to every trial button (Pam, Nov 2026). */
 export const GUARANTEE_DAYS = 30;
 export const GUARANTEE = `Satisfait ou remboursé ${GUARANTEE_DAYS} jours`;
-export const MONTHLY_PRICE = '10 $';
+/** What Stripe actually charges: the Payment Link is in Canadian dollars. */
+export const MONTHLY_PRICE_CAD = 10;
+export const MONTHLY_PRICE = `${MONTHLY_PRICE_CAD} $ CA`;
+/**
+ * Rough conversions shown next to the price for parents in Europe and in the
+ * CFA franc zone, so "10 $" doesn't read as US dollars. Display only: Stripe
+ * still charges CAD. Update the rate if the CAD moves a lot. The CFA franc is
+ * pegged to the euro (1 € = 655,957 FCFA).
+ */
+export const CAD_TO_EUR = 0.65;
+export const EUR_TO_XOF = 655.957;
+
+/** Public site, used for links that leave the app (WhatsApp shares, emails). */
+export const SITE_URL = 'https://www.lesmounas.school';
+/**
+ * Short link printed on the Mot du Jour card and in WhatsApp shares. It
+ * redirects to the free word of the day with UTM tags (see src/app/jour).
+ */
+export const MOT_DU_JOUR_SHORT_URL = `${SITE_URL}/jour`;
 
 /** Build a wa.me link, optionally pre-filling the first message. */
 export function whatsappLink(message?: string): string {

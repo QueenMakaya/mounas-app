@@ -27,7 +27,8 @@ import { gamesOfTheDay, type GameKey } from '@/lib/games';
 import { useReviewChoice } from '@/lib/review';
 import { ReviewOption } from '@/components/app/ReviewWords';
 import { CalculIcon } from '@/components/app/AppSections';
-import { GUARANTEE, MONTHLY_PRICE, STRIPE_PAYMENT_LINK, TRIAL_DAYS } from '@/lib/config';
+import { GUARANTEE, STRIPE_PAYMENT_LINK, TRIAL_DAYS } from '@/lib/config';
+import PriceTag from '@/components/site/PriceTag';
 import FindImage from '@/components/app/games/FindImage';
 import SoundFishing from '@/components/app/games/SoundFishing';
 import MissingWord from '@/components/app/games/MissingWord';
@@ -1753,7 +1754,7 @@ function TrialOffer({ kind }: { kind: TrialOfferKind }) {
       </a>
       <p className="mt-3 text-center text-xs font-semibold text-cream/90">
         {TRIAL_DAYS} jours gratuits · 0 $ aujourd’hui · annule avant la fin de l’essai et rien n’est prélevé. Ensuite{' '}
-        {MONTHLY_PRICE}/mois, sans engagement.
+        <PriceTag />, sans engagement.
       </p>
       <p className="mt-2 text-center text-sm font-extrabold">🛡️ {GUARANTEE}</p>
       {kind === 'visitor' && (

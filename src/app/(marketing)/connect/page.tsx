@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import PriceTag from '@/components/site/PriceTag';
 import DiamondIcon from '@/components/brand/DiamondIcon';
 import EbookSignup from '@/components/marketing/EbookSignup';
 import NewsletterSignup from '@/components/marketing/NewsletterSignup';
@@ -64,7 +65,7 @@ const STEPS = [
 const FAQ = [
   {
     q: 'Est-ce que je paie pendant l’essai ?',
-    a: `Non. Les ${TRIAL_DAYS} premiers jours sont offerts. L’abonnement (${MONTHLY_PRICE} CAD par mois) commence seulement après.`,
+    a: `Non. Les ${TRIAL_DAYS} premiers jours sont offerts. L’abonnement (${MONTHLY_PRICE} par mois) commence seulement après.`,
   },
   { q: 'Pour quel âge ?', a: 'Pour les enfants de 0 à 6 ans. Les activités s’adaptent : les plus petits écoutent et chantent, les plus grands lisent.' },
   {
@@ -96,7 +97,7 @@ function TrialButton({ label = `🌱 Commencer mes ${TRIAL_DAYS} jours gratuits`
         {label}
       </a>
       <p className="mt-3 text-sm" style={{ color: COLORS.purple }}>
-        Puis {MONTHLY_PRICE} CAD par mois. Sans engagement, tu arrêtes quand tu veux.
+        Puis <PriceTag suffix=" par mois" />. Sans engagement, tu arrêtes quand tu veux.
       </p>
     </div>
   );
