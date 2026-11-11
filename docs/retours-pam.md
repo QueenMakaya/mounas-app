@@ -101,7 +101,8 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   restent sur une seule carte dans « On lit les sons », les jeux et la dictée. MER et FIER gardent leur « r ».
 - [x] **Rappel verbe / nom** : quand le mot est un verbe, petit encadré après la lecture du mot mystère :
   ce qu'est un verbe, le nom de la même famille (danser → la danse) et « je danse ». Colonne Airtable « Nature » (facultative).
-- [ ] **Refaire tous les sons** : liste complète des 37 sons dans `docs/sons-a-refaire.md`.
+- [x] **Écouter tous les sons** : fait le 11 nov. sur la page de comparaison. 19 consonnes à refaire, les voyelles sont justes (`docs/sons-a-refaire.md`).
+- [ ] **Réenregistrer les 19 consonnes**.
 
 ## 11 novembre 2026
 

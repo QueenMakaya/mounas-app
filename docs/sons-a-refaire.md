@@ -1,5 +1,39 @@
 # Les sons de l'app : liste complète à réenregistrer
 
+## Résultat de l'écoute de Pam (11 nov. 2026)
+
+Écoute faite sur la page de comparaison (voix générique / ma voix), 36 sons sur 37 notés.
+
+**À refaire : 19 sons, toutes des consonnes sauf « ch »**
+
+| Son | Exemple | Note de Pam |
+|---|---|---|
+| m | maman | |
+| n | nez | |
+| l | lune | |
+| r | robe | |
+| s | sable | |
+| z | zèbre | |
+| f | fleur | |
+| v | vert | |
+| j | jaune | |
+| gn | araignée | |
+| y | yeux | |
+| w | wifi | |
+| p | papa | |
+| b | banane | |
+| t | tête | |
+| d | dodo | « On garde ma voix » |
+| k | coco | « On garde ma voix » |
+| g | gorille | « On garde ma voix » |
+| ks (x) | taxi | |
+
+**Justes : 17 sons.** Toutes les voyelles (a, e, é, è, i, o, u, oi, eu, an, on, in, ille, eille, aille, ouille) et « ch ».
+
+**Pas encore noté :** « ou » (nounours).
+
+---
+
 **10 novembre 2026.** On refait tous les sons. Voici les **37 sons** que l'app utilise
 (étape « On lit les sons ensemble », la pêche aux sons, « Nourris le Mounas », la dictée…).
 Chaque son a **un seul fichier**, quelle que soit la façon de l'écrire : le son « é » sert
