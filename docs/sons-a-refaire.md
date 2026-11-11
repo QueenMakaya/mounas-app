@@ -23,14 +23,16 @@
 | p | papa | |
 | b | banane | |
 | t | tête | |
-| d | dodo | « On garde ma voix » |
-| k | coco | « On garde ma voix » |
-| g | gorille | « On garde ma voix » |
+| d | dodo | « On garde ma voix » (Pam le refait au micro) |
+| k | coco | « On garde ma voix » (Pam le refait au micro) |
+| g | gorille | « On garde ma voix » (Pam le refait au micro) |
 | ks (x) | taxi | |
 
 **Justes : 17 sons.** Toutes les voyelles (a, e, é, è, i, o, u, oi, eu, an, on, in, ille, eille, aille, ouille) et « ch ».
 
 **Pas encore noté :** « ou » (nounours).
+
+**Décisions de Pam :** les 19 consonnes sont réenregistrées par Pam au micro (fiche : `docs/consonnes-a-enregistrer.md`). « ou » et « i » passent à la voix de synthèse générique (`public/voix/sons/ou.mp3` et `i.mp3`, remplacés le 11 nov.).
 
 ---
 
