@@ -1,6 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useState } from 'react';
+import { whyNot } from '@/lib/lessons';
 import { playChime } from '@/lib/chime';
 import { fishingPond } from '@/lib/games';
 import { SOUNDS } from '@/lib/phonics';
@@ -17,6 +19,9 @@ import type { GameProps } from '@/components/app/games/types';
 export default function SoundFishing({ activity: a, library, canSpeak, speak, onSuccess }: GameProps) {
   const pond = fishingPond(a, library);
   const [caught, setCaught] = useState<string[]>([]);
+  // Words picked by mistake: they get a ⓘ, and the last one opens its explanation.
+  const [missed, setMissed] = useState<string[]>([]);
+  const [why, setWhy] = useState<string | null>(null);
   const tries = useTries();
   if (!pond) return null;
   const { sound, fish } = pond;
@@ -38,6 +43,8 @@ export default function SoundFishing({ activity: a, library, canSpeak, speak, on
       }
     } else {
       tries.miss('pond', id);
+      setMissed((m) => (m.includes(id) ? m : [...m, id]));
+      setWhy(id);
       if (canSpeak) speak(TRY_AGAIN, 0.85);
     }
   };
@@ -82,11 +89,33 @@ export default function SoundFishing({ activity: a, library, canSpeak, speak, on
                 <span aria-hidden="true" className="text-xl">{isCaught ? '✓' : '🐟'}</span>
                 {isCaught && f.text ? <Highlight word={word} text={f.text} at={f.at} /> : word}
                 {handOn === f.card.id && <HintHand />}
+                {missed.includes(f.card.id) && !isCaught && (
+                  <span
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Pourquoi pas ${word} ?`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setWhy(why === f.card.id ? null : f.card.id);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setWhy(why === f.card.id ? null : f.card.id);
+                      }
+                    }}
+                    className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full bg-mpurple font-body text-sm font-extrabold italic text-cream shadow-md"
+                  >
+                    i
+                  </span>
+                )}
               </button>
             );
           })}
         </div>
       </div>
+      {why && <WhyNotPanel fish={fish.find((f) => f.card.id === why)?.card} sound={sound} onClose={() => setWhy(null)} />}
       <p className="mt-4 font-display text-xl font-bold text-ink" aria-live="polite">
         {done ? 'Belle pêche, tu as bien cherché ! 🎉' : `🎣 ${caught.length} / ${toCatch.length}`}
       </p>
@@ -105,5 +134,46 @@ function Highlight({ word, text, at: found }: { word: string; text: string; at: 
       <span className="text-mred underline decoration-2 underline-offset-4">{word.slice(at, at + text.length)}</span>
       {word.slice(at + text.length)}
     </span>
+  );
+}
+
+/** The ⓘ of a word picked by mistake: why it doesn't have the sound, and the lesson that explains it. */
+function WhyNotPanel({
+  fish,
+  sound,
+  onClose,
+}: {
+  fish: { word: string; syllables: string; graphemes: string } | undefined;
+  sound: { key: string; text: string };
+  onClose: () => void;
+}) {
+  if (!fish) return null;
+  const why = whyNot(fish.word, fish.syllables, fish.graphemes, sound);
+  return (
+    <div className="animate-rise mt-4 rounded-3xl bg-white p-4 text-left shadow-sm ring-2 ring-mpurple/20" role="status">
+      <div className="flex items-start gap-3">
+        <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-mpurple font-extrabold italic text-cream" aria-hidden="true">
+          i
+        </span>
+        <div className="flex-1">
+          <p className="font-extrabold text-ink">Pourquoi pas « {fish.word.toLocaleLowerCase('fr')} » ?</p>
+          <p className="mt-1 leading-snug text-ink">{why.lead}</p>
+          <p className="mt-2 text-sm text-ink-soft">
+            On lit : <strong className="font-display text-lg text-ink">{why.readAs}</strong>
+          </p>
+          {why.rule && <p className="mt-2 rounded-2xl bg-[#F1E9F8] px-3 py-2 text-sm font-bold text-mpurple">{why.rule}</p>}
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            {why.lesson && (
+              <Link href={why.lesson.href} className="rounded-full bg-mpurple px-4 py-2 text-sm font-extrabold text-cream active:scale-95">
+                📘 La leçon : {why.lesson.title} →
+              </Link>
+            )}
+            <button type="button" onClick={onClose} className="text-sm font-bold text-ink-soft underline underline-offset-4">
+              Fermer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

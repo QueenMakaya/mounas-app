@@ -148,8 +148,8 @@ export default function YLesson() {
   return (
     <main className="flex-1 bg-cream font-body">
       <div className="mx-auto max-w-2xl px-4 pb-20 pt-6 sm:px-6 sm:pt-10">
-        <Link href="/app" className="text-sm font-bold text-ink-soft">
-          ← Accueil
+        <Link href="/app/sons" className="text-sm font-bold text-ink-soft">
+          ← Les leçons
         </Link>
 
         <header className="mt-4 text-center">

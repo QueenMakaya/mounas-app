@@ -34,6 +34,7 @@ import MissingWord from '@/components/app/games/MissingWord';
 import FindWord from '@/components/app/games/FindWord';
 import PhrasePoem from '@/components/app/PhrasePoem';
 import VerbReminder from '@/components/app/VerbReminder';
+import { LESSONS, type Lesson } from '@/lib/lessons';
 import FeedMounas from '@/components/app/games/FeedMounas';
 
 /*
@@ -643,18 +644,40 @@ function ReadAlong({ step, activity: a, canSpeak, speak, speakSeries, library, o
         (ou fais rouler la boule rouge sous le mot), puis colle-les ensemble pour dire le mot.
         {canSpeak && ' Touche un son pour l’entendre.'}
       </ParentTip>
-      {/y/i.test(a.frenchWord) && (
+      <LessonLinks word={a.frenchWord} sounds={sounds} />
+    </>
+  );
+}
+
+/**
+ * Links to the lessons that explain what this word shows: the Y, and
+ * vowels/consonants (always useful, and first when the word has « an, on, in »).
+ */
+function LessonLinks({ word, sounds }: { word: string; sounds: Sound[] }) {
+  const nasal = sounds.some((s) => ['an', 'on', 'in'].includes(s.key));
+  const links = [
+    /y/i.test(word) && { lesson: LESSONS.y, label: 'Le Y est un son piège ! Voir la leçon spéciale du Y' },
+    {
+      lesson: LESSONS['voyelles-consonnes'],
+      label: nasal ? 'Pourquoi « an » ici, mais pas dans « manioc » ? La leçon voyelles et consonnes' : 'Voyelle ou consonne ? Voir la leçon',
+    },
+  ].filter((x): x is { lesson: Lesson; label: string } => Boolean(x));
+  return (
+    <div className="mt-4 flex flex-col gap-2">
+      {links.map(({ lesson, label }) => (
         <Link
-          href="/app/sons/y"
-          className="mt-4 flex items-center justify-between gap-3 rounded-3xl bg-[#F1E9F8] px-5 py-4 font-bold text-mpurple ring-1 ring-mpurple/10"
+          key={lesson.slug}
+          href={lesson.href}
+          className="flex items-center justify-between gap-3 rounded-3xl bg-[#F1E9F8] px-5 py-4 font-bold text-mpurple ring-1 ring-mpurple/10"
         >
           <span>
-            <span aria-hidden="true">🔤 </span>Le Y est un son piège ! Voir la leçon spéciale du Y
+            <span aria-hidden="true">📘 </span>
+            {label}
           </span>
           <span aria-hidden="true">→</span>
         </Link>
-      )}
-    </>
+      ))}
+    </div>
   );
 }
 

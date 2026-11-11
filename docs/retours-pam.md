@@ -102,3 +102,15 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 - [x] **Rappel verbe / nom** : quand le mot est un verbe, petit encadré après la lecture du mot mystère :
   ce qu'est un verbe, le nom de la même famille (danser → la danse) et « je danse ». Colonne Airtable « Nature » (facultative).
 - [ ] **Refaire tous les sons** : liste complète des 37 sons dans `docs/sons-a-refaire.md`.
+
+## 11 novembre 2026
+
+- [x] **Leçon « Voyelles et consonnes »** (/app/sons/voyelles-consonnes) : les voyelles chantent, les consonnes bloquent l'air
+  (m + a = ma), les voyelles qui font équipe (ou, oi, au, eau, eu, ai), le piège de « an, on, in » (mangue mais ma-ni-oc),
+  puis deux petits jeux : « Voyelle ou consonne ? » et « On entend an ? ».
+- [x] **Page « Les leçons »** (/app/sons) : toutes les leçons au même endroit (voyelles/consonnes, le Y), depuis l'accueil.
+  Sous les sons du mot, des liens vers les leçons utiles (le Y si le mot en a un, voyelles/consonnes toujours).
+- [x] **ⓘ dans la pêche aux sons** : quand l'enfant pêche un mot qui n'a pas le son (MANIOC pour « an »), le poisson
+  garde un petit i et l'explication s'ouvre : « le n est suivi de i, une voyelle : il part avec elle. On lit ma-ni-oc »,
+  avec le bouton vers la leçon.
+- [ ] **Sons justes** : pas de banque de sons français isolés, libre pour une app payante, trouvée. Voir la discussion.

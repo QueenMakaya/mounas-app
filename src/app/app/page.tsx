@@ -115,15 +115,15 @@ export default async function HomePage() {
         <h2 className="mb-3 mt-8 font-display text-xl font-bold text-ink">Encore plus</h2>
         <div className="grid gap-3 sm:grid-cols-2">
           <Link
-            href="/app/sons/y"
+            href="/app/sons"
             className="group flex items-center gap-4 rounded-3xl bg-white p-4 ring-1 ring-ink/5 transition-colors hover:bg-sand"
           >
-            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-mpurple text-2xl font-bold text-cream" aria-hidden="true">
-              Y
+            <span className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-mpurple text-xl font-bold text-cream" aria-hidden="true">
+              a·b
             </span>
             <span className="flex-1">
-              <span className="block font-extrabold text-ink">Leçon spéciale : le Y</span>
-              <span className="block text-sm text-ink-soft">Stylo, yeux, joyeux : 3 façons de le lire</span>
+              <span className="block font-extrabold text-ink">Les leçons sur les sons</span>
+              <span className="block text-sm text-ink-soft">Voyelles et consonnes, le piège de « an », le Y</span>
             </span>
             <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
           </Link>
