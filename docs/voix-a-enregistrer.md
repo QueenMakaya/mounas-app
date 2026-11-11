@@ -1,10 +1,59 @@
 # Voix de Pam : ce qu'il reste à enregistrer
 
-**État au 6 nov. 2026** : tout est enregistré, découpé dans `public/voix/` et branché dans
+**État au 11 nov. 2026** : tout est enregistré, découpé dans `public/voix/` et branché dans
 `src/lib/voice-clips.ts` et `src/lib/voice-clips-words.ts` : consignes, petites phrases, bravos,
 calcul (0 à 100), les 37 sons (réenregistrés le 2 nov.), les 182 mots d'Airtable et les 219 syllabes.
-Plus rien n'est en attente : la partie E (3 consignes et 52 syllabes) a été enregistrée le 6 nov.
-Tout ce qui n'est pas enregistré est lu par la voix du navigateur.
+**Au 11 nov. 2026, il reste (par priorité) :**
+
+## F. La lettre Y (vidéo prévue jeudi 16 h + leçon de l'app)
+
+Script complet : `docs/script-video-lettre-y.md` (branche `claude/loving-mayer-li2v85`).
+Fichier A : les 40 répliques de la vidéo. Fichier B, pour l'app, un mot à la fois :
+
+stylo · cygne · yaourt · yoga · crayon · noyau · voyage · yoyo · goyave · Bravo !
+
+## G. Les échecs de Mounaville (18 phrases)
+
+1. Voici le Roi !
+2. Voici la Reine !
+3. Voici le Rhinocéros !
+4. Voici l'Éléphant !
+5. Voici la Gazelle !
+6. Voici le Mouna !
+7. Parfait ! Trois étoiles !
+8. Bravo, toutes les mangues sont ramassées !
+9. Le Soleil a gagné la course !
+10. La Lune a gagné la course !
+11. Échec ! Attention au Roi !
+12. Échec… mais le Roi peut encore s'échapper. Essaie autre chose !
+13. Pas encore. Essaie un autre coup !
+14. Échec et mat ! Bravo, tu as attrapé le Roi !
+15. Échec et mat ! Le Soleil a gagné !
+16. Échec et mat ! La Lune a gagné !
+17. Match nul ! Personne ne gagne.
+18. Le Mouna est arrivé au bout : il devient une Reine !
+
+## H. Les 37 nouveaux mots d'Airtable (statut « À produire »)
+
+Dans cet ordre (thème puis alphabet) :
+
+- Animaux : abeille
+- Corps : bras · dent · doigt · jambe · langue · voix
+- Couleurs : argenté · couleur · doré · gris · indigo · marron
+- Cuisine Afro : cacao
+- Émotions : amour · déçu · espoir · gentil · inquiet · rire
+- Famille : enfant · ensemble
+- Maison : maison
+- Musique : chanson · chorale · guitare · rythme · trompette
+- Nature : montagne · neige · vent
+- Nourriture : haricot · maïs · soupe
+- Quotidien : fête · merci · village
+
+Puis leurs 29 syllabes qui n'ont pas encore ta voix (le champ « Syllables » est encore vide dans
+Airtable ; découpage proposé : a-beil-le, en-sem-ble, trom-pet-te…) :
+
+beil · ci · cot · dé · es · fant · fê · gen · gui · ha · in · jam · leur · mai · mon · mour · nei ·
+pet · poir · quiet · ron · ryth · sem · til · trom · té · vil · çu · ïs
 
 Les mots ajoutés plus tard dans Airtable : enregistrer le mot et ses syllabes de la même façon,
 ou laisser le clone de voix s'en charger.
