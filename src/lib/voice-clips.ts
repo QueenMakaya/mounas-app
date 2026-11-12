@@ -9,15 +9,19 @@
 import { SYLLABLE_CLIPS, WORD_CLIPS } from './voice-clips-words';
 
 const CLIPS: Record<string, string> = {
-  ...WORD_CLIPS,
+  // A word that is also a syllable (« yeux ») plays the word.
   ...SYLLABLE_CLIPS,
+  ...WORD_CLIPS,
   // Consignes (prompts.ts)
   'Touche les cartes, puis lis le mot tout seul.': 'consignes/decouvrir-lire.mp3',
   'Écoute bien le mot, puis écris-le avec les sons.': 'consignes/decouvrir-ecoute.mp3',
+  'Combien de syllabes ? Écris le nombre, puis tape dans tes mains pour vérifier.': 'consignes/syllabes.mp3',
   'Glisse ton doigt sous le mot.': 'consignes/lire.mp3',
   'Dis le mot trois fois.': 'consignes/prononcer.mp3',
   'On en parle ensemble.': 'consignes/activite.mp3',
+  'Invente ta phrase avec le mot, puis récite la comptine !': 'consignes/chanson.mp3',
   'Touche les sons dans le bon ordre.': 'consignes/epeler.mp3',
+  'Dessine le mot avec ton doigt.': 'consignes/dessiner.mp3',
   'Écris le mot avec ton doigt.': 'consignes/ecrire.mp3',
   'Écoute bien la mission.': 'consignes/mission.mp3',
   'Écoute le mot, puis touche la bonne image.': 'consignes/jeu-image.mp3',
@@ -45,6 +49,25 @@ const CLIPS: Record<string, string> = {
   'Quel beau travail de recherche !': 'bravos/recherche.mp3',
   'Tu as utilisé un indice, c’est une très bonne façon de chercher. Bravo !': 'bravos/indice.mp3',
   'Tu n’as pas abandonné, et tu as trouvé. Bravo pour ta patience !': 'bravos/patience.mp3',
+  // Les échecs de Mounaville (EchecsClient.tsx)
+  'Voici le Roi !': 'echecs/voici-le-roi.mp3',
+  'Voici la Reine !': 'echecs/voici-la-reine.mp3',
+  'Voici le Rhinocéros !': 'echecs/voici-le-rhinoceros.mp3',
+  'Voici l’Éléphant !': 'echecs/voici-l-elephant.mp3',
+  'Voici la Gazelle !': 'echecs/voici-la-gazelle.mp3',
+  'Voici le Mouna !': 'echecs/voici-le-mouna.mp3',
+  'Parfait ! Trois étoiles !': 'echecs/parfait-trois-etoiles.mp3',
+  'Bravo, toutes les mangues sont ramassées !': 'echecs/bravo-toutes-les-mangues-sont-ramassees.mp3',
+  'Le Soleil a gagné la course !': 'echecs/le-soleil-a-gagne-la-course.mp3',
+  'La Lune a gagné la course !': 'echecs/la-lune-a-gagne-la-course.mp3',
+  'Échec ! Attention au Roi !': 'echecs/echec-attention-au-roi.mp3',
+  'Échec… mais le Roi peut encore s’échapper. Essaie autre chose !': 'echecs/echec-mais-le-roi-peut-encore-s-echapper.mp3',
+  'Pas encore. Essaie un autre coup !': 'echecs/pas-encore-essaie-un-autre-coup.mp3',
+  'Échec et mat ! Bravo, tu as attrapé le Roi !': 'echecs/echec-et-mat-bravo-tu-as-attrape-le-roi.mp3',
+  'Échec et mat ! Le Soleil a gagné !': 'echecs/echec-et-mat-le-soleil-a-gagne.mp3',
+  'Échec et mat ! La Lune a gagné !': 'echecs/echec-et-mat-la-lune-a-gagne.mp3',
+  'Match nul ! Personne ne gagne.': 'echecs/match-nul-personne-ne-gagne.mp3',
+  'Le Mouna est arrivé au bout : il devient une Reine !': 'echecs/le-mouna-est-arrive-au-bout-il-devient-u.mp3',
   // Calcul : opérations et nombres de 0 à 100
   plus: 'calcul/plus.mp3',
   moins: 'calcul/moins.mp3',
