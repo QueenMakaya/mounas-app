@@ -3,6 +3,7 @@
 import { randomInt, timingSafeEqual } from 'node:crypto';
 import { cookies, headers } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { after } from 'next/server';
 import { track } from '@vercel/analytics/server';
 import { sendLoginCode } from '@/lib/email';
 import type { LoginState } from '@/lib/login-state';
@@ -21,6 +22,7 @@ import {
   signSession,
 } from '@/lib/session';
 import { DEMO_CUSTOMER_ID, DEMO_EMAIL, DEMO_MINUTES, demoEnabled, demoLevelForAge, isDemo } from '@/lib/demo';
+import { logDemoStart } from '@/lib/demo-log';
 import { getActivitiesByFilters, getTodayActivity } from '@/lib/airtable';
 import { createPortalUrl, findAccess, findAccessByPhone, normalizePhone, readLoginCode, saveLoginCode } from '@/lib/subscription';
 
@@ -228,9 +230,20 @@ export async function startDemo(formData?: FormData): Promise<void> {
   } catch (err) {
     console.warn('[analytics] event not recorded: Démo lancée', err);
   }
+  // One row in Airtable « Démos », written after the redirect is sent so the
+  // child doesn't wait for it (src/lib/demo-log.ts).
+  const age = String(formData?.get('age') ?? '');
+  const h = await headers();
+  const demo = {
+    age,
+    userAgent: h.get('user-agent') ?? '',
+    country: h.get('x-vercel-ip-country') ?? '',
+    source: String(formData?.get('source') ?? '').slice(0, 200),
+  };
+  after(() => logDemoStart(demo));
   // With an age (the buttons on /demo), the child lands straight in a word of
   // the right level: no home page, no extra click before playing.
-  const level = demoLevelForAge(String(formData?.get('age') ?? ''));
+  const level = demoLevelForAge(age);
   if (level) {
     const wordId = await demoWordFor(level);
     if (wordId) redirect(`/app/activity?id=${encodeURIComponent(wordId)}`);
