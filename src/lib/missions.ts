@@ -28,11 +28,25 @@ export type Mission = {
   answer: string;
   answerType: AnswerType;
   choices: string[];
+  /** The harder variant as the child hears it, without its answer. */
   harder: string;
+  /** The answer written after the variant in Airtable (« … ? (8) »), for the parent only. */
+  harderAnswer: string;
   materials: string;
   /** Activity record ids this mission belongs to. */
   wordIds: string[];
 };
+
+/**
+ * Airtable keeps the variant's answer at the end, in brackets: « Et pour 3
+ * bols ? (9) ». The child must not hear or see it, so it is set apart. Only a
+ * bracket that starts with a number is an answer: « (trouver la partie
+ * manquante) » stays in the text.
+ */
+export function splitHarder(raw: string): { harder: string; harderAnswer: string } {
+  const m = raw.match(/^([\s\S]*?)\s*\((\d[^()]*)\)\s*$/);
+  return m ? { harder: m[1], harderAnswer: m[2].trim() } : { harder: raw, harderAnswer: '' };
+}
 
 const lines = (value: unknown) =>
   typeof value === 'string'
@@ -58,7 +72,7 @@ function toMission(record: Records<FieldSet>[number]): Mission {
     answer: text(record.get('Réponse')),
     answerType: kind === 'choix' || kind === 'photo' ? kind : 'nombre',
     choices: lines(record.get('Choix')),
-    harder: text(record.get('Variante plus difficile')),
+    ...splitHarder(text(record.get('Variante plus difficile'))),
     materials: text(record.get('Matériel')),
     wordIds: (record.get('Mot lié') as string[] | undefined) ?? [],
   };

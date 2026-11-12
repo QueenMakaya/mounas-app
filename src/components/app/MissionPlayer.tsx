@@ -65,6 +65,7 @@ export default function MissionPlayer({ mission: m, compact = false }: { mission
   const [showAnswer, setShowAnswer] = useState(false);
   const [showHarder, setShowHarder] = useState(false);
   const [harderDone, setHarderDone] = useState(false);
+  const [showHarderAnswer, setShowHarderAnswer] = useState(false);
 
   const allHints = hints >= m.hints.length;
   const canRevealAnswer = !parentChecks && !solved && tries >= MIN_TRIES_BEFORE_ANSWER && allHints;
@@ -241,6 +242,20 @@ export default function MissionPlayer({ mission: m, compact = false }: { mission
                 {harderDone ? '✅ Défi relevé, bravo pour tes efforts !' : 'On l’a fait !'}
               </button>
             </div>
+            {m.harderAnswer &&
+              (showHarderAnswer ? (
+                <p className="mt-3 text-sm font-bold text-ink-soft">
+                  La réponse : <span className="font-display text-lg text-ink">{m.harderAnswer}</span>
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowHarderAnswer(true)}
+                  className="mt-3 min-h-11 text-sm font-bold text-ink-soft underline underline-offset-4"
+                >
+                  Voir la réponse (pour le parent)
+                </button>
+              ))}
           </div>
         ) : (
           <button

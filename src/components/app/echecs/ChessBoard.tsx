@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { PIECES, CAMPS, isDark, sqName, type Board } from '@/lib/echecs';
 import PieceIcon from './PieceIcon';
 
@@ -29,8 +29,20 @@ type Props = {
 };
 
 export default function ChessBoard({ board, selected = null, targets = [], lastMove = null, check = null, decor = {}, hint = null, onSquare, disabled, className = '' }: Props) {
+  // On a tablet the whole board must be visible without scrolling: its size
+  // follows the screen height (never under 18rem), and when a game opens the
+  // page moves so that the board's bottom edge is on screen.
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (el && el.getBoundingClientRect().bottom > window.innerHeight) el.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  }, []);
+
   return (
-    <div className={`mx-auto w-full max-w-[min(100%,34rem)] rounded-[22px] bg-[#7A4A22] p-1.5 shadow-[0_14px_40px_-14px_rgba(91,31,140,0.45)] sm:p-2 ${className}`}>
+    <div
+      ref={ref}
+      className={`mx-auto w-full max-w-[min(100%,34rem,max(18rem,calc(100svh_-_15rem)))] scroll-mb-14 rounded-[22px] bg-[#7A4A22] p-1.5 shadow-[0_14px_40px_-14px_rgba(91,31,140,0.45)] sm:p-2 ${className}`}
+    >
       <div className="grid grid-cols-8 overflow-hidden rounded-2xl" role="group" aria-label="Le plateau">
         {board.map((piece, sq) => {
           const dark = isDark(sq);
