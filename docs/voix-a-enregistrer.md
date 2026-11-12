@@ -1,18 +1,66 @@
 # Voix de Pam : ce qu'il reste à enregistrer
 
-**État au 11 nov. 2026** : tout est enregistré, découpé dans `public/voix/` et branché dans
-`src/lib/voice-clips.ts` et `src/lib/voice-clips-words.ts` : consignes, petites phrases, bravos,
-calcul (0 à 100), les 37 sons (réenregistrés le 2 nov.), les 182 mots d'Airtable et les 219 syllabes.
-**Au 11 nov. 2026, il reste seulement :**
+**État au 12 nov. 2026.** Déjà enregistré et en ligne : consignes, petites phrases, bravos, calcul (0 à 100),
+les 37 sons, les 220 mots d'Airtable et toutes leurs syllabes, les 18 phrases dites pendant les échecs.
+Tout ce qui suit est encore lu par la voix du navigateur.
 
-## F. La lettre Y, fichier B (leçon de l'app)
+**Comment enregistrer** : un fichier par partie (ou plusieurs pour les longues), environ 2 s de silence
+entre deux répliques, ne pas dire les numéros ni les titres, même pièce et même micro. Une réplique ratée :
+la redire juste après, c'est la dernière prise qui compte.
 
-Le fichier A (voix de la vidéo) est enregistré et la vidéo est montée. Pour l'app, un mot à la fois :
+Par ordre de priorité :
+
+## F. Leçon du Y (15 mots, 1 min)
 
 stylo · cygne · yaourt · yoga · crayon · noyau · voyage · yoyo · goyave · sympa · symbole · olympique · synonyme · il y a · Bravo !
 
-Faits le 11 nov. : les 18 phrases des échecs, les 37 nouveaux mots d'Airtable et 29 syllabes
-(découpage proposé, à garder dans le champ « Syllables » d'Airtable : a-beil-le, en-sem-ble, trom-pet-te…).
+## G. Échecs de Mounaville : les boutons « Écouter » (16 textes, 4 min)
+
+Les consignes des chapitres :
+
+1. Bienvenue à Mounaville ! Ici, le camp du Soleil affronte le camp de la Lune. Chaque chapitre est un petit jeu. Commence par rencontrer la famille royale !
+2. Choisis une pièce. Elle doit ramasser toutes les mangues, en faisant le moins de déplacements possible. Fais attention aux cailloux : on ne peut pas passer dessus !
+3. La course des Mounas ! Chaque Mouna avance d'un pas tout droit, ou de deux pas la première fois. Pour attraper un Mouna de la Lune, il fait un pas en diagonale. Le premier qui arrive tout au bout gagne !
+4. Quand on attaque le Roi, on dit : échec ! Et si le Roi ne peut plus du tout s'échapper, c'est échec et mat : on a gagné ! Dans chaque défi, trouve le coup qui coince le Roi de la Lune.
+
+« Comment ça bouge » :
+
+5. Le Roi fait un seul pas, dans toutes les directions. Il est précieux : il faut toujours le protéger !
+6. La Reine va où elle veut : tout droit ou en diagonale, aussi loin qu'elle le souhaite. C'est la plus forte !
+7. Le Rhinocéros fonce tout droit : en avant, en arrière ou sur les côtés, aussi loin qu'il veut. Mais jamais en diagonale !
+8. L'Éléphant marche en diagonale, aussi loin qu'il veut. Il reste toujours sur les cases de la même couleur.
+9. La Gazelle bondit en forme de L : deux cases tout droit, puis une sur le côté. C'est la seule qui saute par-dessus les autres !
+10. Le Mouna avance d'un pas tout droit (deux pas la première fois). Pour attraper, il fait un pas en diagonale. S'il arrive tout au bout, il devient une Reine !
+
+Les histoires :
+
+11. Il s'appelle Mansa, comme Mansa Moussa, le roi du Mali, qui était si riche qu'il a semé de l'or tout le long de son voyage.
+12. Elle s'appelle Nzinga, comme la reine Nzinga d'Angola, une grande stratège qui a défendu son peuple pendant quarante ans.
+13. Le rhinocéros ne voit pas très bien, alors il fonce droit devant lui. Personne n'ose lui barrer la route !
+14. Le sais-tu ? Dans le tout premier jeu d'échecs, il y a très longtemps, cette pièce était déjà un éléphant !
+15. La gazelle bondit si haut et si vite dans la savane que le lion lui-même a du mal à l'attraper.
+16. « Mouna » veut dire « enfant ». Les petits avancent pas à pas… et celui qui traverse toute la savane devient une Reine !
+
+## H. Les groupes de consonnes (13 sons, 1 min) : nouveau
+
+Aujourd'hui, dans « zèbre » ou « prénom », l'app fait entendre les sons un par un (b, r…). Avec ces enregistrements,
+on pourra lire le groupe d'un coup, comme on l'apprend en classe. Dis-les dans cet ordre, courts, sans traîner sur le « e » :
+
+bre · cre · dre · fre · gre · pre · tre · vre · ble · cle · fle · gle · ple
+
+(Il faudra une petite modification de l'app pour les utiliser : je la fais quand tu me les envoies.)
+
+## I. Les missions (80 énoncés + 80 variantes, environ 15 min)
+
+Texte complet : [`docs/voix/missions.md`](voix/missions.md).
+
+## J. Les phrases d'exemple (181 phrases, environ 10 min)
+
+Texte complet : [`docs/voix/phrases-exemple.md`](voix/phrases-exemple.md).
+
+## K. Les comptines (155 comptines, 717 lignes, environ 40 min)
+
+Texte complet : [`docs/voix/comptines.md`](voix/comptines.md). L'app les lit ligne par ligne : lis-les une ligne à la fois.
 
 Les mots ajoutés plus tard dans Airtable : enregistrer le mot et ses syllabes de la même façon,
 ou laisser le clone de voix s'en charger.
