@@ -1,14 +1,15 @@
 'use client';
 
 import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
-import { PIECES, CAMPS, colOf, isDark, rowOf, sqName, type Board } from '@/lib/echecs';
-import PieceIcon from './PieceIcon';
+import { PIECES, colOf, isDark, rowOf, sqName, type Board } from '@/lib/echecs';
+import { FabricSwatch, fabricColors } from './PieceIcon';
+import { TeamPiece, useTeams } from './teams';
 
 /*
  * The savanna board: sand and ochre squares, the pieces as big round tokens.
  * Tap a piece, its possible moves light up (a dot for an empty square, a
  * ring for a piece to catch), tap where to go. Everything is a button, so it
- * also works with a keyboard and a screen reader (« la Gazelle du Soleil, b1 »).
+ * also works with a keyboard and a screen reader (« la Gazelle Kente, b1 »).
  */
 
 type Props = {
@@ -33,6 +34,7 @@ export default function ChessBoard({ board, selected = null, targets = [], lastM
   // follows the screen height (never under 18rem), and when a game opens the
   // page moves so that the board's bottom edge is on screen.
   const ref = useRef<HTMLDivElement>(null);
+  const { names } = useTeams();
   useEffect(() => {
     const el = ref.current;
     if (el && el.getBoundingClientRect().bottom > window.innerHeight) el.scrollIntoView({ block: 'end', behavior: 'smooth' });
@@ -50,7 +52,7 @@ export default function ChessBoard({ board, selected = null, targets = [], lastM
           const isSel = selected === sq;
           const isLast = lastMove && (lastMove.from === sq || lastMove.to === sq);
           const label = piece
-            ? `${PIECES[piece.kind].name} ${CAMPS[piece.camp].of}, ${sqName(sq)}${target ? ', à attraper' : ''}`
+            ? `${PIECES[piece.kind].name} ${names[piece.camp]}, ${sqName(sq)}${target ? ', à attraper' : ''}`
             : `${sqName(sq)}${target ? ', on peut y aller' : ''}`;
           return (
             <button
@@ -77,7 +79,7 @@ export default function ChessBoard({ board, selected = null, targets = [], lastM
                       : undefined
                   }
                 >
-                  <PieceIcon kind={piece.kind} camp={piece.camp} className="h-full w-full" />
+                  <TeamPiece kind={piece.kind} camp={piece.camp} className="h-full w-full" />
                 </span>
               )}
               {target && !piece && <span className="absolute left-1/2 top-1/2 h-[30%] w-[30%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0E8C80]/70 ring-2 ring-white/70" />}
@@ -95,15 +97,18 @@ export default function ChessBoard({ board, selected = null, targets = [], lastM
   );
 }
 
-/** Whose turn it is, with the camp's sun or moon. */
+/** Whose turn it is, in the colours of that team's fabric. */
 export function TurnBadge({ camp, label }: { camp: 's' | 'l'; label?: string }) {
+  const { ids, teams } = useTeams();
+  const c = fabricColors(ids[camp]);
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full px-4 py-2 font-display text-base font-bold ${camp === 's' ? 'bg-[#FEF3E2] text-morange-ink' : 'bg-mpurple text-cream'}`}
+      className="inline-flex items-center gap-2 rounded-full py-1.5 pl-1.5 pr-4 font-display text-base font-bold ring-2"
+      style={{ backgroundColor: c.fill, color: c.ink, ['--tw-ring-color' as string]: c.edge }}
       aria-live="polite"
     >
-      <span aria-hidden="true">{CAMPS[camp].emoji}</span>
-      {label ?? `À ${camp === 's' ? 'toi, Soleil' : 'la Lune'} de jouer`}
+      <FabricSwatch id={ids[camp]} className="h-8 w-8" />
+      {label ?? `À ${camp === 's' ? 'toi' : teams.l.team} de jouer`}
     </span>
   );
 }

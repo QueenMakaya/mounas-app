@@ -1,26 +1,156 @@
+
+import type { ReactNode } from 'react';
 import type { Camp, Kind } from '@/lib/echecs';
+import { DEFAULT_TEAMS, type FabricId } from '@/lib/echecs-tissus';
 
 /*
  * The pieces of Mounaville, drawn as round tokens like a children's board
- * game: Soleil in warm cream and amber, Lune in deep purple. Each figure is a
- * simple silhouette a 4-year-old can name: a crown, a queen in her gele, a
- * charging rhinoceros, an elephant seen from the front, a gazelle with her
+ * game, each team wearing its fabric: the outer ring is the cloth's pattern
+ * (kente bands, bogolan zigzags, kuba diamonds, ndop indigo, kanga dots), the
+ * centre a plain disc with the figure, so it stays easy to read. Each figure
+ * is a simple silhouette a 4-year-old can name: a crown, a queen in her gele,
+ * a charging rhinoceros, an elephant seen from the front, a gazelle with her
  * long horns, a little Mouna with her two puffs of hair.
  */
 
-const CAMP_STYLE: Record<Camp, { fill: string; ring: string; ink: string; soft: string }> = {
-  s: { fill: '#FFF7E8', ring: '#F4A340', ink: '#9A4A06', soft: '#F4A340' },
-  l: { fill: '#5B1F8C', ring: '#2E0F47', ink: '#FDF6EC', soft: '#C9A6E8' },
+type Art = { fill: string; ink: string; soft: string; edge: string; tile: number; pattern: ReactNode };
+
+const ART: Record<FabricId, Art> = {
+  // Ghana: woven bands of gold, green, red and black.
+  kente: {
+    fill: '#FFE9A6',
+    ink: '#14532D',
+    soft: '#C8102E',
+    edge: '#14532D',
+    tile: 16,
+    pattern: (
+      <>
+        <rect width="16" height="16" fill="#F2B705" />
+        <rect width="4" height="16" fill="#1E7B3A" />
+        <rect x="8" width="8" height="4" fill="#C8102E" />
+        <rect x="8" y="8" width="8" height="4" fill="#1A1A1A" />
+        <rect x="4" y="4" width="4" height="4" fill="#1A1A1A" />
+        <rect x="4" y="12" width="4" height="4" fill="#C8102E" />
+      </>
+    ),
+  },
+  // Mali: cream zigzags and dots painted on earth brown.
+  bogolan: {
+    fill: '#3B2416',
+    ink: '#F3E3C3',
+    soft: '#D9A066',
+    edge: '#1E120A',
+    tile: 18,
+    pattern: (
+      <>
+        <rect width="18" height="18" fill="#3B2416" />
+        <path d="M0 8 L4.5 3 L9 8 L13.5 3 L18 8" fill="none" stroke="#F3E3C3" strokeWidth="1.8" />
+        <circle cx="4.5" cy="13.5" r="1.6" fill="#F3E3C3" />
+        <circle cx="13.5" cy="13.5" r="1.6" fill="#F3E3C3" />
+      </>
+    ),
+  },
+  // RD Congo: brown diamonds on raffia beige.
+  kuba: {
+    fill: '#EFE1C2',
+    ink: '#5A3418',
+    soft: '#A0522D',
+    edge: '#5A3418',
+    tile: 16,
+    pattern: (
+      <>
+        <rect width="16" height="16" fill="#D8BE8A" />
+        <path d="M8 1.5 L14.5 8 L8 14.5 L1.5 8 Z" fill="none" stroke="#5A3418" strokeWidth="2" />
+        <rect x="6.5" y="6.5" width="3" height="3" fill="#5A3418" />
+      </>
+    ),
+  },
+  // Cameroon: white motifs on deep indigo.
+  ndop: {
+    fill: '#1B2A6B',
+    ink: '#FFFFFF',
+    soft: '#8FB3FF',
+    edge: '#0E1640',
+    tile: 14,
+    pattern: (
+      <>
+        <rect width="14" height="14" fill="#1B2A6B" />
+        <path d="M7 0 V14 M0 7 H14" stroke="#FFFFFF" strokeOpacity="0.4" strokeWidth="1" />
+        <circle cx="3.5" cy="3.5" r="1.8" fill="#FFFFFF" />
+        <circle cx="10.5" cy="10.5" r="1.8" fill="#FFFFFF" />
+      </>
+    ),
+  },
+  // Kenya, Tanzania: bright pink with yellow dots.
+  kanga: {
+    fill: '#D81B60',
+    ink: '#FFFFFF',
+    soft: '#FFD23F',
+    edge: '#7A0E36',
+    tile: 16,
+    pattern: (
+      <>
+        <rect width="16" height="16" fill="#D81B60" />
+        <circle cx="8" cy="8" r="3.4" fill="#FFD23F" />
+        <circle cx="8" cy="8" r="1.3" fill="#1A1A1A" />
+        <circle cx="0" cy="0" r="1.5" fill="#FFFFFF" />
+        <circle cx="16" cy="16" r="1.5" fill="#FFFFFF" />
+        <circle cx="16" cy="0" r="1.5" fill="#FFFFFF" />
+        <circle cx="0" cy="16" r="1.5" fill="#FFFFFF" />
+      </>
+    ),
+  },
 };
 
-export default function PieceIcon({ kind, camp, className = '', title }: { kind: Kind; camp: Camp; className?: string; title?: string }) {
-  const c = CAMP_STYLE[camp];
+/** The main colours of a fabric, for small swatches and badges. */
+export function fabricColors(id: FabricId) {
+  const a = ART[id];
+  return { fill: a.fill, ink: a.ink, edge: a.edge };
+}
+
+/** A little round sample of the cloth. */
+export function FabricSwatch({ id, className = '' }: { id: FabricId; className?: string }) {
+  const a = ART[id];
+  return (
+    <svg viewBox="0 0 40 40" className={className} aria-hidden="true">
+      <defs>
+        <pattern id={`sw-${id}`} width={a.tile} height={a.tile} patternUnits="userSpaceOnUse">
+          {a.pattern}
+        </pattern>
+      </defs>
+      <circle cx="20" cy="20" r="18" fill={`url(#sw-${id})`} stroke={a.edge} strokeWidth="2.5" />
+    </svg>
+  );
+}
+
+export default function PieceIcon({
+  kind,
+  camp,
+  fabric,
+  className = '',
+  title,
+}: {
+  kind: Kind;
+  camp: Camp;
+  /** The team's cloth; by default Kente for your team, Bogolan for the other side. */
+  fabric?: FabricId;
+  className?: string;
+  title?: string;
+}) {
+  const id = fabric ?? DEFAULT_TEAMS[camp];
+  const a = ART[id];
   return (
     <svg viewBox="0 0 100 100" className={className} role={title ? 'img' : undefined} aria-hidden={title ? undefined : true} aria-label={title}>
-      <circle cx="50" cy="52" r="44" fill="rgba(26,26,26,0.18)" />
-      <circle cx="50" cy="48" r="44" fill={c.fill} stroke={c.ring} strokeWidth="5" />
-      <g fill={c.ink} stroke={c.ink} strokeLinejoin="round" strokeLinecap="round">
-        <Figure kind={kind} soft={c.soft} fill={c.fill} />
+      <defs>
+        <pattern id={`fab-${id}`} width={a.tile} height={a.tile} patternUnits="userSpaceOnUse">
+          {a.pattern}
+        </pattern>
+      </defs>
+      <circle cx="50" cy="52" r="45" fill="rgba(26,26,26,0.2)" />
+      <circle cx="50" cy="48" r="45" fill={`url(#fab-${id})`} stroke={a.edge} strokeWidth="3" />
+      <circle cx="50" cy="48" r="35" fill={a.fill} stroke={a.edge} strokeWidth="2.5" />
+      <g transform="translate(50 48) scale(0.74) translate(-50 -48)" fill={a.ink} stroke={a.ink} strokeLinejoin="round" strokeLinecap="round">
+        <Figure kind={kind} soft={a.soft} fill={a.fill} />
       </g>
     </svg>
   );

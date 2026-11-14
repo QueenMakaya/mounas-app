@@ -114,4 +114,11 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 - [x] **Le conteur** : une phrase pour chaque coup, lue à voix haute et affichée dans une bulle au-dessus du plateau
   (« Hop ! La Gazelle de la Lune saute par-dessus les hautes herbes. », « Le Rhinocéros du Soleil fonce et attrape un Mouna de la Lune ! Échec ! »).
   Bouton « Conteur » pour le couper (choix gardé sur l'appareil). Aussi dans la course des Mounas.
-- [ ] **Noms des équipes** : Pam réfléchit à remplacer « le Soleil / la Lune » (propositions envoyées le 14/11).
+- [x] **Les équipes portent des tissus africains** (à la place du Soleil et de la Lune) : kente (Ghana), bogolan (Mali),
+  kuba (RD Congo), ndop (Cameroun), kanga (Kenya, Tanzanie). L'enfant choisit son tissu et celui de l'autre équipe
+  (sur l'accueil des échecs, et avant chaque partie avec « Changer »), choix gardé sur l'appareil. Une phrase sur chaque tissu,
+  à écouter. Le motif est dessiné sur le bord de chaque pièce ; le conteur dit « la Gazelle Kente », « le Roi Bogolan ».
+  Pas de peuples opposés entre eux : chaque équipe porte simplement un tissu et son histoire.
+  Fins de partie contre l'ordinateur : « Ton équipe a gagné ! » / « L'ordinateur a gagné. On rejoue ? » (nouvelles phrases à enregistrer,
+  voir docs/voix-a-enregistrer.md, partie G).
+- [ ] **Visuels de la campagne** (carrousel, reels, stories, carte WhatsApp) : ils montrent encore le Soleil et la Lune et les anciennes pièces, à refaire.
