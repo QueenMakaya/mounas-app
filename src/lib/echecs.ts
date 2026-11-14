@@ -120,10 +120,70 @@ export const PIECES: Record<Kind, PieceInfo> = {
   },
 };
 
-export const CAMPS: Record<Camp, { name: string; emoji: string }> = {
-  s: { name: 'le Soleil', emoji: '☀️' },
-  l: { name: 'la Lune', emoji: '🌙' },
+export const CAMPS: Record<Camp, { name: string; of: string; emoji: string }> = {
+  s: { name: 'le Soleil', of: 'du Soleil', emoji: '☀️' },
+  l: { name: 'la Lune', of: 'de la Lune', emoji: '🌙' },
 };
+
+/* ------------------------------------------------------------ the storyteller */
+
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+
+/** « la Gazelle de la Lune », « le Mouna du Soleil ». */
+export function pieceName(kind: Kind, camp: Camp): string {
+  return `${PIECES[kind].name} ${CAMPS[camp].of}`;
+}
+
+const STEPS: Record<Kind, string[]> = {
+  p: ['{P} avance d’un petit pas.', '{P} fait un pas courageux vers l’avant.', 'Pas à pas, {p} traverse la savane.'],
+  n: ['{P} fait un grand bond en L&nbsp;!', 'Hop&nbsp;! {P} saute par-dessus les hautes herbes.', '{P} bondit, légère comme le vent.'],
+  b: ['{P} glisse en diagonale.', '{P} avance tranquillement en diagonale, pom, pom, pom.', '{P} traverse la savane en diagonale.'],
+  r: ['{P} fonce tout droit&nbsp;!', 'Attention&nbsp;: {p} charge en ligne droite&nbsp;!', 'Boum, boum&nbsp;: {p} fonce droit devant lui.'],
+  q: ['{P} traverse la savane d’un pas royal.', '{P} se déplace&nbsp;: tout le monde la regarde&nbsp;!', '{P} s’élance, aussi loin qu’elle veut.'],
+  k: ['{P} fait un petit pas prudent.', '{P} se déplace doucement.', '{P} change de place, bien à l’abri.'],
+};
+const CATCHES: Record<Kind, string[]> = {
+  p: ['{P} fait un pas en diagonale et attrape {v}&nbsp;!', 'Surprise&nbsp;! {P} attrape {v}.'],
+  n: ['{P} bondit sur {v} et l’attrape&nbsp;!', 'Hop&nbsp;! {P} saute et attrape {v}.'],
+  b: ['{P} glisse en diagonale et attrape {v}&nbsp;!', '{P} surprend {v} et l’attrape.'],
+  r: ['{P} fonce et attrape {v}&nbsp;!', 'Boum&nbsp;! {P} charge et attrape {v}.'],
+  q: ['{P} attrape {v}&nbsp;! Quelle reine&nbsp;!', '{P} s’élance et attrape {v}.'],
+  k: ['{P} attrape lui-même {v}&nbsp;!', '{P} fait un pas et attrape {v}.'],
+};
+
+/**
+ * One sentence telling what just happened, like a story for the little ones:
+ * « Hop ! La Gazelle de la Lune saute par-dessus les hautes herbes. Échec ! »
+ * `n` (the move number) picks the variant, so the story never changes on screen.
+ */
+export function narrate(before: Position, move: Move, after: Position, n: number, race = false): string {
+  const mover = before.board[move.from]!;
+  const who = pieceName(mover.kind, mover.camp);
+  const pick = (list: string[]) => list[(n * 7 + move.from) % list.length];
+  let text: string;
+  if (move.castle) {
+    text = `${cap(who)} se met à l’abri derrière son Rhinocéros&nbsp;: c’est le roque&nbsp;!`;
+  } else if (move.capture !== undefined) {
+    const victim = before.board[move.capture]!;
+    const v = victim.kind === 'p' ? `un Mouna ${CAMPS[victim.camp].of}` : pieceName(victim.kind, victim.camp);
+    text = pick(CATCHES[mover.kind]).replace('{v}', v);
+  } else if (mover.kind === 'p' && Math.abs(rowOf(move.to) - rowOf(move.from)) === 2) {
+    text = '{P} fait deux grands pas d’un coup&nbsp;!';
+  } else {
+    text = pick(STEPS[mover.kind]);
+  }
+  text = text.replace('{P}', cap(who)).replace('{p}', who);
+  if (race) {
+    if (raceWinner(after) === mover.camp) text += ` Il arrive au bout de la savane&nbsp;: ${CAMPS[mover.camp].name} gagne la course&nbsp;!`;
+  } else {
+    if (move.promo) text += ' Il a traversé toute la savane&nbsp;: il devient une Reine&nbsp;!';
+    const st = status(after);
+    if (st === 'mate') text += ` Échec et mat&nbsp;! ${cap(CAMPS[mover.camp].name)} gagne la partie&nbsp;!`;
+    else if (st === 'check') text += ` Échec&nbsp;! Le Roi ${CAMPS[after.turn].of} est en danger&nbsp;!`;
+    else if (st === 'pat') text += ' Plus personne ne peut bouger&nbsp;: match nul.';
+  }
+  return text.replace(/&nbsp;/g, '\u00a0');
+}
 
 /* ------------------------------------------------------------- positions */
 

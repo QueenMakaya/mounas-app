@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
-import { PIECES, CAMPS, isDark, sqName, type Board } from '@/lib/echecs';
+import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+import { PIECES, CAMPS, colOf, isDark, rowOf, sqName, type Board } from '@/lib/echecs';
 import PieceIcon from './PieceIcon';
 
 /*
@@ -50,7 +50,7 @@ export default function ChessBoard({ board, selected = null, targets = [], lastM
           const isSel = selected === sq;
           const isLast = lastMove && (lastMove.from === sq || lastMove.to === sq);
           const label = piece
-            ? `${PIECES[piece.kind].name} ${piece.camp === 's' ? 'du Soleil' : 'de la Lune'}, ${sqName(sq)}${target ? ', à attraper' : ''}`
+            ? `${PIECES[piece.kind].name} ${CAMPS[piece.camp].of}, ${sqName(sq)}${target ? ', à attraper' : ''}`
             : `${sqName(sq)}${target ? ', on peut y aller' : ''}`;
           return (
             <button
@@ -63,12 +63,20 @@ export default function ChessBoard({ board, selected = null, targets = [], lastM
               className="relative aspect-square outline-none focus-visible:z-10 focus-visible:ring-4 focus-visible:ring-inset focus-visible:ring-mpurple disabled:cursor-default"
               style={{ backgroundColor: dark ? '#C98A4B' : '#F3DDB8' }}
             >
-              {isLast && <span className="absolute inset-0 bg-[#FFE27A]/45" />}
+              {isLast && <span className={`absolute inset-0 ${lastMove?.from === sq ? 'bg-[#FFE27A]/70 ring-4 ring-inset ring-[#F4A340]/70' : 'bg-[#FFE27A]/45'}`} />}
               {isSel && <span className="absolute inset-0 bg-mteal/45" />}
               {check === sq && <span className="animate-glow absolute inset-[6%] rounded-full bg-mred/50" />}
               {decor[sq] && <span className="absolute inset-0 flex items-center justify-center text-[min(7vw,2.2rem)] leading-none">{decor[sq]}</span>}
               {piece && (
-                <span key={lastMove?.to === sq ? `m${lastMove.from}` : 'p'} className={`absolute inset-[5%] ${lastMove?.to === sq ? 'animate-pop' : ''}`}>
+                <span
+                  key={lastMove?.to === sq ? `m${lastMove.from}` : 'p'}
+                  className={`absolute inset-[5%] ${lastMove?.to === sq ? 'animate-slide z-20' : ''}`}
+                  style={
+                    lastMove?.to === sq
+                      ? ({ '--dx': colOf(lastMove.from) - colOf(sq), '--dy': rowOf(lastMove.from) - rowOf(sq) } as CSSProperties)
+                      : undefined
+                  }
+                >
                   <PieceIcon kind={piece.kind} camp={piece.camp} className="h-full w-full" />
                 </span>
               )}

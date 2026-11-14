@@ -20,6 +20,7 @@ import {
   mangoPar,
   mangoPosition,
   matePosition,
+  narrate,
   notEnoughToWin,
   parseSq,
   play,
@@ -514,9 +515,11 @@ type Opponent = 'bot' | 'ami';
  * Tap-to-move for the camp whose turn it is; the Mounaville bot answers by
  * itself after a short pause. `rules` chooses between the race and real chess.
  */
-function usePlay(initial: () => Position, opts: { opponent: Opponent; race?: boolean; level?: 0 | 1 }) {
+function usePlay(initial: () => Position, opts: { opponent: Opponent; race?: boolean; level?: 0 | 1; hold?: boolean }) {
   const [history, setHistory] = useState<Position[]>(() => [initial()]);
   const [moves, setMoves] = useState<Move[]>([]);
+  /** One sentence per move, told by the storyteller. */
+  const [stories, setStories] = useState<string[]>([]);
   const [selected, setSelected] = useState<number | null>(null);
   const pos = history[history.length - 1];
   const last = moves[moves.length - 1] ?? null;
@@ -537,18 +540,25 @@ function usePlay(initial: () => Position, opts: { opponent: Opponent; race?: boo
     const next = opts.race ? racePlay(pos, m) : play(pos, m);
     setHistory((h) => [...h, next]);
     setMoves((ms) => [...ms, m]);
+    setStories((st) => [...st, narrate(pos, m, next, moves.length, opts.race)]);
     setSelected(null);
   };
 
+  // The computer takes its time, so the child can follow: it waits until the
+  // storyteller has finished the child's move (at most 6 s), then a moment more.
+  const hold = !!opts.hold;
   useEffect(() => {
     if (!botTurn) return;
-    const t = window.setTimeout(() => {
-      const m = opts.race ? raceBotMove(pos) : botMove(pos, opts.level ?? 0);
-      if (m) doMove(m);
-    }, 650);
+    const t = window.setTimeout(
+      () => {
+        const m = opts.race ? raceBotMove(pos) : botMove(pos, opts.level ?? 0);
+        if (m) doMove(m);
+      },
+      hold ? 6000 : 1200,
+    );
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [botTurn, pos]);
+  }, [botTurn, pos, hold]);
 
   const onSquare = (sq: number) => {
     if (winner || botTurn) return;
@@ -567,12 +577,14 @@ function usePlay(initial: () => Position, opts: { opponent: Opponent; race?: boo
     if (history.length <= n) return;
     setHistory((h) => h.slice(0, -n));
     setMoves((ms) => ms.slice(0, -n));
+    setStories((st) => st.slice(0, -n));
     setSelected(null);
   };
 
   const reset = () => {
     setHistory([initial()]);
     setMoves([]);
+    setStories([]);
     setSelected(null);
   };
 
@@ -589,7 +601,68 @@ function usePlay(initial: () => Position, opts: { opponent: Opponent; race?: boo
     return out;
   }, [history, moves]);
 
-  return { pos, last, selected, targets, onSquare, undo, reset, winner, botTurn, status: st, caught, canUndo: history.length > 1 };
+  const story = stories[stories.length - 1] ?? null;
+  return { pos, last, story, selected, targets, onSquare, undo, reset, winner, botTurn, status: st, caught, canUndo: history.length > 1 };
+}
+
+/* ------------------------------------------------- the storyteller (on/off) */
+
+const LS_STORY = 'mounas_echecs_conteur';
+
+/** The storyteller is on unless the parent turned it off (kept on the device). */
+let storyListeners: (() => void)[] = [];
+function subscribeStory(cb: () => void) {
+  storyListeners.push(cb);
+  return () => {
+    storyListeners = storyListeners.filter((l) => l !== cb);
+  };
+}
+function useStoryteller() {
+  const on = useSyncExternalStore(subscribeStory, () => readPref(LS_STORY) !== 'non', () => true);
+  const toggle = () => {
+    writePref(LS_STORY, on ? 'non' : 'oui');
+    storyListeners.forEach((l) => l());
+  };
+  return { on, toggle };
+}
+
+/**
+ * Tells each move aloud (the bubble shows it). While it talks (`speech.speaking`),
+ * the computer waits before answering.
+ */
+function useTellStory(story: string | null, on: boolean, quiet: boolean, speech: ReturnType<typeof useSpeech>) {
+  const { speak, supported } = speech;
+  const told = useRef<string | null>(null);
+  useEffect(() => {
+    if (!story || !on || told.current === story) return;
+    told.current = story;
+    if (supported && !quiet) speak(story, 0.9);
+  }, [story, on, quiet, speak, supported]);
+}
+
+function StoryBubble({ story, on, onToggle }: { story: string | null; on: boolean; onToggle: () => void }) {
+  return (
+    <div className="mt-3 flex items-start gap-2">
+      <div className="min-h-12 flex-1 rounded-2xl bg-white px-4 py-2.5 ring-1 ring-ink/10" aria-live="polite">
+        {on ? (
+          <p key={story ?? ''} className="animate-rise text-[15px] font-bold leading-snug text-ink">
+            <span aria-hidden="true">📖 </span>
+            {story ?? 'Il était une fois, dans la savane de Mounaville… À toi de jouer le premier coup !'}
+          </p>
+        ) : (
+          <p className="text-sm text-ink-soft">Le conteur se repose.</p>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-pressed={on}
+        className={`min-h-12 flex-shrink-0 rounded-2xl px-3 text-xs font-extrabold ring-1 ring-ink/15 ${on ? 'bg-mpurple text-cream' : 'bg-white text-ink-soft'}`}
+      >
+        {on ? '🔊 Conteur' : '🔇 Conteur'}
+      </button>
+    </div>
+  );
 }
 
 function OpponentPicker({ onPick, withLevels }: { onPick: (o: Opponent, level?: 0 | 1) => void; withLevels?: boolean }) {
@@ -657,8 +730,11 @@ function Course() {
 }
 
 function RaceGame({ opponent, onChange }: { opponent: Opponent; onChange: () => void }) {
-  const g = usePlay(racePosition, { opponent, race: true });
-  const { speak, supported } = useSpeech();
+  const teller = useStoryteller();
+  const speech = useSpeech();
+  const { speak, supported } = speech;
+  const g = usePlay(racePosition, { opponent, race: true, hold: teller.on && speech.speaking !== null });
+  useTellStory(g.story, teller.on, !!g.winner, speech);
   const counted = useRef(false);
 
   useEffect(() => {
@@ -676,6 +752,7 @@ function RaceGame({ opponent, onChange }: { opponent: Opponent; onChange: () => 
       <div className="mt-4 flex justify-center">
         {!g.winner && <TurnBadge camp={g.pos.turn} label={g.botTurn ? 'Mounaville réfléchit…' : opponent === 'bot' ? 'À toi de jouer !' : undefined} />}
       </div>
+      <StoryBubble story={g.story} on={teller.on} onToggle={teller.toggle} />
       <ChessBoard className="mt-3" board={g.pos.board} selected={g.selected} targets={g.targets} lastMove={g.last} onSquare={g.onSquare} disabled={!!g.winner} />
       {g.winner && g.winner !== 'nul' && (
         <Celebrate title={g.winner === 's' ? 'Le Soleil gagne la course ! ☀️' : 'La Lune gagne la course ! 🌙'} text={g.winner === 'l' && opponent === 'bot' ? 'Pas grave : on rejoue ?' : undefined}>
@@ -861,18 +938,22 @@ function Partie() {
 }
 
 function FullGame({ opponent, level, onChange }: { opponent: Opponent; level: 0 | 1; onChange: () => void }) {
-  const g = usePlay(startPosition, { opponent, level });
-  const { speak, supported } = useSpeech();
+  const teller = useStoryteller();
+  const speech = useSpeech();
+  const { speak, supported } = speech;
+  const g = usePlay(startPosition, { opponent, level, hold: teller.on && speech.speaking !== null });
   const counted = useRef(false);
   const said = useRef('');
+  useTellStory(g.story, teller.on, !!g.winner, speech);
 
+  // Storyteller off: only the important news is said.
   useEffect(() => {
     const key = `${g.last?.from}-${g.last?.to}`;
-    if (!g.last || said.current === key || !supported) return;
+    if (teller.on || !g.last || said.current === key || !supported) return;
     said.current = key;
     if (g.status === 'check') speak('Échec ! Attention au Roi !', 0.95);
     else if (g.last.promo) speak('Le Mouna est arrivé au bout : il devient une Reine !', 0.9);
-  }, [g.last, g.status, speak, supported]);
+  }, [g.last, g.status, speak, supported, teller.on]);
 
   useEffect(() => {
     if (!g.winner || counted.current) return;
@@ -902,11 +983,12 @@ function FullGame({ opponent, level, onChange }: { opponent: Opponent; level: 0 
           />
         )}
       </div>
+      <StoryBubble story={g.story} on={teller.on} onToggle={teller.toggle} />
       <ChessBoard className="mt-3" board={g.pos.board} selected={g.selected} targets={g.targets} lastMove={g.last} check={checkSq} onSquare={g.onSquare} disabled={!!g.winner} />
       <div className="mt-2 flex items-center gap-1.5 text-sm font-bold text-morange-ink">
         ☀️ <Caught kinds={g.caught.s} camp="l" />
       </div>
-      {g.last?.promo && !g.winner && (
+      {g.last?.promo && !g.winner && !teller.on && (
         <p className="animate-rise mt-3 rounded-2xl bg-[#FDECEE] px-4 py-2 text-center font-bold text-mred-dark">👑 Un Mouna a traversé la savane : il devient une Reine !</p>
       )}
       {g.winner && (

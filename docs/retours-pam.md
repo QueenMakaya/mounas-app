@@ -105,3 +105,13 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   (que des pions) · 4. Attrape le Roi ! (8 mats en un coup) · 5. La grande partie (contre Mounaville « tout doux » / « malin »
   ou contre un ami sur le même écran, bouton « Oups, je reviens »). Les coups possibles s'allument toujours ; toutes les vraies règles.
   Nouvelle icône « Échecs » dans la rangée des rubriques, carte sur l'accueil et dans la démo.
+
+## 14 novembre 2026
+
+- [x] **Échecs, la partie contre l'ordinateur** : il ne joue plus trop vite. Il attend que le conteur ait fini de raconter
+  le coup de l'enfant, puis 1 à 2 secondes. Chaque pièce **glisse** de sa case de départ à sa case d'arrivée, et la case de départ
+  reste marquée en orange : on voit toujours ce que l'ordinateur vient de jouer.
+- [x] **Le conteur** : une phrase pour chaque coup, lue à voix haute et affichée dans une bulle au-dessus du plateau
+  (« Hop ! La Gazelle de la Lune saute par-dessus les hautes herbes. », « Le Rhinocéros du Soleil fonce et attrape un Mouna de la Lune ! Échec ! »).
+  Bouton « Conteur » pour le couper (choix gardé sur l'appareil). Aussi dans la course des Mounas.
+- [ ] **Noms des équipes** : Pam réfléchit à remplacer « le Soleil / la Lune » (propositions envoyées le 14/11).
