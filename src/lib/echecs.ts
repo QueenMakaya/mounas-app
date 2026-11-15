@@ -5,9 +5,10 @@
  *   La Reine (Nzinga)   → queen     L'Éléphant    → bishop (as in the very first chess!)
  *   La Gazelle          → knight    Les Mounas    → pawns (the little ones)
  *
- * Two camps instead of « white » and « black »: Soleil (moves first, at the
- * bottom) and Lune. The board is 64 squares, index = row * 8 + col, row 0 at
- * the top (Lune's back row), so Soleil goes up (row - 1).
+ * Two camps instead of « white » and « black »: 's' (the child's team, moves
+ * first, at the bottom) and 'l' (the other side), each wearing a fabric
+ * (echecs-tissus.ts). The board is 64 squares, index = row * 8 + col, row 0 at
+ * the top (the other side's back row), so 's' goes up (row - 1).
  *
  * The engine knows every rule (check, checkmate, stalemate, castling, en
  * passant, promotion) but also works on boards without kings, for the
@@ -22,7 +23,7 @@ export type Board = (Piece | null)[];
 export type Position = {
   board: Board;
   turn: Camp;
-  /** Castling still allowed: Soleil king side / queen side, Lune king side / queen side. */
+  /** Castling still allowed: 's' king side / queen side, 'l' king side / queen side. */
   castle: { sK: boolean; sQ: boolean; lK: boolean; lQ: boolean };
   /** The square a Mouna jumped over (two steps) on the last move, for « en passant ». */
   ep: number | null;
@@ -44,7 +45,7 @@ export const sqAt = (row: number, col: number) => row * 8 + col;
 const inside = (row: number, col: number) => row >= 0 && row < 8 && col >= 0 && col < 8;
 export const isDark = (sq: number) => (rowOf(sq) + colOf(sq)) % 2 === 1;
 
-/** Square name as on a real chess board (a1 bottom left, Soleil's side). */
+/** Square name as on a real chess board (a1 bottom left, the child's side). */
 export const sqName = (sq: number) => `${'abcdefgh'[colOf(sq)]}${8 - rowOf(sq)}`;
 export const parseSq = (name: string) => sqAt(8 - Number(name[1]), name.charCodeAt(0) - 97);
 
@@ -120,10 +121,70 @@ export const PIECES: Record<Kind, PieceInfo> = {
   },
 };
 
-export const CAMPS: Record<Camp, { name: string; emoji: string }> = {
-  s: { name: 'le Soleil', emoji: '☀️' },
-  l: { name: 'la Lune', emoji: '🌙' },
+/** The two sides are named after the fabric each team wears (echecs-tissus.ts): « Kente », « Bogolan »… */
+export type TeamNames = Record<Camp, string>;
+const DEFAULT_NAMES: TeamNames = { s: 'Kente', l: 'Bogolan' };
+
+/* ------------------------------------------------------------ the storyteller */
+
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+
+/** « la Gazelle Kente », « le Mouna Bogolan ». */
+export function pieceName(kind: Kind, camp: Camp, names: TeamNames = DEFAULT_NAMES): string {
+  return `${PIECES[kind].name} ${names[camp]}`;
+}
+
+const STEPS: Record<Kind, string[]> = {
+  p: ['{P} avance d’un petit pas.', '{P} fait un pas courageux vers l’avant.', 'Pas à pas, {p} traverse la savane.'],
+  n: ['{P} fait un grand bond en L&nbsp;!', 'Hop&nbsp;! {P} saute par-dessus les hautes herbes.', '{P} bondit, légère comme le vent.'],
+  b: ['{P} glisse en diagonale.', '{P} avance tranquillement en diagonale, pom, pom, pom.', '{P} traverse la savane en diagonale.'],
+  r: ['{P} fonce tout droit&nbsp;!', 'Attention&nbsp;: {p} charge en ligne droite&nbsp;!', 'Boum, boum&nbsp;: {p} fonce droit devant lui.'],
+  q: ['{P} traverse la savane d’un pas royal.', '{P} se déplace&nbsp;: tout le monde la regarde&nbsp;!', '{P} s’élance, aussi loin qu’elle veut.'],
+  k: ['{P} fait un petit pas prudent.', '{P} se déplace doucement.', '{P} change de place, bien à l’abri.'],
 };
+const CATCHES: Record<Kind, string[]> = {
+  p: ['{P} fait un pas en diagonale et attrape {v}&nbsp;!', 'Surprise&nbsp;! {P} attrape {v}.'],
+  n: ['{P} bondit sur {v} et l’attrape&nbsp;!', 'Hop&nbsp;! {P} saute et attrape {v}.'],
+  b: ['{P} glisse en diagonale et attrape {v}&nbsp;!', '{P} surprend {v} et l’attrape.'],
+  r: ['{P} fonce et attrape {v}&nbsp;!', 'Boum&nbsp;! {P} charge et attrape {v}.'],
+  q: ['{P} attrape {v}&nbsp;! Quelle reine&nbsp;!', '{P} s’élance et attrape {v}.'],
+  k: ['{P} attrape lui-même {v}&nbsp;!', '{P} fait un pas et attrape {v}.'],
+};
+
+/**
+ * One sentence telling what just happened, like a story for the little ones:
+ * « Hop ! La Gazelle Bogolan saute par-dessus les hautes herbes. Échec ! »
+ * `n` (the move number) picks the variant, so the story never changes on screen.
+ */
+export function narrate(before: Position, move: Move, after: Position, n: number, race = false, names: TeamNames = DEFAULT_NAMES): string {
+  const mover = before.board[move.from]!;
+  const who = pieceName(mover.kind, mover.camp, names);
+  const team = (c: Camp) => `l’équipe ${names[c]}`;
+  const pick = (list: string[]) => list[(n * 7 + move.from) % list.length];
+  let text: string;
+  if (move.castle) {
+    text = `${cap(who)} se met à l’abri derrière son Rhinocéros&nbsp;: c’est le roque&nbsp;!`;
+  } else if (move.capture !== undefined) {
+    const victim = before.board[move.capture]!;
+    const v = victim.kind === 'p' ? `un Mouna ${names[victim.camp]}` : pieceName(victim.kind, victim.camp, names);
+    text = pick(CATCHES[mover.kind]).replace('{v}', v);
+  } else if (mover.kind === 'p' && Math.abs(rowOf(move.to) - rowOf(move.from)) === 2) {
+    text = '{P} fait deux grands pas d’un coup&nbsp;!';
+  } else {
+    text = pick(STEPS[mover.kind]);
+  }
+  text = text.replace('{P}', cap(who)).replace('{p}', who);
+  if (race) {
+    if (raceWinner(after) === mover.camp) text += ` Il arrive au bout de la savane&nbsp;: ${team(mover.camp)} gagne la course&nbsp;!`;
+  } else {
+    if (move.promo) text += ' Il a traversé toute la savane&nbsp;: il devient une Reine&nbsp;!';
+    const st = status(after);
+    if (st === 'mate') text += ` Échec et mat&nbsp;! ${cap(team(mover.camp))} gagne la partie&nbsp;!`;
+    else if (st === 'check') text += ` Échec&nbsp;! Le Roi ${names[after.turn]} est en danger&nbsp;!`;
+    else if (st === 'pat') text += ' Plus personne ne peut bouger&nbsp;: match nul.';
+  }
+  return text.replace(/&nbsp;/g, '\u00a0');
+}
 
 /* ------------------------------------------------------------- positions */
 
@@ -378,7 +439,7 @@ export function botMove(pos: Position, level: 0 | 1 = 0): Move | null {
 /* -------------------------------------------- game 2: collect the mangoes */
 
 /**
- * A piece alone on the board (Soleil) and mangoes to pick. Lune pieces can
+ * A piece alone on the board ('s') and mangoes to pick. 'l' pieces can
  * stand in the way (as rocks: they can't be taken). The fewest jumps possible
  * is found by a search over (square, mangoes picked).
  */
@@ -450,14 +511,14 @@ export function mangoPar(level: MangoLevel): number {
 
 export type MatePuzzle = { list: Record<string, string>; hint: string };
 
-/** Soleil to play and win in one move (checked: each has at least one mating move and Lune isn't already in check). */
+/** 's' to play and win in one move (checked: each has at least one mating move and 'l' isn't already in check). */
 export const MATE_PUZZLES: MatePuzzle[] = [
-  { list: { g1: 'sk', d1: 'sr', g8: 'lk', f7: 'lp', g7: 'lp', h7: 'lp' }, hint: 'Le Roi Lune est coincé derrière ses petits Mounas… Le Rhinocéros fonce tout droit !' },
+  { list: { g1: 'sk', d1: 'sr', g8: 'lk', f7: 'lp', g7: 'lp', h7: 'lp' }, hint: 'Le Roi adverse est coincé derrière ses petits Mounas… Le Rhinocéros fonce tout droit !' },
   { list: { g1: 'sk', a1: 'sr', b7: 'sr', g8: 'lk' }, hint: 'Un Rhinocéros garde une ligne, l’autre fonce sur la ligne du Roi.' },
-  { list: { g6: 'sk', a7: 'sq', h8: 'lk' }, hint: 'La Reine se place tout près du Roi Lune, protégée par son propre Roi.' },
-  { list: { b6: 'sk', d1: 'sq', a8: 'lk' }, hint: 'La Reine fonce jusqu’à la ligne du haut. Le Roi Soleil garde les autres cases.' },
+  { list: { g6: 'sk', a7: 'sq', h8: 'lk' }, hint: 'La Reine se place tout près du Roi adverse, protégée par son propre Roi.' },
+  { list: { b6: 'sk', d1: 'sq', a8: 'lk' }, hint: 'La Reine fonce jusqu’à la ligne du haut. Ton Roi garde les autres cases.' },
   { list: { g1: 'sk', a7: 'sr', e1: 'sr', h8: 'lk' }, hint: 'Un Rhinocéros garde déjà une ligne. Envoie l’autre sur la ligne du Roi !' },
-  { list: { g1: 'sk', e5: 'sn', h8: 'lk', g8: 'lr', g7: 'lp', h7: 'lp' }, hint: 'Le Roi Lune est entouré par sa propre famille… La Gazelle peut sauter !' },
+  { list: { g1: 'sk', e5: 'sn', h8: 'lk', g8: 'lr', g7: 'lp', h7: 'lp' }, hint: 'Le Roi adverse est entouré par sa propre famille… La Gazelle peut sauter !' },
   { list: { g1: 'sk', b2: 'sb', g4: 'sq', h8: 'lk', g7: 'lp', h7: 'lp' }, hint: 'L’Éléphant vise la case g7 de loin. La Reine peut y aller sans crainte !' },
   {
     list: { g1: 'sk', c4: 'sb', h5: 'sq', e8: 'lk', d8: 'lq', f8: 'lb', g8: 'ln', d7: 'lp', e7: 'lp', f7: 'lp', g7: 'lp' },

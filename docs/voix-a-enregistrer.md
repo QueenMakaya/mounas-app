@@ -14,14 +14,14 @@ Par ordre de priorité :
 
 stylo · cygne · yaourt · yoga · crayon · noyau · voyage · yoyo · goyave · sympa · symbole · olympique · synonyme · il y a · Bravo !
 
-## G. Échecs de Mounaville : les boutons « Écouter » (16 textes, 4 min)
+## G. Échecs de Mounaville : les boutons « Écouter » et les fins de partie (25 textes, 6 min)
 
 Les consignes des chapitres :
 
-1. Bienvenue à Mounaville ! Ici, le camp du Soleil affronte le camp de la Lune. Chaque chapitre est un petit jeu. Commence par rencontrer la famille royale !
+1. Bienvenue à Mounaville ! Ici, chaque équipe porte un tissu d'Afrique : choisis le tien ! Chaque chapitre est un petit jeu. Commence par rencontrer la famille royale !
 2. Choisis une pièce. Elle doit ramasser toutes les mangues, en faisant le moins de déplacements possible. Fais attention aux cailloux : on ne peut pas passer dessus !
-3. La course des Mounas ! Chaque Mouna avance d'un pas tout droit, ou de deux pas la première fois. Pour attraper un Mouna de la Lune, il fait un pas en diagonale. Le premier qui arrive tout au bout gagne !
-4. Quand on attaque le Roi, on dit : échec ! Et si le Roi ne peut plus du tout s'échapper, c'est échec et mat : on a gagné ! Dans chaque défi, trouve le coup qui coince le Roi de la Lune.
+3. La course des Mounas ! Chaque Mouna avance d'un pas tout droit, ou de deux pas la première fois. Pour attraper un Mouna de l'autre équipe, il fait un pas en diagonale. Le premier qui arrive tout au bout gagne !
+4. Quand on attaque le Roi, on dit : échec ! Et si le Roi ne peut plus du tout s'échapper, c'est échec et mat : on a gagné ! Dans chaque défi, trouve le coup qui coince le Roi adverse.
 
 « Comment ça bouge » :
 
@@ -40,6 +40,24 @@ Les histoires :
 14. Le sais-tu ? Dans le tout premier jeu d'échecs, il y a très longtemps, cette pièce était déjà un éléphant !
 15. La gazelle bondit si haut et si vite dans la savane que le lion lui-même a du mal à l'attraper.
 16. « Mouna » veut dire « enfant ». Les petits avancent pas à pas… et celui qui traverse toute la savane devient une Reine !
+
+Les tissus des équipes (nouveau, 14 nov.) :
+
+17. Le kente vient du Ghana. Les Ashanti et les Ewe le tissent en longues bandes étroites, cousues ensemble. Chaque motif a un nom et un sens.
+18. Le bogolan vient du Mali. On peint ses motifs avec de la boue : en bambara, « bogo » veut dire « terre ».
+19. Le tissu kuba vient du royaume Kuba, au Congo. Il est fait en fibres de raphia, avec des motifs géométriques qu'on invente en brodant.
+20. Le ndop vient de l'Ouest du Cameroun. Ce tissu bleu indigo aux motifs blancs se porte pour les grandes fêtes et les cérémonies des rois.
+21. Le kanga vient du Kenya et de la Tanzanie. Ce tissu aux couleurs vives porte souvent un proverbe écrit en swahili.
+
+Les fins de partie contre l'ordinateur (remplacent « Le Soleil / La Lune a gagné », qui ne sont plus dites) :
+
+22. Bravo ! Ton équipe a gagné la course !
+23. L'ordinateur a gagné la course ! On rejoue ?
+24. Échec et mat ! Bravo, ton équipe a gagné !
+25. Échec et mat ! L'ordinateur a gagné. On rejoue ?
+
+Les phrases du conteur (une par coup) changent avec les tissus choisis : elles restent lues par la voix du navigateur
+(ou plus tard par le clone de ta voix).
 
 ## H. Les groupes de consonnes (13 sons, 1 min) : nouveau
 

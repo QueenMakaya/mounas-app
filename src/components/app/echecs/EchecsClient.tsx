@@ -7,7 +7,6 @@ import { playChime } from '@/lib/chime';
 import { readPref, writePref } from '@/lib/progress';
 import { useSpeech } from '@/lib/useSpeech';
 import {
-  CAMPS,
   MANGO_LEVELS,
   MATE_PUZZLES,
   PIECES,
@@ -20,6 +19,7 @@ import {
   mangoPar,
   mangoPosition,
   matePosition,
+  narrate,
   notEnoughToWin,
   parseSq,
   play,
@@ -36,7 +36,9 @@ import {
   type Position,
 } from '@/lib/echecs';
 import ChessBoard, { TurnBadge } from './ChessBoard';
-import PieceIcon from './PieceIcon';
+import PieceIconRaw, { FabricSwatch } from './PieceIcon';
+import { TeamPiece, TeamsProvider, useTeamChoice, useTeams } from './teams';
+import { FABRICS, FABRIC_IDS, type FabricId } from '@/lib/echecs-tissus';
 
 /*
  * Les échecs de Mounaville: chess for 4-8 year olds, step by step, never a
@@ -90,6 +92,7 @@ const ORDER: Kind[] = ['p', 'r', 'b', 'n', 'q', 'k'];
 export default function EchecsClient() {
   const [screen, setScreen] = useState<Screen>('hub');
   const saved = useSaved();
+  const { ids } = useTeamChoice();
   const back = () => setScreen('hub');
 
   useEffect(() => {
@@ -97,6 +100,7 @@ export default function EchecsClient() {
   }, [screen]);
 
   return (
+    <TeamsProvider ids={ids}>
     <main className="flex-1 bg-cream font-body">
       <div className="mx-auto max-w-2xl px-4 pb-16 pt-4 sm:px-6 sm:pt-6">
         <div className="flex items-center justify-between gap-3">
@@ -108,7 +112,7 @@ export default function EchecsClient() {
             </button>
           )}
           <h1 className="flex items-center gap-2 font-display text-xl font-bold text-ink sm:text-2xl">
-            <PieceIcon kind="k" camp="s" className="h-8 w-8" /> Les échecs
+            <TeamPiece kind="k" camp="s" className="h-8 w-8" /> Les échecs
           </h1>
         </div>
 
@@ -120,12 +124,14 @@ export default function EchecsClient() {
         {screen === 'partie' && <Partie />}
       </div>
     </main>
+    </TeamsProvider>
   );
 }
 
 /* -------------------------------------------------------------------- hub */
 
 function Hub({ saved, open }: { saved: Saved; open: (s: Screen) => void }) {
+  const { teams } = useTeams();
   const mangoStars = Object.values(saved.mangoes).reduce((a, b) => a + b, 0);
   const chapters: { id: Screen; n: number; title: string; text: string; icon: React.ReactNode; tint: string; done: string }[] = [
     {
@@ -133,7 +139,7 @@ function Hub({ saved, open }: { saved: Saved; open: (s: Screen) => void }) {
       n: 1,
       title: 'La famille royale',
       text: 'Rencontre le Roi, la Reine, la Gazelle, l’Éléphant, le Rhinocéros et les Mounas.',
-      icon: <PieceIcon kind="q" camp="l" className="h-12 w-12" />,
+      icon: <TeamPiece kind="q" camp="l" className="h-12 w-12" />,
       tint: '#FDECEE',
       done: `${saved.met.length}/6 rencontrés`,
     },
@@ -151,7 +157,7 @@ function Hub({ saved, open }: { saved: Saved; open: (s: Screen) => void }) {
       n: 3,
       title: 'La course des Mounas',
       text: 'Seulement les petits ! Le premier qui traverse la savane gagne.',
-      icon: <PieceIcon kind="p" camp="s" className="h-12 w-12" />,
+      icon: <TeamPiece kind="p" camp="s" className="h-12 w-12" />,
       tint: '#E3F8F5',
       done: saved.race ? `${saved.race} victoire${saved.race > 1 ? 's' : ''}` : 'À essayer',
     },
@@ -159,8 +165,8 @@ function Hub({ saved, open }: { saved: Saved; open: (s: Screen) => void }) {
       id: 'roi',
       n: 4,
       title: 'Attrape le Roi !',
-      text: 'Trouve le coup qui coince le Roi de la Lune : échec et mat !',
-      icon: <PieceIcon kind="k" camp="l" className="h-12 w-12" />,
+      text: 'Trouve le coup qui coince le Roi adverse : échec et mat !',
+      icon: <TeamPiece kind="k" camp="l" className="h-12 w-12" />,
       tint: '#F1E9F8',
       done: `${saved.mates.length}/${MATE_PUZZLES.length} trouvés`,
     },
@@ -180,14 +186,16 @@ function Hub({ saved, open }: { saved: Saved; open: (s: Screen) => void }) {
       <section className="mt-4 overflow-hidden rounded-[28px] bg-white shadow-[0_14px_44px_-14px_rgba(91,31,140,0.35)] ring-1 ring-ink/5">
         <div className="h-2 bg-gradient-to-r from-mamber via-mred to-mpurple" />
         <div className="p-6 text-center">
-          <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-mpurple">☀️ Le Soleil contre la Lune 🌙</p>
+          <p className="text-xs font-extrabold uppercase tracking-[0.18em] text-mpurple">
+            {teams.s.name} contre {teams.l.name}
+          </p>
           <h2 className="mt-2 font-display text-2xl font-bold text-ink sm:text-3xl">
             Les échecs de Mounaville
             <span className="ml-2 inline-block rounded-full bg-mamber px-2 py-0.5 align-middle font-body text-[11px] font-extrabold uppercase tracking-wider text-ink">Bêta</span>
           </h2>
           <div className="mx-auto mt-4 flex max-w-sm justify-center gap-1">
             {ORDER.map((k) => (
-              <PieceIcon key={k} kind={k} camp={k === 'k' || k === 'q' ? 'l' : 's'} className="h-12 w-12" />
+              <TeamPiece key={k} kind={k} camp={k === 'k' || k === 'q' ? 'l' : 's'} className="h-12 w-12" />
             ))}
           </div>
           <p className="mx-auto mt-4 max-w-md text-ink-soft">
@@ -196,10 +204,12 @@ function Hub({ saved, open }: { saved: Saved; open: (s: Screen) => void }) {
           <SpeakButton
             className="mt-4"
             tone="soft"
-            text="Bienvenue à Mounaville ! Ici, le camp du Soleil affronte le camp de la Lune. Chaque chapitre est un petit jeu. Commence par rencontrer la famille royale !"
+            text="Bienvenue à Mounaville ! Ici, chaque équipe porte un tissu d’Afrique : choisis le tien ! Chaque chapitre est un petit jeu. Commence par rencontrer la famille royale !"
           />
         </div>
       </section>
+
+      <TeamPicker />
 
       <ol className="mt-5 grid gap-3">
         {chapters.map((c) => (
@@ -231,7 +241,7 @@ function Hub({ saved, open }: { saved: Saved; open: (s: Screen) => void }) {
         <ul className="mt-3 grid gap-2 text-sm text-ink-soft">
           {(['k', 'q', 'r', 'b', 'n', 'p'] as Kind[]).map((k) => (
             <li key={k} className="flex items-center gap-3">
-              <PieceIcon kind={k} camp="s" className="h-9 w-9 flex-shrink-0" />
+              <TeamPiece kind={k} camp="s" className="h-9 w-9 flex-shrink-0" />
               <span>
                 <strong className="capitalize text-ink">{PIECES[k].name}</strong> = {PIECES[k].classic}
               </span>
@@ -240,7 +250,7 @@ function Hub({ saved, open }: { saved: Saved; open: (s: Screen) => void }) {
         </ul>
         <p className="mt-3 text-sm text-ink-soft">
           Toutes les vraies règles sont là (échec, mat, pat, roque, prise en passant, promotion), mais les coups possibles s’allument
-          toujours : l’enfant apprend en jouant, sans rien devoir retenir par cœur. Le Soleil commence, comme les Blancs.
+          toujours : l’enfant apprend en jouant, sans rien devoir retenir par cœur. Ton équipe, en bas, commence, comme les Blancs. Chaque équipe porte un tissu africain, au choix de l’enfant.
         </p>
       </details>
     </>
@@ -324,7 +334,7 @@ function Famille({ saved, onDone }: { saved: Saved; onDone: () => void }) {
               aria-current={n === i || undefined}
               className={`rounded-full p-0.5 transition-transform ${n === i ? 'scale-110 ring-4 ring-mpurple' : 'opacity-70 hover:opacity-100'}`}
             >
-              <PieceIcon kind={k} camp="s" className="h-10 w-10 sm:h-12 sm:w-12" />
+              <TeamPiece kind={k} camp="s" className="h-10 w-10 sm:h-12 sm:w-12" />
             </button>
           </li>
         ))}
@@ -332,7 +342,7 @@ function Famille({ saved, onDone }: { saved: Saved; onDone: () => void }) {
 
       <div className="mt-5 flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
         <span className="flex h-28 w-28 flex-shrink-0 items-center justify-center rounded-[28px]" style={{ backgroundColor: info.tint }}>
-          <PieceIcon key={kind} kind={kind} camp="s" className="animate-badge h-24 w-24" />
+          <TeamPiece key={kind} kind={kind} camp="s" className="animate-badge h-24 w-24" />
         </span>
         <div>
           <h2 className="font-display text-3xl font-bold capitalize text-ink">{info.name}</h2>
@@ -361,7 +371,7 @@ function Famille({ saved, onDone }: { saved: Saved; onDone: () => void }) {
         </button>
         {i < ORDER.length - 1 ? (
           <button type="button" className={btnMain} onClick={() => go(i + 1)}>
-            Suivant <PieceIcon kind={ORDER[i + 1]} camp="s" className="ml-1 inline h-7 w-7 align-middle" /> →
+            Suivant <TeamPiece kind={ORDER[i + 1]} camp="s" className="ml-1 inline h-7 w-7 align-middle" /> →
           </button>
         ) : (
           <button type="button" className={btnMain} onClick={onDone}>
@@ -396,7 +406,7 @@ function Mangues({ saved }: { saved: Saved }) {
                 className="flex w-full flex-col items-center gap-1 rounded-3xl p-3 ring-1 ring-ink/10 transition-colors hover:bg-sand"
                 style={{ backgroundColor: PIECES[l.kind].tint }}
               >
-                <PieceIcon kind={l.kind} camp="s" className="h-12 w-12" />
+                <TeamPiece kind={l.kind} camp="s" className="h-12 w-12" />
                 <span className="text-sm font-extrabold capitalize text-ink">
                   {PIECES[l.kind].name} · {l.mangoes.length} 🥭
                 </span>
@@ -463,7 +473,7 @@ function MangoGame({ n, onNext, onList }: { n: number; onNext: () => void; onLis
     <Panel>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 font-display text-xl font-bold capitalize text-ink">
-          <PieceIcon kind={lvl.kind} camp="s" className="h-9 w-9" /> {PIECES[lvl.kind].name}
+          <TeamPiece kind={lvl.kind} camp="s" className="h-9 w-9" /> {PIECES[lvl.kind].name}
         </h2>
         <p className="rounded-full bg-sand px-3 py-1 text-sm font-bold text-ink">
           🥭 {lvl.mangoes.length - left.length}/{lvl.mangoes.length} · {moves} coup{moves > 1 ? 's' : ''} · objectif {par}
@@ -514,9 +524,12 @@ type Opponent = 'bot' | 'ami';
  * Tap-to-move for the camp whose turn it is; the Mounaville bot answers by
  * itself after a short pause. `rules` chooses between the race and real chess.
  */
-function usePlay(initial: () => Position, opts: { opponent: Opponent; race?: boolean; level?: 0 | 1 }) {
+function usePlay(initial: () => Position, opts: { opponent: Opponent; race?: boolean; level?: 0 | 1; hold?: boolean }) {
   const [history, setHistory] = useState<Position[]>(() => [initial()]);
   const [moves, setMoves] = useState<Move[]>([]);
+  /** One sentence per move, told by the storyteller. */
+  const [stories, setStories] = useState<string[]>([]);
+  const { names } = useTeams();
   const [selected, setSelected] = useState<number | null>(null);
   const pos = history[history.length - 1];
   const last = moves[moves.length - 1] ?? null;
@@ -537,18 +550,25 @@ function usePlay(initial: () => Position, opts: { opponent: Opponent; race?: boo
     const next = opts.race ? racePlay(pos, m) : play(pos, m);
     setHistory((h) => [...h, next]);
     setMoves((ms) => [...ms, m]);
+    setStories((st) => [...st, narrate(pos, m, next, moves.length, opts.race, names)]);
     setSelected(null);
   };
 
+  // The computer takes its time, so the child can follow: it waits until the
+  // storyteller has finished the child's move (at most 6 s), then a moment more.
+  const hold = !!opts.hold;
   useEffect(() => {
     if (!botTurn) return;
-    const t = window.setTimeout(() => {
-      const m = opts.race ? raceBotMove(pos) : botMove(pos, opts.level ?? 0);
-      if (m) doMove(m);
-    }, 650);
+    const t = window.setTimeout(
+      () => {
+        const m = opts.race ? raceBotMove(pos) : botMove(pos, opts.level ?? 0);
+        if (m) doMove(m);
+      },
+      hold ? 6000 : 1200,
+    );
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [botTurn, pos]);
+  }, [botTurn, pos, hold]);
 
   const onSquare = (sq: number) => {
     if (winner || botTurn) return;
@@ -567,12 +587,14 @@ function usePlay(initial: () => Position, opts: { opponent: Opponent; race?: boo
     if (history.length <= n) return;
     setHistory((h) => h.slice(0, -n));
     setMoves((ms) => ms.slice(0, -n));
+    setStories((st) => st.slice(0, -n));
     setSelected(null);
   };
 
   const reset = () => {
     setHistory([initial()]);
     setMoves([]);
+    setStories([]);
     setSelected(null);
   };
 
@@ -589,22 +611,89 @@ function usePlay(initial: () => Position, opts: { opponent: Opponent; race?: boo
     return out;
   }, [history, moves]);
 
-  return { pos, last, selected, targets, onSquare, undo, reset, winner, botTurn, status: st, caught, canUndo: history.length > 1 };
+  const story = stories[stories.length - 1] ?? null;
+  return { pos, last, story, selected, targets, onSquare, undo, reset, winner, botTurn, status: st, caught, canUndo: history.length > 1 };
+}
+
+/* ------------------------------------------------- the storyteller (on/off) */
+
+const LS_STORY = 'mounas_echecs_conteur';
+
+/** The storyteller is on unless the parent turned it off (kept on the device). */
+let storyListeners: (() => void)[] = [];
+function subscribeStory(cb: () => void) {
+  storyListeners.push(cb);
+  return () => {
+    storyListeners = storyListeners.filter((l) => l !== cb);
+  };
+}
+function useStoryteller() {
+  const on = useSyncExternalStore(subscribeStory, () => readPref(LS_STORY) !== 'non', () => true);
+  const toggle = () => {
+    writePref(LS_STORY, on ? 'non' : 'oui');
+    storyListeners.forEach((l) => l());
+  };
+  return { on, toggle };
+}
+
+/**
+ * Tells each move aloud (the bubble shows it). While it talks (`speech.speaking`),
+ * the computer waits before answering.
+ */
+function useTellStory(story: string | null, on: boolean, quiet: boolean, speech: ReturnType<typeof useSpeech>) {
+  const { speak, supported } = speech;
+  const told = useRef<string | null>(null);
+  useEffect(() => {
+    if (!story || !on || told.current === story) return;
+    told.current = story;
+    if (supported && !quiet) speak(story, 0.9);
+  }, [story, on, quiet, speak, supported]);
+}
+
+function StoryBubble({ story, on, onToggle }: { story: string | null; on: boolean; onToggle: () => void }) {
+  return (
+    <div className="mt-3 flex items-start gap-2">
+      <div className="min-h-12 flex-1 rounded-2xl bg-white px-4 py-2.5 ring-1 ring-ink/10" aria-live="polite">
+        {on ? (
+          <p key={story ?? ''} className="animate-rise text-[15px] font-bold leading-snug text-ink">
+            <span aria-hidden="true">📖 </span>
+            {story ?? 'Il était une fois, dans la savane de Mounaville… À toi de jouer le premier coup !'}
+          </p>
+        ) : (
+          <p className="text-sm text-ink-soft">Le conteur se repose.</p>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-pressed={on}
+        className={`min-h-12 flex-shrink-0 rounded-2xl px-3 text-xs font-extrabold ring-1 ring-ink/15 ${on ? 'bg-mpurple text-cream' : 'bg-white text-ink-soft'}`}
+      >
+        {on ? '🔊 Conteur' : '🔇 Conteur'}
+      </button>
+    </div>
+  );
 }
 
 function OpponentPicker({ onPick, withLevels }: { onPick: (o: Opponent, level?: 0 | 1) => void; withLevels?: boolean }) {
+  const { teams } = useTeams();
   return (
-    <div className="mt-5 grid gap-3 sm:grid-cols-2">
+    <>
+    <TeamPicker compact />
+    <div className="mt-4 grid gap-3 sm:grid-cols-2">
       <button type="button" onClick={() => onPick('bot', 0)} className="flex items-center gap-3 rounded-3xl bg-[#F1E9F8] p-4 text-left ring-1 ring-ink/10 hover:ring-mpurple">
-        <PieceIcon kind="p" camp="l" className="h-12 w-12 flex-shrink-0" />
+        <TeamPiece kind="p" camp="l" className="h-12 w-12 flex-shrink-0" />
         <span>
           <span className="block font-extrabold text-ink">Contre Mounaville{withLevels ? ' · tout doux' : ''}</span>
-          <span className="block text-sm text-ink-soft">L’ordinateur joue la Lune{withLevels ? ', comme un enfant qui apprend' : ''}.</span>
+          <span className="block text-sm text-ink-soft">
+            L’ordinateur joue avec {teams.l.team}
+            {withLevels ? ', comme un enfant qui apprend' : ''}.
+          </span>
         </span>
       </button>
       {withLevels && (
         <button type="button" onClick={() => onPick('bot', 1)} className="flex items-center gap-3 rounded-3xl bg-[#E4F0F8] p-4 text-left ring-1 ring-ink/10 hover:ring-mpurple">
-          <PieceIcon kind="q" camp="l" className="h-12 w-12 flex-shrink-0" />
+          <TeamPiece kind="q" camp="l" className="h-12 w-12 flex-shrink-0" />
           <span>
             <span className="block font-extrabold text-ink">Contre Mounaville · malin</span>
             <span className="block text-sm text-ink-soft">Il fait plus attention à ses pièces.</span>
@@ -621,15 +710,17 @@ function OpponentPicker({ onPick, withLevels }: { onPick: (o: Opponent, level?: 
         </span>
       </button>
     </div>
+    </>
   );
 }
 
 function Caught({ kinds, camp }: { kinds: Kind[]; camp: Camp }) {
+  const { names } = useTeams();
   if (!kinds.length) return <span className="text-xs text-ink-soft">Rien attrapé pour l’instant</span>;
   return (
-    <span className="flex flex-wrap gap-0.5" aria-label={`Pièces attrapées : ${kinds.map((k) => PIECES[k].name).join(', ')}`}>
+    <span className="flex flex-wrap gap-0.5" aria-label={`Pièces attrapées : ${kinds.map((k) => `${PIECES[k].name} ${names[camp]}`).join(', ')}`}>
       {kinds.map((k, i) => (
-        <PieceIcon key={i} kind={k} camp={camp} className="h-6 w-6" />
+        <TeamPiece key={i} kind={k} camp={camp} className="h-6 w-6" />
       ))}
     </span>
   );
@@ -648,7 +739,7 @@ function Course() {
       <div className="mt-2 flex justify-center">
         <SpeakButton
           tone="soft"
-          text="La course des Mounas ! Chaque Mouna avance d’un pas tout droit, ou de deux pas la première fois. Pour attraper un Mouna de la Lune, il fait un pas en diagonale. Le premier qui arrive tout au bout gagne !"
+          text="La course des Mounas ! Chaque Mouna avance d’un pas tout droit, ou de deux pas la première fois. Pour attraper un Mouna de l’autre équipe, il fait un pas en diagonale. Le premier qui arrive tout au bout gagne !"
         />
       </div>
       {opponent ? <RaceGame key={opponent} opponent={opponent} onChange={() => setOpponent(null)} /> : <OpponentPicker onPick={setOpponent} />}
@@ -657,8 +748,12 @@ function Course() {
 }
 
 function RaceGame({ opponent, onChange }: { opponent: Opponent; onChange: () => void }) {
-  const g = usePlay(racePosition, { opponent, race: true });
-  const { speak, supported } = useSpeech();
+  const teller = useStoryteller();
+  const speech = useSpeech();
+  const { speak, supported } = speech;
+  const g = usePlay(racePosition, { opponent, race: true, hold: teller.on && speech.speaking !== null });
+  const { teams } = useTeams();
+  useTellStory(g.story, teller.on, !!g.winner, speech);
   const counted = useRef(false);
 
   useEffect(() => {
@@ -668,17 +763,26 @@ function RaceGame({ opponent, onChange }: { opponent: Opponent; onChange: () => 
       playChime();
       if (opponent === 'bot') save((s) => ({ ...s, race: s.race + 1 }));
     }
-    if (supported) speak(g.winner === 's' ? 'Le Soleil a gagné la course !' : 'La Lune a gagné la course !', 0.9);
-  }, [g.winner, opponent, speak, supported]);
+    if (supported)
+      speak(
+        opponent === 'bot'
+          ? g.winner === 's'
+            ? 'Bravo ! Ton équipe a gagné la course !'
+            : 'L’ordinateur a gagné la course ! On rejoue ?'
+          : `${cap(g.winner === 's' ? teams.s.team : teams.l.team)} a gagné la course !`,
+        0.9,
+      );
+  }, [g.winner, opponent, speak, supported, teams]);
 
   return (
     <>
       <div className="mt-4 flex justify-center">
         {!g.winner && <TurnBadge camp={g.pos.turn} label={g.botTurn ? 'Mounaville réfléchit…' : opponent === 'bot' ? 'À toi de jouer !' : undefined} />}
       </div>
+      <StoryBubble story={g.story} on={teller.on} onToggle={teller.toggle} />
       <ChessBoard className="mt-3" board={g.pos.board} selected={g.selected} targets={g.targets} lastMove={g.last} onSquare={g.onSquare} disabled={!!g.winner} />
       {g.winner && g.winner !== 'nul' && (
-        <Celebrate title={g.winner === 's' ? 'Le Soleil gagne la course ! ☀️' : 'La Lune gagne la course ! 🌙'} text={g.winner === 'l' && opponent === 'bot' ? 'Pas grave : on rejoue ?' : undefined}>
+        <Celebrate title={`${cap(g.winner === 's' ? teams.s.team : teams.l.team)} gagne la course !`} text={g.winner === 'l' && opponent === 'bot' ? 'Pas grave : on rejoue ?' : undefined}>
           <button
             type="button"
             className={btnMain}
@@ -726,7 +830,7 @@ function Roi({ saved }: { saved: Saved }) {
         <div className="mt-2 flex justify-center">
           <SpeakButton
             tone="soft"
-            text="Quand on attaque le Roi, on dit : échec ! Et si le Roi ne peut plus du tout s’échapper, c’est échec et mat : on a gagné ! Dans chaque défi, trouve le coup qui coince le Roi de la Lune."
+            text="Quand on attaque le Roi, on dit : échec ! Et si le Roi ne peut plus du tout s’échapper, c’est échec et mat : on a gagné ! Dans chaque défi, trouve le coup qui coince le Roi adverse."
           />
         </div>
         <ul className="mt-5 grid grid-cols-4 gap-3">
@@ -795,22 +899,22 @@ function MatePuzzleGame({ n, onNext, onList }: { n: number; onNext: () => void; 
     else setSelected(null);
   };
 
-  const kingLune = kingSquare(pos.board, 'l');
+  const kingOther = kingSquare(pos.board, 'l');
 
   return (
     <Panel>
       <div className="flex items-center justify-between gap-2">
         <h2 className="font-display text-xl font-bold text-ink">Défi {n + 1}</h2>
-        <TurnBadge camp="s" label="Le Soleil joue et gagne" />
+        <TurnBadge camp="s" label="Tu joues et tu gagnes" />
       </div>
-      <p className="mt-2 text-sm text-ink-soft">En un seul coup, mets le Roi de la Lune échec et mat.</p>
+      <p className="mt-2 text-sm text-ink-soft">En un seul coup, mets le Roi adverse échec et mat.</p>
       <ChessBoard
         className="mt-4"
         board={pos.board}
         selected={selected}
         targets={targets}
         lastMove={last}
-        check={inCheck(pos, 'l') ? kingLune : null}
+        check={inCheck(pos, 'l') ? kingOther : null}
         onSquare={onSquare}
       />
       <div className="mt-3 min-h-12 text-center" aria-live="polite">
@@ -822,7 +926,7 @@ function MatePuzzleGame({ n, onNext, onList }: { n: number; onNext: () => void; 
         )}
       </div>
       {won ? (
-        <Celebrate title="Échec et mat !" text="Le Roi de la Lune ne peut plus s’échapper.">
+        <Celebrate title="Échec et mat !" text="Le Roi adverse ne peut plus s’échapper.">
           <button type="button" className={btnMain} onClick={onNext}>
             Défi suivant →
           </button>
@@ -849,7 +953,7 @@ function Partie() {
     <Panel>
       <h2 className="text-center font-display text-2xl font-bold text-ink">🏆 La grande partie</h2>
       <p className="mx-auto mt-1 max-w-md text-center text-ink-soft">
-        Toute la famille sur la savane ! Le Soleil commence. Touche une pièce : ses chemins s’allument.
+        Toute la famille sur la savane ! Ton équipe commence. Touche une pièce : ses chemins s’allument.
       </p>
       {choice ? (
         <FullGame key={`${choice.opponent}${choice.level}`} {...choice} onChange={() => setChoice(null)} />
@@ -861,18 +965,23 @@ function Partie() {
 }
 
 function FullGame({ opponent, level, onChange }: { opponent: Opponent; level: 0 | 1; onChange: () => void }) {
-  const g = usePlay(startPosition, { opponent, level });
-  const { speak, supported } = useSpeech();
+  const teller = useStoryteller();
+  const speech = useSpeech();
+  const { speak, supported } = speech;
+  const g = usePlay(startPosition, { opponent, level, hold: teller.on && speech.speaking !== null });
+  const { ids, teams } = useTeams();
   const counted = useRef(false);
   const said = useRef('');
+  useTellStory(g.story, teller.on, !!g.winner, speech);
 
+  // Storyteller off: only the important news is said.
   useEffect(() => {
     const key = `${g.last?.from}-${g.last?.to}`;
-    if (!g.last || said.current === key || !supported) return;
+    if (teller.on || !g.last || said.current === key || !supported) return;
     said.current = key;
     if (g.status === 'check') speak('Échec ! Attention au Roi !', 0.95);
     else if (g.last.promo) speak('Le Mouna est arrivé au bout : il devient une Reine !', 0.9);
-  }, [g.last, g.status, speak, supported]);
+  }, [g.last, g.status, speak, supported, teller.on]);
 
   useEffect(() => {
     if (!g.winner || counted.current) return;
@@ -882,8 +991,17 @@ function FullGame({ opponent, level, onChange }: { opponent: Opponent; level: 0 
       if (opponent === 'bot') save((s) => ({ ...s, games: s.games + 1 }));
     }
     if (supported)
-      speak(g.winner === 'nul' ? 'Match nul ! Personne ne gagne.' : `Échec et mat ! ${g.winner === 's' ? 'Le Soleil' : 'La Lune'} a gagné !`, 0.9);
-  }, [g.winner, opponent, speak, supported]);
+      speak(
+        g.winner === 'nul'
+          ? 'Match nul ! Personne ne gagne.'
+          : opponent === 'bot'
+            ? g.winner === 's'
+              ? 'Échec et mat ! Bravo, ton équipe a gagné !'
+              : 'Échec et mat ! L’ordinateur a gagné. On rejoue ?'
+            : `Échec et mat ! ${cap(g.winner === 's' ? teams.s.team : teams.l.team)} a gagné !`,
+        0.9,
+      );
+  }, [g.winner, opponent, speak, supported, teams]);
 
   const checkSq = g.status === 'check' || g.status === 'mate' ? kingSquare(g.pos.board, g.pos.turn) : null;
 
@@ -891,27 +1009,28 @@ function FullGame({ opponent, level, onChange }: { opponent: Opponent; level: 0 
     <>
       <div className="mt-4 flex items-center justify-between gap-2 text-sm">
         <span className="flex items-center gap-1.5 font-bold text-mpurple">
-          🌙 <Caught kinds={g.caught.l} camp="s" />
+          <FabricSwatch id={ids.l} className="h-6 w-6" /> <Caught kinds={g.caught.l} camp="s" />
         </span>
       </div>
       <div className="mt-2 flex justify-center">
         {!g.winner && (
           <TurnBadge
             camp={g.pos.turn}
-            label={g.botTurn ? 'Mounaville réfléchit…' : g.status === 'check' ? `Échec ! Protège ton Roi ${CAMPS[g.pos.turn].emoji}` : opponent === 'bot' ? 'À toi de jouer !' : undefined}
+            label={g.botTurn ? 'Mounaville réfléchit…' : g.status === 'check' ? 'Échec ! Protège ton Roi' : opponent === 'bot' ? 'À toi de jouer !' : undefined}
           />
         )}
       </div>
+      <StoryBubble story={g.story} on={teller.on} onToggle={teller.toggle} />
       <ChessBoard className="mt-3" board={g.pos.board} selected={g.selected} targets={g.targets} lastMove={g.last} check={checkSq} onSquare={g.onSquare} disabled={!!g.winner} />
       <div className="mt-2 flex items-center gap-1.5 text-sm font-bold text-morange-ink">
-        ☀️ <Caught kinds={g.caught.s} camp="l" />
+        <FabricSwatch id={ids.s} className="h-6 w-6" /> <Caught kinds={g.caught.s} camp="l" />
       </div>
-      {g.last?.promo && !g.winner && (
+      {g.last?.promo && !g.winner && !teller.on && (
         <p className="animate-rise mt-3 rounded-2xl bg-[#FDECEE] px-4 py-2 text-center font-bold text-mred-dark">👑 Un Mouna a traversé la savane : il devient une Reine !</p>
       )}
       {g.winner && (
         <Celebrate
-          title={g.winner === 'nul' ? 'Match nul !' : `${g.winner === 's' ? 'Le Soleil' : 'La Lune'} gagne ! ${g.winner === 's' ? '☀️' : '🌙'}`}
+          title={g.winner === 'nul' ? 'Match nul !' : `${cap(g.winner === 's' ? teams.s.team : teams.l.team)} gagne !`}
           text={g.winner === 'nul' ? 'Personne ne peut plus gagner : bien joué à tous les deux.' : 'Échec et mat : le Roi ne peut plus s’échapper.'}
         >
           <button
@@ -929,4 +1048,83 @@ function FullGame({ opponent, level, onChange }: { opponent: Opponent; level: 0 
       <GameButtons g={g} onChange={onChange} />
     </>
   );
+}
+
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+
+/* ------------------------------------------------------- the fabric picker */
+
+/**
+ * Each team wears an African fabric: the child picks theirs and the other
+ * side's. `compact` (before a game) shows the match-up on one line, with a
+ * button to change it.
+ */
+function TeamPicker({ compact = false }: { compact?: boolean }) {
+  const { ids, choose } = useTeamChoice();
+  const [open, setOpen] = useState(!compact);
+  const [about, setAbout] = useState<FabricId>(ids.s);
+  const row = (camp: Camp, title: string) => (
+    <div className="mt-3">
+      <p className="text-sm font-extrabold text-ink">{title}</p>
+      <ul className="mt-2 grid grid-cols-5 gap-1.5 sm:gap-2">
+        {FABRIC_IDS.map((id) => {
+          const on = ids[camp] === id;
+          return (
+            <li key={id}>
+              <button
+                type="button"
+                aria-pressed={on}
+                onClick={() => {
+                  choose(camp, id);
+                  setAbout(id);
+                }}
+                className={`flex w-full flex-col items-center gap-1 rounded-2xl px-0.5 py-2 transition-transform ${on ? 'bg-white shadow-sm ring-2 ring-ink' : 'hover:bg-white/70'}`}
+              >
+                <TeamPieceFor fabric={id} camp={camp} />
+                <span className={`text-[11px] leading-tight sm:text-xs ${on ? 'font-extrabold text-ink' : 'font-bold text-ink-soft'}`}>{FABRICS[id].name}</span>
+                <span className="hidden text-[10px] leading-tight text-ink-soft sm:block">{FABRICS[id].origin}</span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+
+  return (
+    <section className={`${compact ? 'mt-4' : 'mt-5'} rounded-3xl bg-sand/60 p-4 ring-1 ring-ink/5`} aria-label="Les tissus des équipes">
+      <div className="flex items-center justify-between gap-2">
+        <p className="flex items-center gap-2 font-display text-lg font-bold text-ink">
+          <FabricSwatch id={ids.s} className="h-7 w-7" />
+          {FABRICS[ids.s].name}
+          <span className="font-body text-sm font-bold text-ink-soft">contre</span>
+          {FABRICS[ids.l].name}
+          <FabricSwatch id={ids.l} className="h-7 w-7" />
+        </p>
+        {compact && (
+          <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="min-h-10 rounded-full bg-white px-3 text-sm font-bold text-ink ring-1 ring-ink/15">
+            {open ? 'Fermer' : 'Changer'}
+          </button>
+        )}
+      </div>
+      {!compact && <p className="mt-1 text-sm text-ink-soft">Chaque équipe porte un tissu d’Afrique. Choisis le tien !</p>}
+      {open && (
+        <>
+          {row('s', 'Ton tissu')}
+          {row('l', 'Le tissu de l’autre équipe')}
+          <div className="mt-3 rounded-2xl bg-white p-3">
+            <p className="text-sm text-ink">
+              <strong>{FABRICS[about].name}</strong> · {FABRICS[about].story}
+            </p>
+            <SpeakButton className="mt-2" tone="soft" label="Écouter" text={FABRICS[about].story} />
+          </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+/** A king dressed in one fabric, for the picker. */
+function TeamPieceFor({ fabric, camp }: { fabric: FabricId; camp: Camp }) {
+  return <PieceIconRaw kind={camp === 's' ? 'k' : 'q'} camp={camp} fabric={fabric} className="h-11 w-11 sm:h-12 sm:w-12" />;
 }

@@ -64,6 +64,13 @@ body {
   100% { transform: scale(1) rotate(0); }
 }
 .animate-pop { animation: mounas-pop 0.35s ease-out; }
+/* A chess piece gliding from its old square (--dx/--dy: squares to come from). */
+@keyframes mounas-slide {
+  from { transform: translate(calc(var(--dx) * 111%), calc(var(--dy) * 111%)) scale(1.12); }
+  80% { transform: translate(0, 0) scale(1.12); }
+  to { transform: translate(0, 0) scale(1); }
+}
+.animate-slide { animation: mounas-slide 0.7s ease-in-out both; }
 .animate-rise { animation: mounas-rise 0.35s ease-out both; }
 .animate-badge { animation: mounas-badge 0.7s cubic-bezier(0.2, 0.8, 0.3, 1.2) both; }
 
@@ -150,6 +157,7 @@ body {
 .animate-hold { animation: mounas-hold 3s linear forwards; }
 
 @media (prefers-reduced-motion: reduce) {
+  .animate-slide,
   .animate-pop,
   .animate-rise,
   .animate-badge,

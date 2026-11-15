@@ -179,7 +179,7 @@ export default async function HomePage() {
                 Les échecs de Mounaville
                 <span className="ml-1.5 inline-block rounded-full bg-mamber px-2 py-0.5 align-middle font-body text-[11px] font-extrabold uppercase tracking-wider text-ink">Bêta</span>
               </span>
-              <span className="block text-sm text-ink-soft">La Reine, la Gazelle, l’Éléphant… le Soleil contre la Lune</span>
+              <span className="block text-sm text-ink-soft">La Reine, la Gazelle, l’Éléphant… et ton équipe en kente ou en bogolan</span>
             </span>
             <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
           </Link>

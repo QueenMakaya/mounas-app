@@ -97,7 +97,7 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
 
 ## 9 novembre 2026
 
-- [x] **Les échecs de Mounaville** (/app/echecs, en bêta ; promo la semaine du 16 novembre) : les échecs plutôt que les dames, mais rendus faciles et inspirés de l'Afrique.
+- [x] **Les échecs de Mounaville** (/app/echecs, en bêta ; promo la semaine du 23 novembre) : les échecs plutôt que les dames, mais rendus faciles et inspirés de l'Afrique.
   Le camp du Soleil (commence) contre le camp de la Lune. Le Roi (Mansa), la Reine (Nzinga), la Gazelle (cavalier),
   l'Éléphant (fou, comme dans le tout premier jeu d'échecs), le Rhinocéros (tour, il fonce tout droit) et les Mounas (pions :
   « mouna » = enfant ; celui qui traverse la savane devient Reine). Cinq chapitres : 1. La famille royale (chaque pièce, son
@@ -105,3 +105,20 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   (que des pions) · 4. Attrape le Roi ! (8 mats en un coup) · 5. La grande partie (contre Mounaville « tout doux » / « malin »
   ou contre un ami sur le même écran, bouton « Oups, je reviens »). Les coups possibles s'allument toujours ; toutes les vraies règles.
   Nouvelle icône « Échecs » dans la rangée des rubriques, carte sur l'accueil et dans la démo.
+
+## 14 novembre 2026
+
+- [x] **Échecs, la partie contre l'ordinateur** : il ne joue plus trop vite. Il attend que le conteur ait fini de raconter
+  le coup de l'enfant, puis 1 à 2 secondes. Chaque pièce **glisse** de sa case de départ à sa case d'arrivée, et la case de départ
+  reste marquée en orange : on voit toujours ce que l'ordinateur vient de jouer.
+- [x] **Le conteur** : une phrase pour chaque coup, lue à voix haute et affichée dans une bulle au-dessus du plateau
+  (« Hop ! La Gazelle de la Lune saute par-dessus les hautes herbes. », « Le Rhinocéros du Soleil fonce et attrape un Mouna de la Lune ! Échec ! »).
+  Bouton « Conteur » pour le couper (choix gardé sur l'appareil). Aussi dans la course des Mounas.
+- [x] **Les équipes portent des tissus africains** (à la place du Soleil et de la Lune) : kente (Ghana), bogolan (Mali),
+  kuba (RD Congo), ndop (Cameroun), kanga (Kenya, Tanzanie). L'enfant choisit son tissu et celui de l'autre équipe
+  (sur l'accueil des échecs, et avant chaque partie avec « Changer »), choix gardé sur l'appareil. Une phrase sur chaque tissu,
+  à écouter. Le motif est dessiné sur le bord de chaque pièce ; le conteur dit « la Gazelle Kente », « le Roi Bogolan ».
+  Pas de peuples opposés entre eux : chaque équipe porte simplement un tissu et son histoire.
+  Fins de partie contre l'ordinateur : « Ton équipe a gagné ! » / « L'ordinateur a gagné. On rejoue ? » (nouvelles phrases à enregistrer,
+  voir docs/voix-a-enregistrer.md, partie G).
+- [ ] **Visuels de la campagne** (carrousel, reels, stories, carte WhatsApp) : ils montrent encore le Soleil et la Lune et les anciennes pièces, à refaire.
