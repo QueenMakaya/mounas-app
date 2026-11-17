@@ -8,9 +8,9 @@ import { KNOWN_THEMES } from '@/lib/themes';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'Commencer avec Les Mounas : le premier mot de ton enfant en 2 minutes',
+  title: 'Commencer avec Les Mounas : le premier mot de ton enfant en 1 minute',
   description:
-    'Quelques questions toutes simples sur ton enfant, et son programme est prêt : le bon niveau, ses thèmes préférés, votre rythme. Sans compte ni carte.',
+    'Quelques questions toutes simples sur ton enfant, et son programme est prêt : le bon niveau, ses thèmes préférés, le calcul et les échecs. Sans compte ni carte.',
 };
 
 /**

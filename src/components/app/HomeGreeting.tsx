@@ -35,7 +35,7 @@ export function StartPrompt() {
       </span>
       <span className="flex-1">
         <span className="block font-extrabold text-ink">Nouveau ici ? Prépare son programme</span>
-        <span className="block text-sm text-ink-soft">2 minutes pour trouver son niveau et ses thèmes</span>
+        <span className="block text-sm text-ink-soft">1 minute pour trouver son niveau, en mots et en calcul</span>
       </span>
       <span aria-hidden="true" className="text-xl text-ink transition-transform group-hover:translate-x-1">→</span>
     </Link>

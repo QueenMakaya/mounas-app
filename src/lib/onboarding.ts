@@ -1,5 +1,6 @@
 import { LEVELS } from '@/lib/levels';
 import { DEMO_AGES, demoLevelForAge } from '@/lib/demo';
+import { readCalcul, saveCalcul, setLevel } from '@/lib/calcul';
 import { readPref, writePref } from '@/lib/progress';
 
 /**
@@ -12,7 +13,8 @@ import { readPref, writePref } from '@/lib/progress';
  *   - the level     → `mounas_last_difficulty` (the word picker opens on it)
  *                     and the first word offered at the end;
  *   - the themes    → the first word is picked among them when possible;
- *   - the rhythm    → `mounas_words_per_day` (child mode, src/lib/child-mode.ts);
+ *   - the numbers   → where the calculation ladder starts (`mounas_calcul`);
+ *   - chess         → the chapter marked « Commence ici » in the chess hub;
  *   - the first name → the greeting on the app's home page.
  */
 
@@ -29,62 +31,39 @@ export const STAGE_CHOICES: Choice[] = [
   { value: '', emoji: '🤔', label: 'Je ne sais pas trop' },
 ];
 
-export const MAX_GOALS = 3;
-
-/** Each goal points at the part of the app that serves it. */
-export const GOAL_CHOICES: (Choice & { section: string })[] = [
-  { value: 'aimer', emoji: '💛', label: 'Aimer le français', section: 'Le mot mystère du jour' },
-  { value: 'lire', emoji: '📖', label: 'Apprendre à lire', section: 'Les syllabes et les sons' },
-  { value: 'ecrire', emoji: '✏️', label: 'Apprendre à écrire', section: 'Le cahier de dictée' },
-  { value: 'compter', emoji: '🔢', label: 'Compter et calculer', section: 'Le calcul et les missions' },
-  { value: 'culture', emoji: '🌍', label: 'Grandir avec la culture afro', section: 'Mounaville, son village qui grandit' },
-  { value: 'confiance', emoji: '🦁', label: 'Prendre confiance', section: 'Les progrès, mot après mot' },
+/** « Et avec les chiffres ? » Each answer is a starting rung of the calculation ladder (src/lib/calcul.ts). */
+export const MATH_CHOICES: (Choice & { calcul: string; start: string })[] = [
+  { value: 'compte', emoji: '🖐️', label: 'Apprend à compter', calcul: 'add-1', start: 'Ajouter 1, avec les jetons' },
+  { value: 'additions', emoji: '➕', label: 'Fait de petites additions', calcul: 'add-10', start: 'Les additions jusqu’à 10' },
+  { value: 'soustractions', emoji: '➖', label: 'Additionne et soustrait', calcul: 'sub-10', start: 'Les soustractions jusqu’à 10' },
+  { value: 'tables', emoji: '✖️', label: 'Apprend ses tables', calcul: 'mul-2', start: 'La table de 2' },
+  { value: 'libre', emoji: '🤔', label: 'Je ne sais pas trop', calcul: 'add-1', start: 'Ajouter 1, puis le niveau s’ajuste tout seul' },
 ];
 
-export const INVOLVEMENT_CHOICES: (Choice & { title: string; text: string })[] = [
-  {
-    value: 'ensemble',
-    emoji: '🤝',
-    label: 'On joue ensemble',
-    title: 'Dix minutes rien que pour vous deux',
-    text: 'Chaque mot se découvre à deux : on retourne les cartes, on tape les syllabes dans les mains, on chante. L’app te guide étape par étape.',
-  },
-  {
-    value: 'seul',
-    emoji: '🚀',
-    label: 'Mon enfant aime jouer seul',
-    title: 'Le mode enfant est fait pour ça',
-    text: 'Ton enfant avance seul, guidé par la voix. L’écran reste verrouillé sur son mot, et c’est toi qui choisis combien de mots par jour.',
-  },
-  {
-    value: 'suivi',
-    emoji: '👀',
-    label: 'Je regarde ses progrès',
-    title: 'Tu vois tout d’un coup d’œil',
-    text: 'Les mots appris, les sons connus, les jours d’affilée : la page Progrès te montre le chemin parcouru, sans note ni pression.',
-  },
+/** « Et les échecs ? » Each answer is a chapter of Les échecs de Mounaville, or none. */
+export const CHESS_CHOICES: (Choice & { chapter: string; start: string })[] = [
+  { value: 'jamais', emoji: '👑', label: 'N’a jamais joué', chapter: 'famille', start: 'Chapitre 1 · La famille royale' },
+  { value: 'pieces', emoji: '🥭', label: 'Connaît quelques pièces', chapter: 'mangues', start: 'Chapitre 2 · La cueillette des mangues' },
+  { value: 'joue', emoji: '♟️', label: 'Sait déjà jouer', chapter: 'partie', start: 'Chapitre 5 · La grande partie' },
+  { value: 'non', emoji: '⏳', label: 'Pas pour l’instant', chapter: '', start: '' },
 ];
 
-/** `words` feeds child mode's « mots par jour » (1 to 5). */
-export const RHYTHM_CHOICES: (Choice & { words: number })[] = [
-  { value: '1', emoji: '☀️', label: 'Un mot par jour', hint: '10 minutes', words: 1 },
-  { value: '3', emoji: '🌤️', label: 'Deux ou trois mots par jour', words: 3 },
-  { value: '5', emoji: '🔥', label: 'Autant que l’envie est là', words: 5 },
-  { value: 'libre', emoji: '🤷', label: 'Je ne sais pas encore', words: 3 },
-];
+/** Calculation and chess are asked from 3 years old. */
+export const asksNumbers = (age: string) => age !== '0-2';
 
 export type ChildProfile = {
   /** First name, or '' when the parent skipped it. */
   name: string;
   age: string;
   level: string;
-  goals: string[];
   themes: string[];
-  involvement: string;
-  rhythm: string;
+  /** A MATH_CHOICES value, or '' when not asked. */
+  math: string;
+  /** A CHESS_CHOICES value, or '' when not asked. */
+  chess: string;
 };
 
-export const EMPTY_PROFILE: ChildProfile = { name: '', age: '', level: '', goals: [], themes: [], involvement: '', rhythm: '' };
+export const EMPTY_PROFILE: ChildProfile = { name: '', age: '', level: '', themes: [], math: '', chess: '' };
 
 /** The level to start at: the parent's answer, else the one that goes with the age. */
 export function startingLevel(stage: string, age: string): string {
@@ -98,25 +77,17 @@ export function de(name: string): string {
 }
 
 const LS_PROFILE = 'mounas_child_profile';
-// Same keys as the word picker and child mode, so the answers are used there.
+// Same key as the word picker, so the level is used there.
 const LS_LAST_DIFFICULTY = 'mounas_last_difficulty';
-const LS_WORDS_PER_DAY = 'mounas_words_per_day';
 
 const strings = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
+const text = (v: unknown): string => (typeof v === 'string' ? v : '');
 
 export function readProfile(): ChildProfile | null {
   try {
     const p = JSON.parse(readPref(LS_PROFILE) ?? 'null');
     if (!p || typeof p !== 'object') return null;
-    return {
-      name: typeof p.name === 'string' ? p.name : '',
-      age: typeof p.age === 'string' ? p.age : '',
-      level: typeof p.level === 'string' ? p.level : '',
-      goals: strings(p.goals),
-      themes: strings(p.themes),
-      involvement: typeof p.involvement === 'string' ? p.involvement : '',
-      rhythm: typeof p.rhythm === 'string' ? p.rhythm : '',
-    };
+    return { name: text(p.name), age: text(p.age), level: text(p.level), themes: strings(p.themes), math: text(p.math), chess: text(p.chess) };
   } catch {
     return null;
   }
@@ -132,15 +103,20 @@ export function hasProfile(): boolean {
   return readProfile() !== null;
 }
 
+/** The chess chapter to begin with (« famille », « mangues », « partie »), or ''. */
+export function chessStart(): string {
+  const answer = readProfile()?.chess;
+  return CHESS_CHOICES.find((c) => c.value === answer)?.chapter ?? '';
+}
+
 export function saveProfile(profile: ChildProfile): void {
   writePref(LS_PROFILE, JSON.stringify(profile));
   if (profile.level) writePref(LS_LAST_DIFFICULTY, profile.level);
-  const rhythm = RHYTHM_CHOICES.find((r) => r.value === profile.rhythm);
-  // « Je ne sais pas encore » leaves a number the parent may already have set.
-  if (rhythm && rhythm.value !== 'libre') writePref(LS_WORDS_PER_DAY, String(rhythm.words));
-  try {
-    window.dispatchEvent(new Event('mounas-child-mode'));
-  } catch {
-    // no window: nothing to notify
+  // The calculation ladder starts where the parent said, unless the child has
+  // already calculated here: progress is never reset by the questionnaire.
+  const math = MATH_CHOICES.find((m) => m.value === profile.math);
+  if (math) {
+    const calcul = readCalcul();
+    if (Object.keys(calcul.stats).length === 0) saveCalcul(setLevel(calcul, math.calcul));
   }
 }

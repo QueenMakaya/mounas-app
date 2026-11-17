@@ -41,7 +41,7 @@ export default async function BienvenuePage() {
               href="/commencer"
               className="mt-3 flex min-h-12 items-center justify-center rounded-full px-6 font-extrabold text-mpurple ring-2 ring-mpurple hover:bg-white"
             >
-              Ou préparer son programme en 2 minutes
+              Ou préparer son programme en 1 minute
             </Link>
           </>
         ) : (

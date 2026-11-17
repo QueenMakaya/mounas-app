@@ -67,7 +67,7 @@ export default function LandingPage() {
             </a>
           </div>
           <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
-            2 minutes de questions, et la démo s&apos;ouvre sur un mot à son niveau : pas de compte, pas de carte.
+            Quelques questions, et la démo s&apos;ouvre sur un mot à son niveau : pas de compte, pas de carte.
             <br />
             Puis 14 jours gratuits, et 10 $/mois sans engagement.
             <br />
