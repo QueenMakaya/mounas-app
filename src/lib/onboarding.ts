@@ -1,5 +1,5 @@
 import { LEVELS } from '@/lib/levels';
-import { DEMO_AGES, demoLevelForAge } from '@/lib/demo';
+import { DEMO_AGES } from '@/lib/demo';
 import { readCalcul, saveCalcul, setLevel } from '@/lib/calcul';
 import { readPref, writePref } from '@/lib/progress';
 
@@ -21,7 +21,14 @@ import { readPref, writePref } from '@/lib/progress';
 
 export type Choice = { value: string; emoji: string; label: string; hint?: string };
 
-export const AGE_CHOICES: Choice[] = DEMO_AGES.map((a) => ({ value: a.value, emoji: a.emoji, label: a.label }));
+/** The ages of /demo, plus the older children: the questionnaire is for the whole family. */
+const AGES = [
+  ...DEMO_AGES,
+  { value: '7-8', label: '7–8 ans', emoji: '📚', level: '4' },
+  { value: '9+', label: '9 ans et plus', emoji: '🚀', level: '4' },
+] as const;
+
+export const AGE_CHOICES: Choice[] = AGES.map((a) => ({ value: a.value, emoji: a.emoji, label: a.label }));
 
 /** « Où en est ton enfant ? » Worded without il/elle. */
 export const STAGE_CHOICES: Choice[] = [
@@ -95,7 +102,7 @@ export const EMPTY_PROFILE: ChildProfile = { name: '', age: '', level: '', inter
 /** The level to start at: the parent's answer, else the one that goes with the age. */
 export function startingLevel(stage: string, age: string): string {
   if (LEVELS.some((l) => l.value === stage)) return stage;
-  return demoLevelForAge(age) ?? '1';
+  return AGES.find((a) => a.value === age)?.level ?? '1';
 }
 
 /** « de Kofi », « d’Awa ». */
