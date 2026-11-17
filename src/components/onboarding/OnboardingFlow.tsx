@@ -9,17 +9,18 @@ import MounasLogo from '@/components/brand/MounasLogo';
 import { GUARANTEE, MONTHLY_PRICE, STRIPE_PAYMENT_LINK, TRIAL_DAYS } from '@/lib/config';
 import { DEMO_MINUTES } from '@/lib/demo';
 import { LEVELS } from '@/lib/levels';
-import { themeEmoji } from '@/lib/themes';
 import {
   AGE_CHOICES,
   asksNumbers,
   CHESS_CHOICES,
   de,
   EMPTY_PROFILE,
+  INTEREST_CHOICES,
   MATH_CHOICES,
   saveProfile,
   STAGE_CHOICES,
   startingLevel,
+  themesFor,
   type Choice,
   type ChildProfile,
 } from '@/lib/onboarding';
@@ -42,7 +43,7 @@ const stepsFor = (age: string): Step[] =>
 /** How the visitor arrives: decides what is offered next to the last button. */
 export type Access = 'member' | 'demo' | 'free';
 
-export default function OnboardingFlow({ themes, access }: { themes: string[]; access: Access }) {
+export default function OnboardingFlow({ access }: { access: Access }) {
   const [index, setIndex] = useState(0);
   const [profile, setProfile] = useState<ChildProfile>(EMPTY_PROFILE);
   // The raw answer to « où en est ton enfant ? » ('' = « je ne sais pas »).
@@ -80,8 +81,9 @@ export default function OnboardingFlow({ themes, access }: { themes: string[]; a
     timer.current = setTimeout(next, 260);
   };
 
-  const toggleTheme = (value: string) =>
-    setProfile((p) => ({ ...p, themes: p.themes.includes(value) ? p.themes.filter((v) => v !== value) : [...p.themes, value] }));
+  const toggleInterest = (value: string) =>
+    setProfile((p) => ({ ...p, interests: p.interests.includes(value) ? p.interests.filter((v) => v !== value) : [...p.interests, value] }));
+  const liked = INTEREST_CHOICES.filter((c) => profile.interests.includes(c.value));
 
   const finish = () => {
     saveProfile(finalProfile);
@@ -206,29 +208,29 @@ export default function OnboardingFlow({ themes, access }: { themes: string[]; a
 
         {step === 'themes' && (
           <>
-            <Question title="Qu’est-ce qui fait briller ses yeux ?" sub="Son premier mot viendra d’un de ses thèmes préférés." />
+            <Question title="Qu’est-ce qui fait briller ses yeux ?" sub="Choisis tout ce que ton enfant adore." />
             <ul className="mt-7 grid grid-cols-2 gap-3">
-              {themes.map((t) => {
-                const on = profile.themes.includes(t);
+              {INTEREST_CHOICES.map((c) => {
+                const on = profile.interests.includes(c.value);
                 return (
-                  <li key={t}>
+                  <li key={c.value}>
                     <button
                       type="button"
                       aria-pressed={on}
-                      onClick={() => toggleTheme(t)}
+                      onClick={() => toggleInterest(c.value)}
                       className={`flex min-h-24 w-full flex-col items-center justify-center gap-1 rounded-3xl px-2 py-3 text-center font-extrabold transition-all active:scale-[0.97] ${
                         on ? 'bg-ink text-cream shadow-md' : 'bg-white text-ink ring-1 ring-ink/10 hover:bg-sand'
                       }`}
                     >
-                      <span className="text-3xl" aria-hidden="true">{themeEmoji(t)}</span>
-                      {t}
+                      <span className="text-3xl" aria-hidden="true">{c.emoji}</span>
+                      {c.label}
                     </button>
                   </li>
                 );
               })}
             </ul>
             <Footer>
-              <Primary onClick={next}>{profile.themes.length === 0 ? 'Un peu de tout !' : 'Continuer'}</Primary>
+              <Primary onClick={next}>{liked.length === 0 ? 'Un peu de tout !' : 'Continuer'}</Primary>
             </Footer>
           </>
         )}
@@ -245,9 +247,9 @@ export default function OnboardingFlow({ themes, access }: { themes: string[]; a
                 <dl className="mt-5 grid gap-3">
                   <Row emoji={level.emoji} term="Les mots" value={`${level.short} · ${level.label}`} />
                   <Row
-                    emoji={profile.themes[0] ? themeEmoji(profile.themes[0]) : '🎲'}
-                    term="Ses thèmes"
-                    value={profile.themes.length > 0 ? profile.themes.join(', ') : 'Un peu de tout'}
+                    emoji={liked[0]?.emoji ?? '🎲'}
+                    term="Ses passions"
+                    value={liked.length > 0 ? liked.map((c) => c.label).join(', ') : 'Un peu de tout'}
                   />
                   {math && <Row emoji="🔢" term="Le calcul" value={math.start} />}
                   {chess?.chapter && <Row emoji="♟️" term="Les échecs" value={chess.start} />}
@@ -274,7 +276,7 @@ export default function OnboardingFlow({ themes, access }: { themes: string[]; a
             <Footer>
               <form action={startFirstWord} onSubmit={finish}>
                 <input type="hidden" name="level" value={levelValue} />
-                <input type="hidden" name="themes" value={profile.themes.join('|')} />
+                <input type="hidden" name="themes" value={themesFor(profile.interests).join('|')} />
                 <Submit>Découvrir son premier mot</Submit>
               </form>
               {access === 'free' && (

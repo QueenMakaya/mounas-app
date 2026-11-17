@@ -12,7 +12,8 @@ import { readPref, writePref } from '@/lib/progress';
  * What the answers really change in the app:
  *   - the level     → `mounas_last_difficulty` (the word picker opens on it)
  *                     and the first word offered at the end;
- *   - the themes    → the first word is picked among them when possible;
+ *   - the passions  → the first word comes from a theme close to them, when
+ *                     the library has one;
  *   - the numbers   → where the calculation ladder starts (`mounas_calcul`);
  *   - chess         → the chapter marked « Commence ici » in the chess hub;
  *   - the first name → the greeting on the app's home page.
@@ -48,6 +49,31 @@ export const CHESS_CHOICES: (Choice & { chapter: string; start: string })[] = [
   { value: 'non', emoji: '⏳', label: 'Pas pour l’instant', chapter: '', start: '' },
 ];
 
+/**
+ * « Qu’est-ce qui fait briller ses yeux ? » What children really talk about,
+ * not our library's categories. `themes` are the Airtable themes closest to
+ * each passion: the first word is taken from them when there is one.
+ */
+export const INTEREST_CHOICES: (Choice & { themes: string[] })[] = [
+  { value: 'spiderman', emoji: '🕷️', label: 'Spider-Man', themes: ['Jeux'] },
+  { value: 'kpop', emoji: '🎤', label: 'La K-pop', themes: ['Musique'] },
+  { value: 'chocolat', emoji: '🍫', label: 'Le chocolat', themes: ['Nourriture', 'Cuisine Afro'] },
+  { value: 'animaux', emoji: '🐾', label: 'Les animaux', themes: ['Animaux'] },
+  { value: 'mode', emoji: '👗', label: 'La mode', themes: ['Couleurs'] },
+  { value: 'musique', emoji: '🎵', label: 'La musique', themes: ['Musique'] },
+  { value: 'foot', emoji: '⚽', label: 'Le foot', themes: ['Corps', 'Jeux'] },
+  { value: 'voitures', emoji: '🚗', label: 'Les voitures', themes: ['Transports'] },
+  { value: 'dinosaures', emoji: '🦖', label: 'Les dinosaures', themes: ['Animaux'] },
+  { value: 'princesses', emoji: '👑', label: 'Les princesses', themes: ['Famille'] },
+  { value: 'dessin', emoji: '🎨', label: 'Le dessin', themes: ['Couleurs'] },
+  { value: 'danse', emoji: '💃', label: 'La danse', themes: ['Musique', 'Corps'] },
+];
+
+/** The library themes behind the passions picked, without doubles. */
+export function themesFor(interests: string[]): string[] {
+  return [...new Set(INTEREST_CHOICES.filter((c) => interests.includes(c.value)).flatMap((c) => c.themes))];
+}
+
 /** Calculation and chess are asked from 3 years old. */
 export const asksNumbers = (age: string) => age !== '0-2';
 
@@ -56,14 +82,15 @@ export type ChildProfile = {
   name: string;
   age: string;
   level: string;
-  themes: string[];
+  /** INTEREST_CHOICES values. */
+  interests: string[];
   /** A MATH_CHOICES value, or '' when not asked. */
   math: string;
   /** A CHESS_CHOICES value, or '' when not asked. */
   chess: string;
 };
 
-export const EMPTY_PROFILE: ChildProfile = { name: '', age: '', level: '', themes: [], math: '', chess: '' };
+export const EMPTY_PROFILE: ChildProfile = { name: '', age: '', level: '', interests: [], math: '', chess: '' };
 
 /** The level to start at: the parent's answer, else the one that goes with the age. */
 export function startingLevel(stage: string, age: string): string {
@@ -87,7 +114,7 @@ export function readProfile(): ChildProfile | null {
   try {
     const p = JSON.parse(readPref(LS_PROFILE) ?? 'null');
     if (!p || typeof p !== 'object') return null;
-    return { name: text(p.name), age: text(p.age), level: text(p.level), themes: strings(p.themes), math: text(p.math), chess: text(p.chess) };
+    return { name: text(p.name), age: text(p.age), level: text(p.level), interests: strings(p.interests), math: text(p.math), chess: text(p.chess) };
   } catch {
     return null;
   }
