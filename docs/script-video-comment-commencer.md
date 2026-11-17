@@ -22,12 +22,14 @@ Vidéo : `public/promo/comment-commencer/comment-commencer.mp4` (9:16, 1080×192
 
 Le bouton « Essayer l'app gratuitement » n'ouvre plus la page démo : il ouvre le questionnaire `/commencer` (six questions, puis le programme de l'enfant et son premier mot). Les lignes marquées **(nouveau)** sont à refaire, les autres ne bougent pas.
 
-À refaire dans la vidéo :
+Fait :
 
-- **Images, 0:11 – 0:21** : remplacer la page démo et « Lancer la démo » par le questionnaire en accéléré, jusqu'au bouton « Découvrir son premier mot ».
-- **Images, 0:24 – 0:34** : après le questionnaire, le mot s'ouvre directement. Si la vidéo montre encore un appui sur « Découvrir le mot » depuis l'accueil de l'app, couper ce plan.
+- **Images** : `comment-commencer.mp4` (9:16, sans voix) montre maintenant le questionnaire de 0:10 à 0:21, jusqu'au bouton « Découvrir son premier mot ». Même durée qu'avant (1 min 19 s), tous les autres plans sont identiques. Le plan « Découvrir le mot » depuis l'accueil de l'app a disparu avec l'ancien passage.
+
+Reste à faire :
+
 - **Voix** : réenregistrer les deux lignes **(nouveau)** (0:11 et 0:24). La ligne 0:04 reste la même.
-- Refaire ensuite les trois fichiers : `comment-commencer.mp4`, `comment-commencer-voix.mp4` et `comment-commencer-16x9-voix.mp4`.
+- **Versions avec voix** : `comment-commencer-voix.mp4` et `comment-commencer-16x9-voix.mp4` montrent encore l'ancienne page démo, avec l'ancienne voix. À remonter une fois les deux nouvelles prises reçues.
 
 ## Enregistrer la voix
 
