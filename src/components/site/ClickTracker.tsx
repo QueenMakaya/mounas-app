@@ -9,6 +9,7 @@ import { track } from '@vercel/analytics';
  *   - any link to Stripe checkout   → "Essai gratuit cliqué"
  *   - any link to WhatsApp          → "WhatsApp cliqué"
  *   - any link to /demo             → "Démo cliquée"
+ *   - any link to /commencer        → "Questionnaire cliqué"
  *   - anything with data-track="X"  → "X" (overrides the above)
  * Each event carries the page it came from.
  */
@@ -19,6 +20,7 @@ function eventFor(el: Element): string | null {
   if (href.includes('buy.stripe.com')) return 'Essai gratuit cliqué';
   if (href.includes('wa.me/')) return 'WhatsApp cliqué';
   if (href === '/demo' || href.startsWith('/demo?') || href.startsWith('/demo#')) return 'Démo cliquée';
+  if (href === '/commencer') return 'Questionnaire cliqué';
   return null;
 }
 

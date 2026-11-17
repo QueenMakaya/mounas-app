@@ -22,6 +22,7 @@ import {
 } from '@/lib/session';
 import { DEMO_CUSTOMER_ID, DEMO_EMAIL, DEMO_MINUTES, demoEnabled, demoLevelForAge, isDemo } from '@/lib/demo';
 import { getActivitiesByFilters, getTodayActivity } from '@/lib/airtable';
+import { LEVELS } from '@/lib/levels';
 import { createPortalUrl, findAccess, findAccessByPhone, normalizePhone, readLoginCode, saveLoginCode } from '@/lib/subscription';
 
 // NOTE: this file is 'use server': it may only export async functions.
@@ -238,18 +239,56 @@ export async function startDemo(formData?: FormData): Promise<void> {
   redirect('/app');
 }
 
-/** Today's word if it has this level, else a word of this level that changes each day. */
-async function demoWordFor(level: string): Promise<string | null> {
+/**
+ * A word of this level: today's if it fits, else one that changes each day,
+ * taken among the child's favourite themes when there are any.
+ */
+async function demoWordFor(level: string, themes: string[] = []): Promise<string | null> {
   try {
     const today = await getTodayActivity();
-    if (today?.difficulty === level) return today.id;
+    if (today?.difficulty === level && (themes.length === 0 || themes.includes(today.theme))) return today.id;
     const words = (await getActivitiesByFilters(undefined, level)).filter((a) => a.id && a.frenchWord);
     if (words.length === 0) return today?.id ?? null;
+    const liked = words.filter((a) => themes.includes(a.theme));
+    const pool = liked.length > 0 ? liked : words;
+    if (liked.length === 0 && today?.difficulty === level) return today.id;
     const day = Math.floor(Date.now() / 86_400_000);
-    return words.sort((a, b) => a.id.localeCompare(b.id))[day % words.length].id;
+    return pool.sort((a, b) => a.id.localeCompare(b.id))[day % pool.length].id;
   } catch {
     return null;
   }
+}
+
+/**
+ * End of the /commencer questionnaire: straight into a first word at the
+ * child's level. A subscriber keeps their session; anyone else gets a demo
+ * session (as on /demo), or the free word of the day if the demo is off.
+ */
+export async function startFirstWord(formData: FormData): Promise<void> {
+  const rawLevel = String(formData.get('level') ?? '');
+  const level = LEVELS.some((l) => l.value === rawLevel) ? rawLevel : null;
+  const themes = String(formData.get('themes') ?? '')
+    .split('|')
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .slice(0, 30);
+
+  const store = await cookies();
+  const current = await readSession(store.get(SESSION_COOKIE)?.value);
+  if (!current) {
+    if (!demoEnabled()) redirect('/app');
+    const token = await signDemoSession(DEMO_EMAIL, DEMO_CUSTOMER_ID, DEMO_MINUTES);
+    if (!token) redirect('/app');
+    store.set(SESSION_COOKIE, token, { ...sessionCookieOptions, maxAge: DEMO_MINUTES * 60 });
+    try {
+      await track('Démo lancée', { depuis: 'commencer' });
+    } catch (err) {
+      console.warn('[analytics] event not recorded: Démo lancée', err);
+    }
+  }
+
+  const wordId = level ? await demoWordFor(level, themes) : null;
+  redirect(wordId ? `/app/activity?id=${encodeURIComponent(wordId)}` : '/app');
 }
 
 /** "Quitter la démo": back to the site, ready for the next family. */

@@ -5,6 +5,7 @@ import MysteryTiles, { letterCount } from '@/components/app/MysteryTiles';
 import { themeEmoji } from '@/lib/themes';
 import WeekProgress from '@/components/app/WeekProgress';
 import ChildStart from '@/components/app/kid/ChildStart';
+import { HomeGreeting, StartPrompt } from '@/components/app/HomeGreeting';
 import { CalculIcon } from '@/components/app/AppSections';
 import PieceIcon from '@/components/app/echecs/PieceIcon';
 
@@ -23,11 +24,13 @@ export default async function HomePage() {
     <main className="flex-1 bg-cream font-body">
       <div className="mx-auto max-w-xl px-4 pb-16 pt-8 sm:px-6 sm:pt-12">
         <header className="mb-6">
-          <p className="text-sm font-bold text-ink-soft">Bonjour 👋</p>
+          <HomeGreeting />
           <h1 className="mt-1 font-display text-3xl font-bold leading-tight text-ink sm:text-4xl">
             Prêts pour le mot du jour&nbsp;?
           </h1>
         </header>
+
+        <StartPrompt />
 
         {todayActivity && (
           <div className="mb-5">

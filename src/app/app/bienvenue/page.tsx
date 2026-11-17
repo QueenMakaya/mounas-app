@@ -37,6 +37,12 @@ export default async function BienvenuePage() {
             >
               Commencer le mot du jour <span aria-hidden="true" className="ml-2">→</span>
             </Link>
+            <Link
+              href="/commencer"
+              className="mt-3 flex min-h-12 items-center justify-center rounded-full px-6 font-extrabold text-mpurple ring-2 ring-mpurple hover:bg-white"
+            >
+              Ou préparer son programme en 1 minute
+            </Link>
           </>
         ) : (
           <>

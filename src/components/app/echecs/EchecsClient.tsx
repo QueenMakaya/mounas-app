@@ -5,6 +5,7 @@ import BackButton from '@/components/app/BackButton';
 import SpeakButton from '@/components/app/SpeakButton';
 import { playChime } from '@/lib/chime';
 import { readPref, writePref } from '@/lib/progress';
+import { chessStart } from '@/lib/onboarding';
 import { useSpeech } from '@/lib/useSpeech';
 import {
   MANGO_LEVELS,
@@ -133,6 +134,8 @@ export default function EchecsClient() {
 function Hub({ saved, open }: { saved: Saved; open: (s: Screen) => void }) {
   const { teams } = useTeams();
   const mangoStars = Object.values(saved.mangoes).reduce((a, b) => a + b, 0);
+  // The chapter the parent's answers point to (/commencer), if any.
+  const startAt = useSyncExternalStore(subscribe, chessStart, () => '');
   const chapters: { id: Screen; n: number; title: string; text: string; icon: React.ReactNode; tint: string; done: string }[] = [
     {
       id: 'famille',
@@ -224,7 +227,14 @@ function Hub({ saved, open }: { saved: Saved; open: (s: Screen) => void }) {
                 <span className="absolute -left-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-ink text-xs font-extrabold text-cream">{c.n}</span>
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block font-display text-lg font-bold text-ink">{c.title}</span>
+                <span className="block font-display text-lg font-bold text-ink">
+                  {c.title}
+                  {c.id === startAt && (
+                    <span className="ml-2 inline-block rounded-full bg-mamber px-2 py-0.5 align-middle font-body text-[11px] font-extrabold uppercase tracking-wider text-ink">
+                      Commence ici
+                    </span>
+                  )}
+                </span>
                 <span className="block text-sm text-ink-soft">{c.text}</span>
                 <span className="mt-1 inline-block rounded-full bg-sand px-2.5 py-0.5 text-xs font-bold text-ink">{c.done}</span>
               </span>
