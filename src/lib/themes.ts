@@ -15,6 +15,9 @@ const THEME_EMOJI: Record<string, string> = {
   Quotidien: '☀️',
 };
 
+/** The themes we know, used when Airtable can't be asked (src/lib/onboarding.ts). */
+export const KNOWN_THEMES = Object.keys(THEME_EMOJI);
+
 export function themeEmoji(theme: string): string {
   return THEME_EMOJI[theme] ?? '✨';
 }

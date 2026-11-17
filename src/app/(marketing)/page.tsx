@@ -52,7 +52,7 @@ export default function LandingPage() {
 
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link
-              href="/demo"
+              href="/commencer"
               className="rounded-full px-8 py-4 text-lg font-bold shadow-md transition-opacity hover:opacity-90"
               style={{ backgroundColor: COLORS.red, color: COLORS.cream }}
             >
@@ -67,7 +67,7 @@ export default function LandingPage() {
             </a>
           </div>
           <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
-            La démo s&apos;ouvre tout de suite : pas de compte, pas de carte.
+            2 minutes de questions, et la démo s&apos;ouvre sur un mot à son niveau : pas de compte, pas de carte.
             <br />
             Puis 14 jours gratuits, et 10 $/mois sans engagement.
             <br />
