@@ -1,5 +1,7 @@
 # Voix de Pam : ce qu'il reste à enregistrer
 
+**Tout en un seul document, avec les textes complets : [`docs/voix/tout-a-enregistrer.md`](voix/tout-a-enregistrer.md).**
+
 **État au 18 nov. 2026 (soir).** Déjà enregistré et en ligne : les consignes de l'app, les petites phrases, les bravos,
 le calcul (0 à 100), les 37 sons, **les 220 mots d'Airtable et toutes leurs syllabes**, et 6 phrases des échecs
 (« Voici le Roi ! »… « Parfait ! Trois étoiles ! »). Tout ce qui suit est encore lu par la voix du navigateur.
