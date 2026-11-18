@@ -7,7 +7,7 @@ import { COLORS, EXPO, EXPO_PAYMENT_LINK, EXPO_PLACES_TAKEN, GUARANTEE, GUARANTE
 export const metadata: Metadata = {
   title: `Les Mounas à l'${EXPO.event} : ${EXPO.places} Familles Fondatrices`,
   description:
-    "10 minutes par jour pour apprendre à lire, écrire et compter avec nos mots et notre culture. Offre salon réservée aux 20 premières familles.",
+    "L'application pour apprendre à lire en 10 minutes par jour, dès la maternelle, avec les mots de chez nous. Offre salon réservée aux 20 premières familles.",
   robots: { index: false },
 };
 
@@ -115,18 +115,21 @@ export default function ExpoPage() {
               className="inline-flex items-center gap-2 rounded-full px-4 py-1 text-xs font-bold uppercase tracking-widest"
               style={{ backgroundColor: COLORS.tealLight, color: COLORS.tealDark }}
             >
-              <DiamondIcon size={14} inner={COLORS.tealLight} className="shrink-0" /> {placesLine}
+              <DiamondIcon size={14} inner={COLORS.tealLight} className="shrink-0" /> L&apos;application pour apprendre à lire
             </span>
 
             <h1 className="mt-6 text-4xl font-bold leading-tight sm:text-6xl" style={{ fontFamily: 'var(--font-fraunces)' }}>
-              10 minutes par jour.
+              Votre enfant apprend à lire.
               <br />
-              <span style={{ color: COLORS.purple }}>Une longueur d&apos;avance pour la vie.</span>
+              <span style={{ color: COLORS.red }}>En 10 minutes par jour.</span>
             </h1>
 
             <p className="mx-auto mt-5 max-w-xl text-lg" style={{ color: 'rgba(26,26,26,0.75)' }}>
-              L&apos;app qui apprend à lire, écrire et compter aux enfants jusqu&apos;à 6 ans, avec nos mots, nos
-              histoires et notre culture.
+              Lire, écrire et compter dès la maternelle, avec les mots de chez nous : alloco, attiéké, balafon. Une
+              petite leçon à faire ensemble, sur votre téléphone.
+            </p>
+            <p className="mt-4 text-base font-bold" style={{ color: COLORS.purple }}>
+              Offre salon : {placesLine.charAt(0).toLowerCase() + placesLine.slice(1)}.
             </p>
 
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -314,7 +317,7 @@ export default function ExpoPage() {
         <section className="px-4 pb-20 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
             <h2 className="text-3xl font-bold sm:text-4xl" style={{ fontFamily: 'var(--font-fraunces)' }}>
-              Son avenir se joue aussi 10 minutes par jour
+              Sa première leçon peut commencer aujourd’hui
             </h2>
             <p className="mt-3 text-base font-bold" style={{ color: COLORS.purple }}>
               {placesLine}.
