@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { track } from '@vercel/analytics';
+import { rememberVisitSource, sendFunnelStep } from '@/lib/funnel-client';
 
 /**
  * One listener for the whole site: records clicks on the buttons that matter
@@ -11,7 +12,9 @@ import { track } from '@vercel/analytics';
  *   - any link to /demo             → "Démo cliquée"
  *   - any link to /commencer        → "Questionnaire cliqué"
  *   - anything with data-track="X"  → "X" (overrides the above)
- * Each event carries the page it came from.
+ * Each event carries the page it came from. Clicks to Stripe also go to the
+ * Airtable « Parcours d'inscription » table (src/lib/funnel-client.ts), since
+ * Web Analytics numbers can't be read back for the daily report.
  */
 function eventFor(el: Element): string | null {
   const explicit = el.closest('[data-track]')?.getAttribute('data-track');
@@ -26,10 +29,12 @@ function eventFor(el: Element): string | null {
 
 export default function ClickTracker() {
   useEffect(() => {
+    rememberVisitSource();
     function onClick(e: MouseEvent) {
       if (!(e.target instanceof Element)) return;
       const name = eventFor(e.target);
       if (name) track(name, { page: window.location.pathname });
+      if (e.target.closest('a[href]')?.getAttribute('href')?.includes('buy.stripe.com')) sendFunnelStep({ event: 'trial' });
     }
     document.addEventListener('click', onClick, { capture: true });
     return () => document.removeEventListener('click', onClick, { capture: true });

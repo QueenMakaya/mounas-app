@@ -17,6 +17,10 @@
 
 import { airtableToken } from '@/lib/airtable-token';
 import { DEMO_AGES } from '@/lib/demo';
+import { deviceFrom } from '@/lib/visit';
+
+// Re-exported for the /demo page, which imported it from here first.
+export { deviceFrom, sourceLabel } from '@/lib/visit';
 
 // The « Démos » table of the « LES MOUNAS — App » base, addressed by id so a
 // rename doesn't break it (same reasoning as src/lib/signups.ts).
@@ -33,32 +37,6 @@ export type DemoStart = {
   /** Where the visitor came from before /demo, as passed by the page. */
   source: string;
 };
-
-export function deviceFrom(userAgent: string): 'Mobile' | 'Tablette' | 'Ordinateur' {
-  const ua = userAgent.toLowerCase();
-  if (/ipad|tablet|kindle|silk|playbook/.test(ua) || (ua.includes('android') && !ua.includes('mobile'))) return 'Tablette';
-  if (/mobi|iphone|ipod|android|blackberry|opera mini|iemobile/.test(ua)) return 'Mobile';
-  return 'Ordinateur';
-}
-
-/**
- * Turns the referrer and utm parameters /demo was opened with into a short
- * label: "instagram.com · utm: reel-lettre-y", "direct"… Our own site counts
- * as direct, since it only means the visitor clicked through from another page.
- */
-export function sourceLabel(referrer: string | null | undefined, utm: { source?: string; campaign?: string }): string {
-  let host = '';
-  try {
-    host = referrer ? new URL(referrer).hostname.replace(/^www\./, '') : '';
-  } catch {
-    host = '';
-  }
-  if (host.endsWith('lesmounas.school') || host.endsWith('vercel.app')) host = '';
-  const parts = [host || (utm.source ? '' : 'direct')];
-  const tag = [utm.source, utm.campaign].filter(Boolean).join(' / ');
-  if (tag) parts.push(`utm: ${tag}`);
-  return parts.filter(Boolean).join(' · ').slice(0, 200);
-}
 
 export async function logDemoStart(demo: DemoStart): Promise<void> {
   const apiKey = airtableToken();

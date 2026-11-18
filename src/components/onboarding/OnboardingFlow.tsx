@@ -8,6 +8,7 @@ import { startFirstWord } from '@/app/auth-actions';
 import MounasLogo from '@/components/brand/MounasLogo';
 import { GUARANTEE, MONTHLY_PRICE, STRIPE_PAYMENT_LINK, TRIAL_DAYS } from '@/lib/config';
 import { DEMO_MINUTES } from '@/lib/demo';
+import { sendFunnelStep } from '@/lib/funnel-client';
 import { LEVELS } from '@/lib/levels';
 import {
   AGE_CHOICES,
@@ -55,6 +56,15 @@ export default function OnboardingFlow({ access }: { access: Access }) {
     if (timer.current) clearTimeout(timer.current);
   }, []);
 
+  // « Questionnaire commencé » in Airtable once the first question is answered
+  // (src/lib/funnel-log.ts). Opening the page alone doesn't count.
+  const started = useRef(false);
+  useEffect(() => {
+    if (index < 1 || started.current) return;
+    started.current = true;
+    sendFunnelStep({ event: 'start', access });
+  }, [index, access]);
+
   const steps = stepsFor(profile.age);
   const step: Step = steps[Math.min(index, steps.length - 1)];
   const name = profile.name.trim();
@@ -85,9 +95,22 @@ export default function OnboardingFlow({ access }: { access: Access }) {
     setProfile((p) => ({ ...p, interests: p.interests.includes(value) ? p.interests.filter((v) => v !== value) : [...p.interests, value] }));
   const liked = INTEREST_CHOICES.filter((c) => profile.interests.includes(c.value));
 
+  const finished = useRef(false);
   const finish = () => {
     saveProfile(finalProfile);
     track('Questionnaire terminé');
+    // The answers, never the first name (src/lib/funnel-log.ts keeps only known choices).
+    if (finished.current) return;
+    finished.current = true;
+    sendFunnelStep({
+      event: 'finish',
+      access,
+      age: finalProfile.age,
+      level: finalProfile.level,
+      math: finalProfile.math,
+      chess: finalProfile.chess,
+      interests: finalProfile.interests,
+    });
   };
 
   return (
