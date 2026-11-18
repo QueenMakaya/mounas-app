@@ -25,8 +25,8 @@ Le bouton « Essayer l'app gratuitement » n'ouvre plus la page démo : il ouvre
 Fait :
 
 - **Images** : le questionnaire (avec ses cinq âges) remplace la page démo dans les trois fichiers, jusqu'au bouton « Découvrir son premier mot ».
-- **Voix** : les deux lignes **(nouveau)** viennent de la prise de Pam du 18 novembre, le reste de la voix est inchangé.
-- **Versions avec voix** (`comment-commencer-voix.mp4` en 9:16 et `comment-commencer-16x9-voix.mp4`) : 1 min 31 s. Après la carte « 2 », le mot s'ouvre directement : le plan « Découvrir le mot » depuis l'accueil de l'app est coupé.
+- **Voix** : une seule prise complète de Pam (18 novembre), les douze phrases d'une traite. Elle remplace toute l'ancienne voix.
+- **Versions avec voix** (`comment-commencer-voix.mp4` en 9:16 et `comment-commencer-16x9-voix.mp4`) : 1 min 32 s, chaque plan recalé sur la phrase qui va avec. Après la carte « 2 », le mot s'ouvre directement : le plan « Découvrir le mot » depuis l'accueil de l'app est coupé.
 - **Version sans voix** (`comment-commencer.mp4`) : 1 min 19 s, mêmes temps que le tableau.
 
 ## Enregistrer la voix
