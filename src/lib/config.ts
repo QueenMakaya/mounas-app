@@ -65,3 +65,31 @@ export function whatsappLink(message?: string): string {
   const base = WHATSAPP_NUMBER ? `https://wa.me/${WHATSAPP_NUMBER}` : 'https://wa.me/';
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
 }
+
+// ── Africa Expo Abidjan (/expo) ──
+// The salon offer: one year, paid once, for the first families who write on
+// WhatsApp. Everything the page and the printed material promise lives here.
+export const EXPO = {
+  event: 'Africa Expo Abidjan',
+  dates: '28 et 29 novembre',
+  /** Places in the « Familles Fondatrices » offer. */
+  places: 20,
+  /** One year, paid once. */
+  price: '30 000 FCFA',
+  pricePerMonth: '2 500 FCFA',
+  /** First words of the WhatsApp message, so the salon leads are easy to spot. */
+  keyword: 'LES MOUNAS EXPO',
+} as const;
+
+/**
+ * Places already taken, updated by hand as families confirm
+ * (NEXT_PUBLIC_EXPO_PLACES_TAKEN, then redeploy). The page never shows a
+ * number that isn't true: at 20 the offer reads as full.
+ */
+export const EXPO_PLACES_TAKEN = Math.min(
+  EXPO.places,
+  Math.max(0, Math.floor(Number(process.env.NEXT_PUBLIC_EXPO_PLACES_TAKEN) || 0)),
+);
+
+/** Optional card payment link for the salon offer; the button only shows once it is set. */
+export const EXPO_PAYMENT_LINK = process.env.NEXT_PUBLIC_EXPO_PAYMENT_LINK || '';

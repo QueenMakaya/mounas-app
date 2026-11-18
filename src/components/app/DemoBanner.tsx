@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { endDemo } from '@/app/auth-actions';
-import { STRIPE_PAYMENT_LINK } from '@/lib/config';
+import { EXPO, STRIPE_PAYMENT_LINK } from '@/lib/config';
+import { useExpoVisit } from '@/lib/expo-client';
 
 /**
  * Thin strip under the site menu while a demo session is open
@@ -22,6 +23,7 @@ function minutesLeft(endsAt: number): number {
 export default function DemoBanner({ endsAt }: { endsAt: number }) {
   const pathname = usePathname() ?? '';
   const [left, setLeft] = useState<number | null>(null);
+  const expo = useExpoVisit();
 
   useEffect(() => {
     const tick = () => setLeft(minutesLeft(endsAt));
@@ -51,6 +53,10 @@ export default function DemoBanner({ endsAt }: { endsAt: number }) {
           <Link href="/demo" className="rounded-full bg-cream px-4 py-1.5 font-extrabold text-mpurple">
             Relancer la démo
           </Link>
+        ) : expo ? (
+          <a href="/expo#offre" className="rounded-full bg-cream px-4 py-1.5 font-extrabold text-mpurple">
+            Offre salon : {EXPO.price} pour un an
+          </a>
         ) : (
           <a href={STRIPE_PAYMENT_LINK} className="rounded-full bg-cream px-4 py-1.5 font-extrabold text-mpurple">
             Commencer l’essai gratuit

@@ -7,6 +7,8 @@ import { track } from '@vercel/analytics';
 import { startFirstWord } from '@/app/auth-actions';
 import MounasLogo from '@/components/brand/MounasLogo';
 import { GUARANTEE, MONTHLY_PRICE, STRIPE_PAYMENT_LINK, TRIAL_DAYS } from '@/lib/config';
+import ExpoOffer from '@/components/expo/ExpoOffer';
+import { useExpoVisit } from '@/lib/expo-client';
 import { DEMO_MINUTES } from '@/lib/demo';
 import { sendFunnelStep } from '@/lib/funnel-client';
 import { LEVELS } from '@/lib/levels';
@@ -46,6 +48,7 @@ export type Access = 'member' | 'demo' | 'free';
 
 export default function OnboardingFlow({ access }: { access: Access }) {
   const [index, setIndex] = useState(0);
+  const expo = useExpoVisit();
   const [profile, setProfile] = useState<ChildProfile>(EMPTY_PROFILE);
   // The raw answer to « où en est ton enfant ? » ('' = « je ne sais pas »).
   const [stage, setStage] = useState<string | null>(null);
@@ -280,7 +283,8 @@ export default function OnboardingFlow({ access }: { access: Access }) {
               </div>
             </section>
 
-            {access !== 'member' && (
+            {access !== 'member' && expo && <ExpoOffer className="mt-4" />}
+            {access !== 'member' && !expo && (
               <section className="mt-4 rounded-[28px] bg-[#F1E9F8] p-5 text-center">
                 <h2 className="font-display text-lg font-bold">Envie de continuer après la démo ?</h2>
                 <a
