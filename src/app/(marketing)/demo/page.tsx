@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { headers } from 'next/headers';
 import { startDemo } from '@/app/auth-actions';
 import { getSession } from '@/lib/auth';
 import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, TRIAL_DAYS, whatsappLink } from '@/lib/config';
 import { DEMO_AGES, DEMO_MINUTES, demoEnabled, isDemo } from '@/lib/demo';
+import { sourceLabel } from '@/lib/demo-log';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,9 +62,12 @@ const TOUR = [
 export default async function DemoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ fin?: string; indisponible?: string }>;
+  searchParams: Promise<{ fin?: string; indisponible?: string; utm_source?: string; utm_campaign?: string }>;
 }) {
-  const { fin, indisponible } = await searchParams;
+  const { fin, indisponible, utm_source, utm_campaign } = await searchParams;
+  // Where the visitor came from, sent along with the demo buttons so the
+  // Airtable « Démos » row can say which post or link brought them.
+  const source = sourceLabel((await headers()).get('referer'), { source: utm_source, campaign: utm_campaign });
   const session = await getSession();
   const inDemo = isDemo(session);
   const member = Boolean(session) && !inDemo;
@@ -123,6 +128,7 @@ export default async function DemoPage({
                   Quel âge a ton enfant ?
                 </p>
                 <form action={startDemo} className="mt-4 grid grid-cols-3 gap-3">
+                  <input type="hidden" name="source" value={source} />
                   {DEMO_AGES.map((age) => (
                     <button
                       key={age.value}
@@ -143,6 +149,7 @@ export default async function DemoPage({
                   Un mot à son niveau s&apos;ouvre tout de suite. À vous de jouer !
                 </p>
                 <form action={startDemo} className="mt-2">
+                  <input type="hidden" name="source" value={source} />
                   <button type="submit" className="text-sm font-bold underline underline-offset-4" style={{ color: COLORS.purple }}>
                     Ou explorer toute l&apos;app →
                   </button>
