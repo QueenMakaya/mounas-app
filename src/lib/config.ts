@@ -71,6 +71,7 @@ export function whatsappLink(message?: string): string {
 // WhatsApp. Everything the page and the printed material promise lives here.
 export const EXPO = {
   event: 'Africa Expo Abidjan',
+  dates: '28 et 29 novembre',
   /** Places in the « Familles Fondatrices » offer. */
   places: 20,
   /** One year, paid once. */

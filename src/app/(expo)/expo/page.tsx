@@ -101,6 +101,8 @@ export default function ExpoPage() {
           <MounasLogo href={null} variant="wordmark" height={28} />
           <span className="text-right text-xs font-bold uppercase tracking-widest" style={{ color: COLORS.purple }}>
             {EXPO.event}
+            <br />
+            {EXPO.dates}
           </span>
         </div>
       </header>
