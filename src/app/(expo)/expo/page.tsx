@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import DiamondIcon from '@/components/brand/DiamondIcon';
 import MounasLogo from '@/components/brand/MounasLogo';
+import ExpoMark from '@/components/expo/ExpoMark';
 import { COLORS, EXPO, EXPO_PAYMENT_LINK, EXPO_PLACES_TAKEN, GUARANTEE, GUARANTEE_DAYS, whatsappLink } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: `Les Mounas à l'${EXPO.event} : ${EXPO.places} Familles Fondatrices`,
   description:
-    "L'application pour apprendre à lire en 10 minutes par jour, dès la maternelle, avec les mots de chez nous. Offre salon réservée aux 20 premières familles.",
+    "L'application pour apprendre à lire en 10 minutes par jour, de 3 à 8 ans, avec les mots de chez nous. Offre salon réservée aux 20 premières familles.",
   robots: { index: false },
 };
 
@@ -45,14 +46,14 @@ const INCLUDED = [
 
 const STEPS = [
   { n: '1', title: 'Écrivez-nous', body: `Le bouton ouvre WhatsApp avec le message « ${EXPO.keyword} » déjà prêt.` },
-  { n: '2', title: 'Essayez avec votre enfant', body: 'Nous vous envoyons la démo : son premier mot, à son niveau, tout de suite.' },
+  { n: '2', title: 'Essayez avec votre enfant', body: 'Sa première leçon est gratuite : un mot à son niveau, tout de suite.' },
   { n: '3', title: 'Confirmez votre place', body: 'Convaincu·e ? Vous réglez, et votre famille est inscrite pour un an.' },
 ];
 
 const FAQ = [
   {
     q: 'À quel âge commencer ?',
-    a: "Dès le plus jeune âge et jusqu'à 6 ans. Quelques questions suffisent pour placer votre enfant au bon niveau, et il avance ensuite à son rythme.",
+    a: "De 3 à 8 ans. Quelques questions suffisent pour placer votre enfant au bon niveau, et il avance ensuite à son rythme.",
   },
   {
     q: 'De quoi a-t-on besoin ?',
@@ -68,15 +69,30 @@ const FAQ = [
   },
 ];
 
-function WhatsAppButton({ label, track, light = false }: { label: string; track: string; light?: boolean }) {
+function WhatsAppButton({
+  label,
+  track,
+  light = false,
+  outline = false,
+}: {
+  label: string;
+  track: string;
+  light?: boolean;
+  outline?: boolean;
+}) {
+  const style = outline
+    ? { color: COLORS.purple, border: `2px solid ${COLORS.purple}` }
+    : light
+      ? { backgroundColor: COLORS.cream, color: COLORS.purple }
+      : { backgroundColor: COLORS.red, color: COLORS.cream };
   return (
     <a
       href={whatsappLink(WHATSAPP_MESSAGE)}
       target="_blank"
       rel="noopener noreferrer"
       data-track={track}
-      className="inline-block w-full rounded-full px-8 py-4 text-center text-lg font-bold shadow-md transition-opacity hover:opacity-90 sm:w-auto"
-      style={light ? { backgroundColor: COLORS.cream, color: COLORS.purple } : { backgroundColor: COLORS.red, color: COLORS.cream }}
+      className={`inline-block w-full rounded-full px-8 py-4 text-center text-lg font-bold transition-opacity hover:opacity-90 sm:w-auto ${outline ? '' : 'shadow-md'}`}
+      style={style}
     >
       {label}
     </a>
@@ -95,6 +111,7 @@ export default function ExpoPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: COLORS.cream, color: COLORS.ink, fontFamily: 'var(--font-nunito)' }}>
+      <ExpoMark />
       {/* ── TOP BAR: logo only, nothing to wander into ── */}
       <header className="px-4 pt-5 sm:px-6">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-3">
@@ -125,7 +142,7 @@ export default function ExpoPage() {
             </h1>
 
             <p className="mx-auto mt-5 max-w-xl text-lg" style={{ color: 'rgba(26,26,26,0.75)' }}>
-              Lire, écrire et compter dès la maternelle, avec les mots de chez nous : alloco, attiéké, balafon. Une
+              Lire, écrire et compter de 3 à 8 ans, avec les mots de chez nous : alloco, attiéké, balafon. Une
               petite leçon à faire ensemble, sur votre téléphone.
             </p>
             <p className="mt-4 text-base font-bold" style={{ color: COLORS.purple }}>
@@ -133,18 +150,18 @@ export default function ExpoPage() {
             </p>
 
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <WhatsAppButton label={cta} track="Expo : WhatsApp (haut)" />
               <Link
                 href="/commencer"
-                data-track="Expo : essayer"
-                className="w-full rounded-full px-8 py-4 text-center text-lg font-bold transition-opacity hover:opacity-80 sm:w-auto"
-                style={{ color: COLORS.purple, border: `2px solid ${COLORS.purple}` }}
+                data-track="Expo : première leçon"
+                className="w-full rounded-full px-8 py-4 text-center text-lg font-bold shadow-md transition-opacity hover:opacity-90 sm:w-auto"
+                style={{ backgroundColor: COLORS.red, color: COLORS.cream }}
               >
-                Essayer maintenant
+                ▶ Commencer sa première leçon
               </Link>
+              <WhatsAppButton label={cta} track="Expo : WhatsApp (haut)" outline />
             </div>
             <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
-              L&apos;essai est gratuit : pas de compte, pas de carte. 🛡️ {GUARANTEE}.
+              La première leçon est gratuite : pas de compte, pas de carte. 🛡️ {GUARANTEE}.
             </p>
           </div>
         </section>
@@ -288,7 +305,16 @@ export default function ExpoPage() {
         <section className="px-4 pb-16 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
             <DiamondIcon size={22} />
-            <h2 className="mt-3 text-3xl font-bold sm:text-4xl" style={{ fontFamily: 'var(--font-fraunces)' }}>
+            <blockquote
+              className="mt-4 text-2xl font-bold leading-snug sm:text-3xl"
+              style={{ fontFamily: 'var(--font-fraunces)', color: COLORS.purple }}
+            >
+              « Elle a lu son premier mot après quelques jours sur Les Mounas. Et elle en redemande. »
+            </blockquote>
+            <p className="mt-3 text-sm font-bold uppercase tracking-widest" style={{ color: 'rgba(26,26,26,0.6)' }}>
+              La fondatrice, à propos de sa fille
+            </p>
+            <h2 className="mt-10 text-2xl font-bold sm:text-3xl" style={{ fontFamily: 'var(--font-fraunces)' }}>
               Née à la maison, testée en famille
             </h2>
             <p className="mt-4 text-lg" style={{ color: 'rgba(26,26,26,0.75)' }}>

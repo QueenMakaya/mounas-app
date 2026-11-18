@@ -28,6 +28,8 @@ import { useReviewChoice } from '@/lib/review';
 import { ReviewOption } from '@/components/app/ReviewWords';
 import { CalculIcon } from '@/components/app/AppSections';
 import { GUARANTEE, MONTHLY_PRICE, STRIPE_PAYMENT_LINK, TRIAL_DAYS } from '@/lib/config';
+import ExpoOffer from '@/components/expo/ExpoOffer';
+import { useExpoVisit } from '@/lib/expo-client';
 import FindImage from '@/components/app/games/FindImage';
 import SoundFishing from '@/components/app/games/SoundFishing';
 import MissingWord from '@/components/app/games/MissingWord';
@@ -1737,6 +1739,8 @@ export type TrialOfferKind = 'demo' | 'visitor';
  * the moment to offer the free trial (demo families and visitors only).
  */
 function TrialOffer({ kind }: { kind: TrialOfferKind }) {
+  const expo = useExpoVisit();
+  if (expo) return <ExpoOffer className="mx-auto mt-8 max-w-sm" title="Votre enfant a aimé ? Votre offre salon vous attend" />;
   return (
     <section aria-labelledby="trial-title" className="mx-auto mt-8 max-w-sm rounded-[28px] bg-mpurple p-6 text-left text-cream shadow-lg">
       <h3 id="trial-title" className="font-display text-2xl font-bold leading-tight">
