@@ -1,33 +1,18 @@
 # Tout ce qu'il reste à enregistrer · Les Mounas
 
-*Liste du 18 nov. 2026, à jour avec l'app et Airtable. Tout le reste a déjà ta voix : consignes, bravos, calcul, les 37 sons, les 220 mots et leurs syllabes, la leçon du Y, les groupes de consonnes et 27 textes des échecs.*
+*Liste du 19 nov. 2026, à jour avec l'app et Airtable. Tout le reste a déjà ta voix : consignes, bravos, calcul, les 37 sons, les 220 mots et leurs syllabes, la leçon du Y, les groupes de consonnes, le son « oin » et tous les textes fixes des échecs.*
 
-**Comment enregistrer** : un fichier par partie (la partie 4 en 3 fichiers), environ 2 s de silence entre deux répliques, ne lis ni les numéros ni les titres en gras, même pièce et même micro. Une réplique ratée : redis-la juste après, je garde la dernière prise.
+**Comment enregistrer** : un fichier par partie (les comptines en 3 fichiers), environ 2 s de silence entre deux répliques, ne lis ni les numéros ni les titres en gras, même pièce et même micro. Une réplique ratée : redis-la juste après, je garde la dernière prise.
 
 | Partie | Quoi | Combien | Durée |
 |---|---|---|---|
-| 1 | Échecs (fin) + le son « oin » | 9 | 1 min |
-| 2 | Missions | 80 énoncés + 80 variantes | 15 min |
-| 3 | Phrases d'exemple | 181 | 10 min |
-| 4 | Comptines | 155 comptines, 717 lignes | 40 min |
+| 1 | Missions | 80 énoncés + 80 variantes | 15 min |
+| 2 | Phrases d'exemple | 181 | 10 min |
+| 3 | Comptines | 155 comptines, 717 lignes | 40 min |
 
 ---
 
-## Partie 1 · Échecs (fin) et le son « oin »
-
-1. Le Rhinocéros fonce tout droit : en avant, en arrière ou sur les côtés, aussi loin qu'il veut. Mais jamais en diagonale !
-2. L'Éléphant marche en diagonale, aussi loin qu'il veut. Il reste toujours sur les cases de la même couleur.
-3. Le rhinocéros ne voit pas très bien, alors il fonce droit devant lui. Personne n'ose lui barrer la route !
-4. Le sais-tu ? Dans le tout premier jeu d'échecs, il y a très longtemps, cette pièce était déjà un éléphant !
-5. Échec et mat ! L'équipe Bogolan a gagné !
-6. Échec et mat ! L'équipe Kuba a gagné !
-7. Échec et mat ! L'équipe Ndop a gagné !
-8. Échec et mat ! L'équipe Kanga a gagné !
-9. oin (comme dans coin, loin), tenu environ 1 seconde
-
----
-
-## Partie 2 · Les missions (80)
+## Partie 1 · Les missions (80)
 
 Pour chaque mission : **a** l'énoncé, 2 s de silence, puis **b** la variante plus difficile, et 3 s avant la mission suivante. Ne lis pas les réponses : elles n'y sont plus.
 
@@ -513,7 +498,7 @@ b. Et pour 3 étoiles ?
 
 ---
 
-## Partie 3 · Les phrases d'exemple (181)
+## Partie 2 · Les phrases d'exemple (181)
 
 Une phrase à la fois. Le mot en gras est seulement un repère : ne le dis pas.
 
@@ -701,7 +686,7 @@ Une phrase à la fois. Le mot en gras est seulement un repère : ne le dis pas.
 
 ---
 
-## Partie 4 · Les comptines (155)
+## Partie 3 · Les comptines (155)
 
 L'app les lit **ligne par ligne** : 1 s de silence entre deux lignes, 3 s entre deux comptines. Fais 3 fichiers : A à F, G à O, P à Z. Ne dis pas les titres.
 
