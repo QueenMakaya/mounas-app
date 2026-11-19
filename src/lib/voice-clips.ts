@@ -96,6 +96,14 @@ const CLIPS: Record<string, string> = {
   'L’équipe Ndop a gagné la course !': 'echecs/fin-course-ndop.mp3',
   'L’équipe Kanga a gagné la course !': 'echecs/fin-course-kanga.mp3',
   'Échec et mat ! L’équipe Kente a gagné !': 'echecs/fin-mat-kente.mp3',
+  'Le Rhinocéros fonce tout droit : en avant, en arrière ou sur les côtés, aussi loin qu’il veut. Mais jamais en diagonale !': 'echecs/bouge-rhinoceros.mp3',
+  'L’Éléphant marche en diagonale, aussi loin qu’il veut. Il reste toujours sur les cases de la même couleur.': 'echecs/bouge-elephant.mp3',
+  'Le rhinocéros ne voit pas très bien, alors il fonce droit devant lui. Personne n’ose lui barrer la route !': 'echecs/histoire-rhinoceros.mp3',
+  'Le sais-tu ? Dans le tout premier jeu d’échecs, il y a très longtemps, cette pièce était déjà un éléphant !': 'echecs/histoire-elephant.mp3',
+  'Échec et mat ! L’équipe Bogolan a gagné !': 'echecs/fin-mat-bogolan.mp3',
+  'Échec et mat ! L’équipe Kuba a gagné !': 'echecs/fin-mat-kuba.mp3',
+  'Échec et mat ! L’équipe Ndop a gagné !': 'echecs/fin-mat-ndop.mp3',
+  'Échec et mat ! L’équipe Kanga a gagné !': 'echecs/fin-mat-kanga.mp3',
   // Leçon du Y (YLesson.tsx)
   'stylo': 'lecon-y/stylo.mp3',
   'cygne': 'lecon-y/cygne.mp3',
@@ -171,7 +179,8 @@ const SOUND_CLIPS: Record<string, string> = {
   k: 'sons/k.mp3',
   g: 'sons/g.mp3',
   ks: 'sons/ks.mp3',
-  // Groupes de consonnes (pas encore utilisés par phonics.ts)
+  oin: 'sons/oin.mp3',
+  // Groupes de consonnes
   br: 'sons/groupes/br.mp3',
   cr: 'sons/groupes/cr.mp3',
   dr: 'sons/groupes/dr.mp3',
