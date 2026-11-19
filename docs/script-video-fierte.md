@@ -4,7 +4,7 @@ Vidéo : `public/promo/fierte/fierte-voix.mp4` (9:16, 1080×1920, 25 s, avec la 
 
 | Temps | À l'écran | Voix de Pam |
 |---|---|---|
-| 0:00 – 0:05 | Une petite fille lève les bras, sa maman la serre dans ses bras (plan généré avec Higgsfield) | Dix minutes par jour, et regarde cette fierté ! |
+| 0:00 – 0:05 | Une petite fille lève le bras à côté de sa maman, la tablette dans les mains (plan généré avec Higgsfield) | Dix minutes par jour, et regarde cette fierté ! |
 | 0:05 – 0:10 | L'app : le mot mystère du jour | Avec Les Mounas, ton enfant découvre un mot chaque jour. |
 | 0:10 – 0:15 | L'app : les syllabes, puis les sons | Il tape les syllabes dans ses mains et lit les sons. |
 | 0:15 – 0:20 | L'app : le calcul, puis les échecs | Il compte, il calcule, et il joue même aux échecs. |
