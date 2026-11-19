@@ -1740,7 +1740,7 @@ export type TrialOfferKind = 'demo' | 'visitor';
  */
 function TrialOffer({ kind }: { kind: TrialOfferKind }) {
   const expo = useExpoVisit();
-  if (expo) return <ExpoOffer className="mx-auto mt-8 max-w-sm" title="Votre enfant a aimé ? Votre offre salon vous attend" />;
+  if (expo) return <ExpoOffer className="mx-auto mt-8 max-w-sm" title="Votre enfant a aimé ? Votre offre de lancement vous attend" />;
   return (
     <section aria-labelledby="trial-title" className="mx-auto mt-8 max-w-sm rounded-[28px] bg-mpurple p-6 text-left text-cream shadow-lg">
       <h3 id="trial-title" className="font-display text-2xl font-bold leading-tight">

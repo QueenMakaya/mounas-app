@@ -54,8 +54,8 @@ export default function DemoBanner({ endsAt }: { endsAt: number }) {
             Relancer la démo
           </Link>
         ) : expo ? (
-          <a href="/expo#offre" className="rounded-full bg-cream px-4 py-1.5 font-extrabold text-mpurple">
-            Offre salon : {EXPO.price} pour un an
+          <a href="/abidjan#offre" className="rounded-full bg-cream px-4 py-1.5 font-extrabold text-mpurple">
+            Offre de lancement : {EXPO.price} pour un an
           </a>
         ) : (
           <a href={STRIPE_PAYMENT_LINK} className="rounded-full bg-cream px-4 py-1.5 font-extrabold text-mpurple">

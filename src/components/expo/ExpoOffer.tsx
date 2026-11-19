@@ -1,12 +1,12 @@
 import { EXPO, GUARANTEE } from '@/lib/config';
 
 /**
- * The salon offer, shown in place of the standard trial to families who came
- * through /expo (see src/lib/expo-client.ts). Sends them back to the offer.
+ * The Abidjan launch offer, shown in place of the standard trial to families who came
+ * through /abidjan (see src/lib/expo-client.ts). Sends them back to the offer.
  */
 export default function ExpoOffer({
   className = '',
-  title = 'Votre offre salon vous attend',
+  title = 'Votre offre de lancement vous attend',
 }: {
   className?: string;
   title?: string;
@@ -18,7 +18,7 @@ export default function ExpoOffer({
         Les {EXPO.places} Familles Fondatrices d’Abidjan : un an de Mounas pour {EXPO.price}.
       </p>
       <a
-        href="/expo#offre"
+        href="/abidjan#offre"
         data-track="Expo : retour à l'offre"
         className="mt-5 flex min-h-14 items-center justify-center rounded-full bg-cream px-6 text-center text-lg font-extrabold text-mpurple shadow-md active:scale-[0.98]"
       >

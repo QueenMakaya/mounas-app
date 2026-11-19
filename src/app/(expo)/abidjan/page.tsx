@@ -6,14 +6,14 @@ import ExpoMark from '@/components/expo/ExpoMark';
 import { COLORS, EXPO, EXPO_PAYMENT_LINK, EXPO_PLACES_TAKEN, GUARANTEE, GUARANTEE_DAYS, whatsappLink } from '@/lib/config';
 
 export const metadata: Metadata = {
-  title: `Les Mounas à l'${EXPO.event} : ${EXPO.places} Familles Fondatrices`,
+  title: `Les Mounas à Abidjan : ${EXPO.places} Familles Fondatrices`,
   description:
-    "L'application pour apprendre à lire en 10 minutes par jour, de 3 à 8 ans, avec les mots de chez nous. Offre salon réservée aux 20 premières familles.",
+    "L'application pour apprendre à lire en 10 minutes par jour, de 3 à 8 ans, avec les mots de chez nous. Offre de lancement réservée aux 20 premières familles.",
   robots: { index: false },
 };
 
 /**
- * /expo: the page behind the QR code of the Africa Expo Abidjan roll-up and
+ * /abidjan: the page behind the QR code of the Abidjan roll-up, flyer and
  * screen spot. One promise, one action (WhatsApp), no site menu to wander
  * into. Written with « vous »: these parents meet the brand at a trade show.
  * The offer itself (places, price, keyword) lives in src/lib/config.ts.
@@ -117,9 +117,13 @@ export default function ExpoPage() {
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-3">
           <MounasLogo href={null} variant="wordmark" height={28} />
           <span className="text-right text-xs font-bold uppercase tracking-widest" style={{ color: COLORS.purple }}>
-            {EXPO.event}
-            <br />
-            {EXPO.dates}
+            {EXPO.event || 'Abidjan'}
+            {EXPO.dates && (
+              <>
+                <br />
+                {EXPO.dates}
+              </>
+            )}
           </span>
         </div>
       </header>
@@ -146,7 +150,7 @@ export default function ExpoPage() {
               petite leçon à faire ensemble, sur votre téléphone.
             </p>
             <p className="mt-4 text-base font-bold" style={{ color: COLORS.purple }}>
-              Offre salon : {placesLine.charAt(0).toLowerCase() + placesLine.slice(1)}.
+              Offre de lancement : {placesLine.charAt(0).toLowerCase() + placesLine.slice(1)}.
             </p>
 
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -234,7 +238,7 @@ export default function ExpoPage() {
         <section id="offre" className="scroll-mt-6 px-4 pb-16 sm:px-6">
           <div className="mx-auto max-w-3xl rounded-3xl p-8 text-center sm:p-12" style={{ backgroundColor: COLORS.purple, color: COLORS.cream }}>
             <p className="text-xs font-bold uppercase tracking-widest" style={{ color: COLORS.amber }}>
-              Réservé aux visiteurs de l&apos;{EXPO.event}
+              Offre de lancement · Abidjan
             </p>
             <h2 className="mt-3 text-3xl font-bold sm:text-4xl" style={{ fontFamily: 'var(--font-fraunces)' }}>
               {`Les ${EXPO.places} Familles Fondatrices d’Abidjan`}
