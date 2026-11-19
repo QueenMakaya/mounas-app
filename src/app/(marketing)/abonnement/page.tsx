@@ -70,6 +70,9 @@ export default async function AbonnementPage({
         <p className="mt-1 text-base" style={{ color: 'rgba(26,26,26,0.75)' }}>
           14 jours gratuits pour essayer. Sans engagement, résilie quand tu veux.
         </p>
+        <p className="mt-2 text-base" style={{ color: 'rgba(26,26,26,0.75)' }}>
+          📲 Rien à télécharger : tout s&apos;ouvre dans ton navigateur, sur téléphone, tablette ou ordinateur.
+        </p>
         <p className="mt-2 text-base font-bold" style={{ color: COLORS.tealDark }}>
           🛡️ {GUARANTEE} : si l&apos;app ne te convient pas, écris-nous et on te rembourse.
         </p>

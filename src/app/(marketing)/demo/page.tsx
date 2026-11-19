@@ -12,7 +12,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Découvrir l’app en démo | Les Mounas',
   description:
-    'Essaie toute l’app Les Mounas avec ton enfant, sans inscription : le mot du jour, les jeux de sons, la dictée, le calcul, les missions et les progrès.',
+    'Essaie toute l’app Les Mounas avec ton enfant, sans inscription et sans rien télécharger : le mot du jour, les jeux de sons, la dictée, le calcul, les missions et les progrès.',
 };
 
 /**
@@ -92,6 +92,9 @@ export default async function DemoPage({
           <p className="mx-auto mt-5 max-w-xl text-lg" style={{ color: 'rgba(26,26,26,0.75)' }}>
             Toute l&apos;app Les Mounas, ouverte pendant {DEMO_MINUTES} minutes : pas de compte, pas de carte bancaire.
             Assieds-toi avec ton enfant et faites le mot du jour ensemble, 10 minutes suffisent.
+          </p>
+          <p className="mx-auto mt-4 max-w-xl text-base font-bold" style={{ color: COLORS.tealDark }}>
+            📲 Rien à télécharger : elle s&apos;ouvre ici, dans ton navigateur.
           </p>
 
           {fin && (

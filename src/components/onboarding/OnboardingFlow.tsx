@@ -172,7 +172,7 @@ export default function OnboardingFlow({ access }: { access: Access }) {
             <div className="flex justify-center">
               <MounasLogo href={null} variant="wordmark" height={34} />
             </div>
-            <Question title="Comment s’appelle ton enfant ?" sub="Quelques questions, et son premier mot est prêt, à son niveau." />
+            <Question title="Comment s’appelle ton enfant ?" sub="Quelques questions, et son premier mot est prêt, à son niveau. Rien à télécharger." />
             <label htmlFor="child-name" className="sr-only">
               Prénom de l’enfant
             </label>
