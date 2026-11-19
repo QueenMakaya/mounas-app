@@ -17,6 +17,10 @@
  *   the levels before it (the closest ones most often), so what was learned
  *   keeps being practised. The parent can switch to « Seulement ce niveau ».
  *   Only the current level's answers count to open the next level.
+ * - Time is measured but never shown while the child works: no clock on the
+ *   screen. At the end of a series the child sees how long the ten took and
+ *   the record for that level, as the time written on a finished Kumon page.
+ *   A series only sets a record with 9 or 10 right: right first, fast after.
  *
  * Kept in localStorage under `mounas_calcul` (follows the parent between
  * devices through src/lib/progress-snapshot.ts). Every access is wrapped:
@@ -188,6 +192,18 @@ export type LevelStats = {
   mastered?: string;
 };
 
+/** The series (« pages ») of a level that counted: 9 or 10 right the first time. Times in ms. */
+export type PageTimes = {
+  /** How many counted. */
+  n: number;
+  /** The first one, to see how far the child has come. */
+  first: number;
+  /** The record. */
+  best: number;
+  /** The latest one. */
+  last: number;
+};
+
 export type CalcMode = 'melange' | 'niveau';
 
 export type CalculState = {
@@ -198,6 +214,8 @@ export type CalculState = {
   since: number;
   recent: { ok: boolean; ms: number }[];
   stats: Record<string, LevelStats>;
+  /** Per level: the times of the series done there (see PageTimes). */
+  pages: Record<string, PageTimes>;
   /** Per day: calculations done and right the first time. */
   days: Record<string, { done: number; ok: number }>;
   /** Calculations missed, to bring back (`a,b` of the current level). */
@@ -213,8 +231,10 @@ export const MASTER_OK = 18;
 const BACK_WINDOW = 10;
 const BACK_MISSES = 5;
 const MAX_RETRY = 10;
+/** A series sets a time for the level's record from this many right the first time. */
+export const PAGE_OK = 9;
 
-export const emptyCalcul = (): CalculState => ({ level: LEVELS[0].id, mode: 'melange', since: 0, recent: [], stats: {}, days: {}, retry: [], updated: 0 });
+export const emptyCalcul = (): CalculState => ({ level: LEVELS[0].id, mode: 'melange', since: 0, recent: [], stats: {}, pages: {}, days: {}, retry: [], updated: 0 });
 
 const LS_CALCUL = 'mounas_calcul';
 const EVENT = 'mounas-calcul';
@@ -241,6 +261,16 @@ export function parseCalcul(v: unknown): CalculState {
       };
     }
   }
+  const pages: CalculState['pages'] = {};
+  if (isObject(v.pages)) {
+    for (const l of LEVELS) {
+      const p = v.pages[l.id];
+      if (!isObject(p)) continue;
+      const best = num(p.best);
+      if (num(p.n) === 0 || best === 0) continue;
+      pages[l.id] = { n: num(p.n), first: Math.max(num(p.first), best), best, last: Math.max(num(p.last), best) };
+    }
+  }
   const days: CalculState['days'] = {};
   if (isObject(v.days)) {
     for (const [d, x] of Object.entries(v.days).slice(-400)) {
@@ -256,6 +286,7 @@ export function parseCalcul(v: unknown): CalculState {
       .slice(-WINDOW)
       .map((r) => ({ ok: r.ok === true, ms: num(r.ms) })),
     stats,
+    pages,
     days,
     retry: (Array.isArray(v.retry) ? v.retry : []).filter((x): x is string => typeof x === 'string' && /^\d+,\d+$/.test(x)).slice(-MAX_RETRY),
     updated: num(v.updated),
@@ -271,9 +302,16 @@ export function mergeCalcul(a: CalculState, b: CalculState): CalculState {
     if (!prev || s.answered > prev.answered) stats[id] = { ...s, ...(prev?.mastered && !s.mastered ? { mastered: prev.mastered } : {}) };
     else if (s.mastered && !prev.mastered) stats[id] = { ...prev, mastered: s.mastered };
   }
+  const older = newest === a ? b : a;
+  const pages = { ...older.pages };
+  for (const [id, p] of Object.entries(newest.pages)) {
+    const prev = pages[id];
+    // The device that did more series there knows the first time; the record is the best of both.
+    pages[id] = prev ? { n: Math.max(p.n, prev.n), first: prev.n > p.n ? prev.first : p.first, best: Math.min(p.best, prev.best), last: p.last } : p;
+  }
   const days = { ...a.days };
   for (const [d, x] of Object.entries(b.days)) if (!days[d] || x.done > days[d].done) days[d] = x;
-  return { ...newest, stats, days };
+  return { ...newest, stats, pages, days };
 }
 
 export function readCalcul(): CalculState {
@@ -410,4 +448,33 @@ export function recordAnswer(state: CalculState, p: Problem, ok: boolean, ms: nu
     return { state: next, change: 'down' };
   }
   return { state: next, change: null };
+}
+
+/** What the time of a finished series means for the level's record. */
+export type PageRecord = 'first' | 'record' | 'none';
+
+/**
+ * The end of a series: `ms` is the time the child took to answer the ten
+ * (thinking time only, as counted for each calculation). With at least
+ * PAGE_OK right the first time it counts for the level's times; `before` is
+ * the record there was until now.
+ */
+export function recordPage(state: CalculState, levelId: string, ok: number, ms: number): { state: CalculState; record: PageRecord; before: number | null } {
+  const prev = state.pages[levelId];
+  const before = prev?.best ?? null;
+  const time = Math.round(ms);
+  if (ok < PAGE_OK || time <= 0 || !LEVELS.some((l) => l.id === levelId)) return { state, record: 'none', before };
+  const page: PageTimes = prev ? { n: prev.n + 1, first: prev.first, best: Math.min(prev.best, time), last: time } : { n: 1, first: time, best: time, last: time };
+  return {
+    state: { ...state, pages: { ...state.pages, [levelId]: page }, updated: Date.now() },
+    record: !prev ? 'first' : time < prev.best ? 'record' : 'none',
+    before,
+  };
+}
+
+/** « 48 secondes », « 1 min 05 s »: a time said the way a parent would. */
+export function timeText(ms: number): string {
+  const s = Math.max(1, Math.round(ms / 1000));
+  if (s < 60) return `${s} seconde${s > 1 ? 's' : ''}`;
+  return `${Math.floor(s / 60)} min ${String(s % 60).padStart(2, '0')} s`;
 }
