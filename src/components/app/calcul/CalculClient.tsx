@@ -11,6 +11,7 @@ import {
   LEVELS,
   MASTER_OK,
   OPS,
+  PAGE_OK,
   SERIES,
   WINDOW,
   calculSnapshot,
@@ -23,13 +24,16 @@ import {
   problemSaid,
   readCalcul,
   recordAnswer,
+  recordPage,
   saveCalcul,
   setLevel,
   setMode,
   subscribeCalcul,
+  timeText,
   type CalcMode,
   type CalculState,
   type Change,
+  type PageRecord,
   type Problem,
 } from '@/lib/calcul';
 
@@ -40,12 +44,16 @@ import {
  * is checked as soon as it has the right number of digits, and the next one
  * comes. A scratch pad sits beside it (below on a phone) for circles, sticks
  * or whatever method the child uses. No limit: series follow one another.
+ * No clock while the child works: the time of the ten is only told once the
+ * series is finished, with the record to beat next time.
  * The parent area (closed by default) shows where the child is and lets the
  * parent pick the level and « Mélange » or « Seulement ce niveau ».
  */
 
 type Feedback = 'ok' | 'wrong' | 'shown' | null;
 type Entry = 'jetons' | 'clavier';
+/** The series just finished: how many right, in how long, and what it means for the record. */
+type PageResult = { ok: number; ms: number; record: PageRecord; before: number | null };
 
 const LS_ENTRY = 'mounas_calcul_saisie';
 
@@ -82,6 +90,9 @@ export default function CalculClient() {
   const scratch = useRef<DrawingCanvasHandle>(null);
   const shownAt = useRef(0);
   const timer = useRef<number | null>(null);
+  /** The series in progress: its level (null once the parent changed it on the way), right answers and time so far. */
+  const page = useRef<{ level: string | null; ok: number; ms: number }>({ level: null, ok: 0, ms: 0 });
+  const [pageResult, setPageResult] = useState<PageResult | null>(null);
 
   useEffect(() => () => {
     if (timer.current) window.clearTimeout(timer.current);
@@ -103,13 +114,21 @@ export default function CalculClient() {
     setEntry(readPref(LS_ENTRY) === 'clavier' ? 'clavier' : 'jetons');
     setSeries([]);
     setChange(null);
+    setPageResult(null);
     setScreen('calc');
-    show(readCalcul(), null);
+    const from = readCalcul();
+    page.current = { level: from.level, ok: 0, ms: 0 };
+    show(from, null);
   };
 
   /** After a calculation: the next one, or the end of the page. */
   const advance = (done: number) => {
     if (done >= SERIES) {
+      const { level: pageLevel, ok, ms } = page.current;
+      const result = recordPage(readCalcul(), pageLevel ?? '', ok, ms);
+      if (result.record !== 'none') saveCalcul(result.state);
+      setPageResult({ ok, ms, record: result.record, before: result.before });
+      if (result.record === 'record' && canSpeak) speak('Nouveau record !', 0.9);
       playChime();
       setScreen('page');
       setProblem(null);
@@ -124,8 +143,11 @@ export default function CalculClient() {
     let done = series.length;
     if (tries === 0) {
       // Only the first answer counts, as on a Kumon page corrected afterwards.
-      const result = recordAnswer(readCalcul(), problem, right, performance.now() - shownAt.current);
+      const ms = performance.now() - shownAt.current;
+      const result = recordAnswer(readCalcul(), problem, right, ms);
       saveCalcul(result.state);
+      page.current.ok += right ? 1 : 0;
+      page.current.ms += Math.min(ms, 60_000);
       done += 1;
       setSeries((s) => [...s, right]);
       setSession((s) => ({ done: s.done + 1, ok: s.ok + (right ? 1 : 0) }));
@@ -196,6 +218,8 @@ export default function CalculClient() {
     const next = setLevel(readCalcul(), id);
     saveCalcul(next);
     setChange(null);
+    // A series that changes level on the way sets no record.
+    page.current.level = null;
     if (problem) show(next, null);
   };
   const pickMode = (mode: CalcMode) => {
@@ -279,7 +303,7 @@ export default function CalculClient() {
             />
           )}
 
-          {screen === 'page' && <PageDone series={series} onMore={startSeries} onStop={stop} />}
+          {screen === 'page' && <PageDone series={series} result={pageResult} onMore={startSeries} onStop={stop} />}
           {screen === 'end' && <Summary session={session} onMore={startSeries} />}
         </section>
 
@@ -596,8 +620,8 @@ function NumberTokens({ onDigit }: { onDigit: (d: string) => void }) {
   );
 }
 
-/** End of a series of 10: a star, the result, and another series if she wants. */
-function PageDone({ series, onMore, onStop }: { series: boolean[]; onMore: () => void; onStop: () => void }) {
+/** End of a series of 10: a star, the result, the time it took, and another series if she wants. */
+function PageDone({ series, result, onMore, onStop }: { series: boolean[]; result: PageResult | null; onMore: () => void; onStop: () => void }) {
   const ok = series.filter(Boolean).length;
   return (
     <div className="animate-rise px-5 py-10 text-center">
@@ -608,6 +632,20 @@ function PageDone({ series, onMore, onStop }: { series: boolean[]; onMore: () =>
       <p className="mt-2 text-ink-soft">
         {ok} sur {series.length} justes du premier coup. Les calculs ratés reviendront pour s’entraîner.
       </p>
+      {result && result.ms > 0 && (
+        <div className="mx-auto mt-5 max-w-sm rounded-3xl bg-cream px-5 py-4" aria-live="polite">
+          <p className="font-display text-2xl font-bold text-ink">
+            <span aria-hidden="true">⏱ </span>
+            {timeText(result.ms)}
+          </p>
+          <p className="mt-1 text-sm font-bold text-ink-soft">
+            {result.record === 'record' && result.before !== null && <>🏆 Nouveau record ! Avant : {timeText(result.before)}.</>}
+            {result.record === 'first' && <>C’est ton premier temps à ce niveau. Essaie de le battre la prochaine fois !</>}
+            {result.record === 'none' && result.ok >= PAGE_OK && result.before !== null && <>Ton record : {timeText(result.before)}.</>}
+            {result.ok < PAGE_OK && <>D’abord juste, ensuite vite : le record compte à partir de {PAGE_OK} justes.</>}
+          </p>
+        </div>
+      )}
       <button type="button" onClick={onMore} className="mt-7 min-h-16 w-full max-w-sm rounded-full bg-ink px-6 text-xl font-extrabold text-cream shadow-lg active:scale-[0.98]">
         ▶ Une autre série
       </button>
@@ -643,6 +681,8 @@ const secs = (ms: number, n: number) => (n === 0 ? '—' : `${(ms / n / 1000).to
 /** For the parent: the level (to match the book), where she stands, and what she did. */
 function ParentArea({ state, onPick, onMode }: { state: CalculState; onPick: (id: string) => void; onMode: (mode: CalcMode) => void }) {
   const { level, count, ok, time, fastEnough } = levelProgress(state);
+  const times = state.pages[level.id];
+  const perCalc = (s: number) => `${s.toFixed(1).replace('.', ',')} s`;
   const practised = LEVELS.filter((l) => (state.stats[l.id]?.answered ?? 0) > 0);
   const today = useSyncExternalStore(subscribeCalcul, localDate, () => '');
   const lastDays = Object.entries(state.days)
@@ -707,15 +747,34 @@ function ParentArea({ state, onPick, onMode }: { state: CalculState; onPick: (id
           {count === 0 ? (
             <p className="mt-1">Pas encore de calcul à ce niveau.</p>
           ) : (
-            <p className="mt-1">
-              Sur les {count} dernier{count > 1 ? 's' : ''} calculs : {ok} juste{ok > 1 ? 's' : ''} du premier coup, environ{' '}
-              {time.toFixed(1).replace('.', ',')} s chacun (objectif {level.target} s).
-              {count >= WINDOW && ok >= MASTER_OK && !fastEnough && ' Tout est juste : encore un peu d’entraînement pour que ça devienne facile.'}
-            </p>
+            <ul className="mt-2 flex flex-col gap-1">
+              <li>
+                <span aria-hidden="true">{ok >= MASTER_OK ? '✅' : '⏳'} </span>
+                <strong className="text-ink">Justesse :</strong> {ok} juste{ok > 1 ? 's' : ''} du premier coup sur les {count} dernier{count > 1 ? 's' : ''}{' '}
+                (il en faut {MASTER_OK} sur {WINDOW}).
+              </li>
+              <li>
+                <span aria-hidden="true">{fastEnough ? '✅' : '⏳'} </span>
+                <strong className="text-ink">Rapidité :</strong> environ {perCalc(time)} par calcul (objectif : {level.target} s ou moins).
+                {!fastEnough && ' Encore un peu d’entraînement pour que ça devienne facile.'}
+              </li>
+              {count < WINDOW && (
+                <li>
+                  Encore {WINDOW - count} calcul{WINDOW - count > 1 ? 's' : ''} à ce niveau avant de pouvoir passer au suivant.
+                </li>
+              )}
+            </ul>
           )}
+          <p className="mt-3">
+            <strong className="text-ink">Série de {SERIES} :</strong> objectif environ {timeText(level.target * SERIES * 1000)}.{' '}
+            {times
+              ? `Record : ${timeText(times.best)}${times.n > 1 ? `, première fois : ${timeText(times.first)}, dernière : ${timeText(times.last)}` : ''}.`
+              : `Pas encore de temps : il compte quand au moins ${PAGE_OK} calculs sont justes.`}
+          </p>
           <p className="mt-2 text-xs">
-            Le niveau suivant s’ouvre quand {MASTER_OK} des {WINDOW} derniers calculs sont justes du premier coup, faits sans trop chercher. Si
-            elle se trompe souvent, l’app revient au niveau d’avant pour consolider. Un calcul raté revient un peu plus tard.
+            Le niveau suivant s’ouvre quand la justesse et la rapidité sont là toutes les deux. Le temps est mesuré sans chronomètre à
+            l’écran : l’enfant le découvre à la fin de la série. Si elle se trompe souvent, l’app revient au niveau d’avant pour consolider.
+            Un calcul raté revient un peu plus tard.
           </p>
         </div>
 
@@ -741,11 +800,18 @@ function ParentArea({ state, onPick, onMode }: { state: CalculState; onPick: (id
             <ul className="mt-2 flex flex-col gap-1">
               {practised.map((l) => {
                 const s = state.stats[l.id];
+                const t = state.pages[l.id];
                 return (
                   <li key={l.id} className="flex justify-between gap-3">
                     <span>
                       {s.mastered && <span aria-label="maîtrisé">✓ </span>}
                       {l.label}
+                      {t && (
+                        <span className="block text-xs">
+                          Série de {SERIES} : {t.n > 1 && t.first > t.best ? `${timeText(t.first)} → ` : ''}
+                          {timeText(t.best)} (record)
+                        </span>
+                      )}
                     </span>
                     <span className="whitespace-nowrap font-bold text-ink">
                       {s.answered} · {pct(s.firstTry, s.answered)} · {secs(s.ms, s.answered)}
