@@ -14,4 +14,4 @@ Vidéo : `public/promo/fierte/fierte-voix.mp4` (9:16, 1080×1920, 25 s, avec la 
 
 - Le premier plan est une image générée (Higgsfield), pas une vraie famille : ne pas le présenter comme un témoignage.
 - Les plans de l'app viennent de `public/promo/demo-app/demo-app.mp4`, sauf les échecs, filmés dans l'app.
-- `fierte-voix-musique.mp4` : la même vidéo avec le groove Mounas en fond (il baisse tout seul quand Pam parle). `fierte-voix.mp4` reste la version sans musique.
+- `fierte-voix-musique.mp4` : la même vidéo avec une musique afrobeat en fond (« Afrobeat Instrumental Summer Groove », Alex Morgan, fichier fourni par Pam) (il baisse tout seul quand Pam parle). `fierte-voix.mp4` reste la version sans musique.
