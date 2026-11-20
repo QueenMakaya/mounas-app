@@ -3,7 +3,7 @@
 On apprend les sons « un », « eu » et « oi » avec les chiffres un, deux, trois.
 
 - Fiche Skool (3 pages, à imprimer) : `public/promo/sons-un-deux-trois/fiche-un-deux-trois.pdf`
-- Vidéo activité : brouillon avec voix de synthèse, rendu par `tools/video-educative/script_sons.py` (5 min 46). La version finale attend la voix de Pam.
+- Vidéo activité avec la voix de Pam : `public/promo/sons-un-deux-trois/video.mp4` (16:9, 7 min 54), rendue par `tools/video-educative/script_sons.py`. La page titre est en musique seule : la phrase du titre n'a pas été enregistrée.
 
 ## Le contenu de la leçon
 

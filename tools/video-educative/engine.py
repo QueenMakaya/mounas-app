@@ -6,7 +6,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.environ.get('MOUNAS_OUT', os.path.join(HERE, 'out'))
 os.makedirs(os.path.join(OUT, 'png'), exist_ok=True)
 os.makedirs(os.path.join(OUT, 'tts'), exist_ok=True)
-SR = 24000
+SR = int(os.environ.get('SR', 24000))
 FPS = 24
 T = []          # {svg, dur, audio: [(offset_s, samples)], voice: bool}
 LINES = []      # répliques à enregistrer
@@ -70,9 +70,26 @@ def sfx(name):
 def _q(d):
     return max(1, round(d * FPS)) / FPS
 
+# Voix de Pam : VOICE_WAV = enregistrement nettoyé, VOICE_ORDER = json [[début, fin] ou null] par appel say
+_voice = None; _order = None; _nsay = [0]
+if os.environ.get('VOICE_WAV'):
+    import soundfile as _sf, json as _json
+    _voice, _vsr = _sf.read(os.environ['VOICE_WAV']); assert _vsr == SR
+    _order = _json.load(open(os.environ['VOICE_ORDER']))
+
+def _pam(i):
+    o = _order[i]
+    if o is None: return np.zeros(int(SR * 1.2), dtype=np.float32)
+    s = _voice[int(o[0]*SR):int(o[1]*SR)].astype(np.float32) * 0.75
+    f = int(SR * 0.02); s[:f] *= np.linspace(0, 1, f); s[-f:] *= np.linspace(1, 0, f)
+    return s
+
 def say(svg, text, tts_text=None, pad=0.55, sfx_name=None, record=True):
     """Affiche svg pendant la réplique. tts_text : orthographe phonétique pour la voix brouillon."""
-    s = tts(tts_text or text)
+    if _order is not None:
+        s = _pam(_nsay[0]); _nsay[0] += 1; pad = min(pad, 0.4)
+    else:
+        s = tts(tts_text or text)
     au = [(0.15, s, True)]
     if sfx_name: au.append((0.0, sfx(sfx_name), False))
     T.append(dict(svg=svg, dur=_q(0.15 + len(s)/SR + pad), audio=au))

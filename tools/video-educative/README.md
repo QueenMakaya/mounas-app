@@ -19,3 +19,12 @@ python3 script_sons.py video    # rend out/sons-un-deux-trois.mp4
 python3 script_sons.py lines    # liste des répliques à enregistrer
 DRY=1 python3 script_sons.py frames   # écrans seuls, sans voix
 ```
+
+## Avec la voix de Pam
+
+```bash
+# pam_clean.wav : l'enregistrement nettoyé, mono 48 kHz
+SR=48000 VOICE_WAV=pam_clean.wav VOICE_ORDER=voix-pam-sons-order.json python3 script_sons.py video
+```
+
+`voix-pam-sons-order.json` donne, pour chaque réplique dans l'ordre, le passage [début, fin] en secondes dans l'enregistrement (`null` : pas de voix).
