@@ -140,6 +140,11 @@ say(scr('UNE AUTRE FAÇON DE L\'ÉCRIRE', C2, h1('Le o et le e se collent, puis 
         card(300, 380, 300, 230, C2, sw=9) + text(450, 550, 'œu', 150, C2),
         rich(880, 540, 'v|œu|', 140, C2), rich(1330, 540, 'n|œu|(d)', 140, C2), rich(1090, 740, 'des |œu|(fs)', 110, C2), trio(940, 2, 46)),
     "Parfois, le o et le e se collent, et le u les suit. Comme dans vœu, dans nœud, et dans des œufs.")
+say(scr('LE E TOUT SEUL', C2, h1('Un petit e tout seul chante presque pareil', 250, C2, 56),
+        card(300, 400, 220, 230, C2, sw=9) + text(410, 570, 'e', 150, C2),
+        rich(760, 520, 'd|e|', 130, C2), rich(1080, 520, 'l|e|', 130, C2), rich(1400, 520, 'j|e|', 130, C2),
+        rich(1080, 720, 'p|e|tit', 130, C2), trio(940, 2, 46)),
+    "Et parfois, un petit e tout seul suffit ! Comme dans de, dans le, dans je, et dans petit.")
 say(scr('CHUT ! LES LETTRES MUETTES', PUR, h1('On les écrit, mais on ne les entend pas', 250, PUR, 56),
         rich(560, 560, 'd|eu|(x)', 170, C2), rich(1360, 560, 'n|œu|(d)', 170, C2),
         amara(960, 560, .7, L='down', R='nose', mouth='o'), pill(960, 900, 'le x de deux et le d de nœud sont muets', PUR, 40)),
@@ -304,15 +309,15 @@ say(defi(0, ['Invente une phrase avec les trois sons'],
 # ============ 10. RÉCAP ============
 def recap():
     out = []
-    data = {1: (['un', 'um'], 'lundi · parfum'), 2: (['eu', 'œu'], 'deux · nœud'), 3: (['oi', 'oî', 'oy', 'oê'], 'trois · boîte · voyage')}
+    data = {1: (['un', 'um'], 'lundi · parfum'), 2: (['eu', 'œu', 'e'], 'deux · nœud · je'), 3: (['oi', 'oî', 'oy', 'oê'], 'trois · boîte · voyage')}
     for n, x in zip((1, 2, 3), (380, 960, 1540)):
         g, c, _ = SON[n]; gs, ex = data[n]
         out.append(card(x - 260, 300, 520, 520, c, sw=8) + badge(x, 400, n, c, 70) + text(x, 600, g, 150, c)
                    + text(x, 690, '  '.join(gs), 54, PUR) + text(x, 770, ex, 36, '#7A6A80', 'nx'))
     return scr('BRAVO !', RED, confetti(9, 50), h1('Tu connais les trois sons', 240), *out)
 say(recap(), "Bravo ! Aujourd'hui, tu as appris trois sons.", sfx_name='tada')
-say(recap(), "Un, comme dans lundi et parfum. Eu, comme dans deux et nœud. Oi, comme dans trois, boîte et voyage.",
-    "Un, comme dans lundi et parfum. Euh, comme dans deux et nœud. Oua, comme dans trois, boîte et voyage.")
+say(recap(), "Un, comme dans lundi et parfum. Eu, comme dans deux, nœud et je. Oi, comme dans trois, boîte et voyage.",
+    "Un, comme dans lundi et parfum. Euh, comme dans deux, nœud et je. Oua, comme dans trois, boîte et voyage.")
 fin = svg(bg('AU REVOIR', TEAL), confetti(12), amara(820, 420, 1.0, L='down', R='up'), kofi(1120, 450, .92, L='up', R='down'),
           text(960, 960, 'À bientôt chez les Mounas !', 80, PUR))
 say(fin, "Un, deux, trois... à bientôt chez les Mounas !")
