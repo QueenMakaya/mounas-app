@@ -3,7 +3,7 @@
 On apprend les sons « un », « eu » et « oi » avec les chiffres un, deux, trois.
 
 - Fiche Skool (3 pages, à imprimer) : `public/promo/sons-un-deux-trois/fiche-un-deux-trois.pdf`
-- Vidéo activité : brouillon avec voix de synthèse, rendu par `tools/video-educative/script_sons.py` (5 min 42). La version finale attend la voix de Pam.
+- Vidéo activité : brouillon avec voix de synthèse, rendu par `tools/video-educative/script_sons.py` (5 min 46). La version finale attend la voix de Pam.
 
 ## Le contenu de la leçon
 
@@ -17,6 +17,7 @@ Gardé pour une autre leçon (dit seulement aux parents, sur la fiche) : le « e
 
 ## Le déroulé de la vidéo
 
+0. Page titre : « Un, deux, trois : les trois sons ».
 1. Mot aux parents : le matériel (quatre feuilles, feutres, ruban adhésif, ciseaux).
 2. Intro : on compte un, deux, trois, et on annonce la marelle des trois sons.
 3. Au marché de Mounaville : un parfum, deux œufs, trois noix de coco.
@@ -47,81 +48,82 @@ Ton défi : invente une phrase avec les trois sons et écris-la en commentaire. 
 
 Un seul fichier, environ deux secondes de silence entre chaque réplique. Les lignes ⏱ ne se disent pas.
 
-1. Bonjour les parents ! Pour l'atelier, à la fin de la vidéo, préparez quatre feuilles de papier, des feutres, du ruban adhésif, et des ciseaux pour un adulte.
-2. La fiche d'exercices à imprimer vous attend dans la communauté Les Mounas.
-3. Coucou ! C'est Amara. Aujourd'hui, on compte jusqu'à trois. Prêt ? Prête ?
-4. Un !
-5. Deux !
-6. Trois !
-7. Dans ces trois petits mots se cachent trois sons magiques.
-8. Et à la fin, tu vas fabriquer la marelle des trois sons, pour sauter de son en son !
-9. Ce matin, à Mounaville, Amara et son ami Kofi vont au marché.
-10. Dans leur panier, il y a un parfum pour mamie,
-11. deux œufs,
-12. et trois noix de coco.
-13. Un parfum, deux œufs, trois noix. Tu entends ? Les sons de un, deux, trois sont partout !
-14. Premier son. Écoute bien : un.
-15. Il s'écrit avec deux lettres : u, et n. Ensemble, elles chantent : un.
-16. Le son passe par ton nez. Répète avec moi : un.
-17. On l'entend dans lundi, dans brun, et dans chacun.
-18. Parfois, il s'écrit avec un m : u, m. Comme dans parfum.
-19. Attention, un piège ! S'il y a une voyelle juste après le n, le son change. Lune. Une. Ici, on n'entend pas le son un.
-20. Deuxième son. Écoute bien : eu.
-21. Il s'écrit e, u. Ensemble, ils chantent : eu.
-22. Ta bouche fait un petit rond, comme pour un bisou. Répète avec moi : eu.
-23. On l'entend dans bleu, dans feu, dans jeu, et dans cheveu.
-24. Parfois, le o et le e se collent, et le u les suit. Comme dans vœu, dans nœud, et dans des œufs.
-25. Et parfois, un petit e tout seul suffit ! Comme dans de, dans le, dans je, et dans petit.
-26. Et regarde le mot deux : à la fin, il y a un x qu'on n'entend pas. C'est une lettre muette. Chut !
-27. Troisième son. Écoute bien : oi.
-28. Il s'écrit o, i. Mais surprise : on n'entend ni o, ni i ! Ensemble, ils font : oi.
-29. Ta bouche s'ouvre en grand. Répète avec moi : oi.
-30. On l'entend dans roi, dans étoile, et dans poisson.
-31. Le son oi aime se déguiser. Avec un petit chapeau sur le i : boîte.
-32. Avec un y : voyage. Tu te souviens ? Le y vaut deux i.
-33. Et même avec o, e, et un chapeau : poêle.
-34. Et à la fin de trois, le s est muet. Comme le t de toit, et le x de noix.
-35. Attention, un piège ! Avec un n juste après, o, i, n, c'est un autre son : point, loin.
-36. Debout ! On joue avec tout le corps.
-37. Si tu entends le son un, tu fais un saut. Le son eu, deux sauts. Le son oi, trois sauts.
-38. Bleu.
-39. Bleu : deux sauts !
-40. Lundi.
-41. Lundi : un saut !
-42. Étoile.
-43. Étoile : trois sauts !
-44. Parfum.
-45. Parfum : un saut !
-46. (après chaque mot du jeu : laisser environ trois secondes de silence avant de donner la réponse)
-47. Petit quiz ! Quel son entends-tu ? Montre un, deux ou trois doigts.
-48. Nœud.
-49. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-50. Le son eu ! Deux doigts.
-51. Voyage.
-52. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-53. Le son oi ! Trois doigts.
-54. Brun.
-55. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-56. Le son un ! Un doigt.
-57. Attention, le dernier est un piège : lune.
-58. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-59. Aucun des trois ! Après le n, il y a un e : le son un a disparu. Bien joué !
-60. Voici le défi du nez ! Dis : eu.
-61. Maintenant, pince ton nez, et dis encore : eu. Ça marche toujours !
-62. Garde ton nez pincé, et dis : un. Ça fait tout drôle !
-63. C'est parce que le son un passe par ton nez. Tu es une vraie petite tête chercheuse !
-64. C'est l'heure de l'atelier ! On fabrique la marelle des trois sons.
-65. Sur la première feuille, écris en grand le chiffre un, et les lettres u, n.
-66. Sur la deuxième feuille, le chiffre deux, et les lettres e, u. Sur la troisième, le chiffre trois, et les lettres o, i.
-67. Mets sur pause, et reviens quand tes trois feuilles sont prêtes.
-68. Un adulte t'aide à couper la dernière feuille en douze petites cartes.
-69. Sur chaque carte, écris un mot. Les douze mots sont sur la fiche à imprimer.
-70. Mets sur pause, le temps d'écrire tes cartes.
-71. Pose les trois feuilles par terre, l'une après l'autre. Un adulte les colle au sol avec du ruban adhésif, pour ne pas glisser. Ta marelle est prête !
-72. Défi numéro un. Pioche une carte, lis le mot, et saute sur la bonne feuille.
-73. Défi numéro deux. Un adulte dit un mot, sans te montrer la carte. Écoute bien, et saute !
-74. Défi numéro trois. Saute sur une feuille, et trouve un nouveau mot avec ce son.
-75. Et ton défi à toi : invente une phrase avec les trois sons. Par exemple : lundi, un roi bleu compte trois œufs.
-76. Bravo ! Aujourd'hui, tu as appris trois sons.
-77. Un, comme dans lundi et parfum. Eu, comme dans deux, nœud et je. Oi, comme dans trois, boîte et voyage.
-78. Un, deux, trois... à bientôt chez les Mounas !
+1. Un, deux, trois : les trois sons !
+2. Bonjour les parents ! Pour l'atelier, à la fin de la vidéo, préparez quatre feuilles de papier, des feutres, du ruban adhésif, et des ciseaux pour un adulte.
+3. La fiche d'exercices à imprimer vous attend dans la communauté Les Mounas.
+4. Coucou ! C'est Amara. Aujourd'hui, on compte jusqu'à trois. Prêt ? Prête ?
+5. Un !
+6. Deux !
+7. Trois !
+8. Dans ces trois petits mots se cachent trois sons magiques.
+9. Et à la fin, tu vas fabriquer la marelle des trois sons, pour sauter de son en son !
+10. Ce matin, à Mounaville, Amara et son ami Kofi vont au marché.
+11. Dans leur panier, il y a un parfum pour mamie,
+12. deux œufs,
+13. et trois noix de coco.
+14. Un parfum, deux œufs, trois noix. Tu entends ? Les sons de un, deux, trois sont partout !
+15. Premier son. Écoute bien : un.
+16. Il s'écrit avec deux lettres : u, et n. Ensemble, elles chantent : un.
+17. Le son passe par ton nez. Répète avec moi : un.
+18. On l'entend dans lundi, dans brun, et dans chacun.
+19. Parfois, il s'écrit avec un m : u, m. Comme dans parfum.
+20. Attention, un piège ! S'il y a une voyelle juste après le n, le son change. Lune. Une. Ici, on n'entend pas le son un.
+21. Deuxième son. Écoute bien : eu.
+22. Il s'écrit e, u. Ensemble, ils chantent : eu.
+23. Ta bouche fait un petit rond, comme pour un bisou. Répète avec moi : eu.
+24. On l'entend dans bleu, dans feu, dans jeu, et dans cheveu.
+25. Parfois, le o et le e se collent, et le u les suit. Comme dans vœu, dans nœud, et dans des œufs.
+26. Et parfois, un petit e tout seul suffit ! Comme dans de, dans le, dans je, et dans petit.
+27. Et regarde le mot deux : à la fin, il y a un x qu'on n'entend pas. C'est une lettre muette. Chut !
+28. Troisième son. Écoute bien : oi.
+29. Il s'écrit o, i. Mais surprise : on n'entend ni o, ni i ! Ensemble, ils font : oi.
+30. Ta bouche s'ouvre en grand. Répète avec moi : oi.
+31. On l'entend dans roi, dans étoile, et dans poisson.
+32. Le son oi aime se déguiser. Avec un petit chapeau sur le i : boîte.
+33. Avec un y : voyage. Tu te souviens ? Le y vaut deux i.
+34. Et même avec o, e, et un chapeau : poêle.
+35. Et à la fin de trois, le s est muet. Comme le t de toit, et le x de noix.
+36. Attention, un piège ! Avec un n juste après, o, i, n, c'est un autre son : point, loin.
+37. Debout ! On joue avec tout le corps.
+38. Si tu entends le son un, tu fais un saut. Le son eu, deux sauts. Le son oi, trois sauts.
+39. Bleu.
+40. Bleu : deux sauts !
+41. Lundi.
+42. Lundi : un saut !
+43. Étoile.
+44. Étoile : trois sauts !
+45. Parfum.
+46. Parfum : un saut !
+47. (après chaque mot du jeu : laisser environ trois secondes de silence avant de donner la réponse)
+48. Petit quiz ! Quel son entends-tu ? Montre un, deux ou trois doigts.
+49. Nœud.
+50. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
+51. Le son eu ! Deux doigts.
+52. Voyage.
+53. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
+54. Le son oi ! Trois doigts.
+55. Brun.
+56. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
+57. Le son un ! Un doigt.
+58. Attention, le dernier est un piège : lune.
+59. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
+60. Aucun des trois ! Après le n, il y a un e : le son un a disparu. Bien joué !
+61. Voici le défi du nez ! Dis : eu.
+62. Maintenant, pince ton nez, et dis encore : eu. Ça marche toujours !
+63. Garde ton nez pincé, et dis : un. Ça fait tout drôle !
+64. C'est parce que le son un passe par ton nez. Tu es une vraie petite tête chercheuse !
+65. C'est l'heure de l'atelier ! On fabrique la marelle des trois sons.
+66. Sur la première feuille, écris en grand le chiffre un, et les lettres u, n.
+67. Sur la deuxième feuille, le chiffre deux, et les lettres e, u. Sur la troisième, le chiffre trois, et les lettres o, i.
+68. Mets sur pause, et reviens quand tes trois feuilles sont prêtes.
+69. Un adulte t'aide à couper la dernière feuille en douze petites cartes.
+70. Sur chaque carte, écris un mot. Les douze mots sont sur la fiche à imprimer.
+71. Mets sur pause, le temps d'écrire tes cartes.
+72. Pose les trois feuilles par terre, l'une après l'autre. Un adulte les colle au sol avec du ruban adhésif, pour ne pas glisser. Ta marelle est prête !
+73. Défi numéro un. Pioche une carte, lis le mot, et saute sur la bonne feuille.
+74. Défi numéro deux. Un adulte dit un mot, sans te montrer la carte. Écoute bien, et saute !
+75. Défi numéro trois. Saute sur une feuille, et trouve un nouveau mot avec ce son.
+76. Et ton défi à toi : invente une phrase avec les trois sons. Par exemple : lundi, un roi bleu compte trois œufs.
+77. Bravo ! Aujourd'hui, tu as appris trois sons.
+78. Un, comme dans lundi et parfum. Eu, comme dans deux, nœud et je. Oi, comme dans trois, boîte et voyage.
+79. Un, deux, trois... à bientôt chez les Mounas !

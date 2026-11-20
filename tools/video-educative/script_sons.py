@@ -20,6 +20,20 @@ def trio(y=900, hl=None, r=58):
         out.append(f'<g opacity="{op}">{badge(x - r*1.07, y, n, c, r)}{text(x + r, y + r*.48, g, int(r*1.45), c)}</g>')
     return ''.join(out)
 
+# ============ 0. PAGE TITRE ============
+def ouverture():
+    big = ''; cx = 960 - width('MOUNAS', 150) / 2
+    for ch, col in zip('MOUNAS', [YEL, TEAL, YEL, RED, PUR, RED]):
+        big += text(cx, 250, ch, 150, col, 'black', 'start'); cx += width(ch, 150) + 2
+    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">'
+            + bg(None).replace(logo(), '') + confetti(21, 60) + big
+            + text(820, 470, 'Un, deux, trois !', 150, PUR) + pill(820, 530, 'Les trois sons : « un », « eu », « oi »', RED, 48)
+            + badge(540, 820, 1, C1, 95) + badge(820, 820, 2, C2, 95) + badge(1100, 820, 3, C3, 95)
+            + amara(1560, 640, 1.05, L='up', R='up') + '</svg>')
+hold(ouverture(), 1.0, 'tada')
+say(ouverture(), "Un, deux, trois : les trois sons !")
+hold(ouverture(), 0.8)
+
 # ============ 1. MOT AUX PARENTS ============
 def mat(i, label, sub, icon):
     x = 250 + i * 370
