@@ -1,0 +1,3 @@
+const {chromium}=require('playwright');(async()=>{const b=await chromium.launch();const p=await b.newPage();await p.goto('file://'+process.argv[2]);await p.evaluate(()=>document.fonts.ready);
+const over=await p.evaluate(()=>[...document.querySelectorAll('.page')].map(s=>{const f=s.querySelector('.foot').getBoundingClientRect().top;const sol=s.querySelector('.sol');const lim=sol?sol.getBoundingClientRect().top:f;let m=0;for(const e of s.children){if(e.classList.contains('foot')||e.classList.contains('sol'))continue;m=Math.max(m,e.getBoundingClientRect().bottom)}return Math.round(lim-m+ -s.getBoundingClientRect().top*0)}));console.log('marge restante px',over);
+await p.pdf({path:process.argv[3],format:'Letter',printBackground:true});await b.close()})()
