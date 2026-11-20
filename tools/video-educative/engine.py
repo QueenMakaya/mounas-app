@@ -80,8 +80,15 @@ if os.environ.get('VOICE_WAV'):
 def _pam(i):
     o = _order[i]
     if o is None: return np.zeros(int(SR * 1.2), dtype=np.float32)
-    s = _voice[int(o[0]*SR):int(o[1]*SR)].astype(np.float32) * 0.75
-    f = int(SR * 0.02); s[:f] *= np.linspace(0, 1, f); s[-f:] *= np.linspace(1, 0, f)
+    s = _voice[int(o[0]*SR):int(o[1]*SR)].astype(np.float32).copy()
+    # même volume pour chaque réplique : niveau mesuré sur les passages parlés, gain borné à ±6 dB
+    h = int(SR * 0.05); k = len(s) // h
+    r = np.sqrt((s[:k*h].reshape(k, h) ** 2).mean(1)); act = r[r > r.max() * 0.1]
+    g = 10 ** (-21 / 20) / (np.sqrt((act ** 2).mean()) + 1e-9)
+    s *= float(np.clip(g, 0.5, 2.0))
+    pk = np.abs(s).max()
+    if pk > 0.8: s *= 0.8 / pk
+    f = int(SR * 0.04); s[:f] *= np.linspace(0, 1, f); s[-f:] *= np.linspace(1, 0, f)
     return s
 
 def say(svg, text, tts_text=None, pad=0.55, sfx_name=None, record=True):
@@ -163,7 +170,7 @@ def render(name, video=True):
     duck = np.convolve(duck, np.ones(SR//2)/(SR//2), 'same')
     mus = music(tot + 1)[:n] * (0.16 - 0.115 * duck)
     fade = np.minimum(1, np.minimum(np.arange(n)/SR/1.5, (n - np.arange(n))/SR/2.5))
-    mix = voice * 0.95 + fx * 0.8 + mus * fade
+    mix = voice * (1.15 if _order is not None else 0.95) + fx * 0.6 + mus * fade
     mix = np.clip(mix, -1, 1)
     wav = os.path.join(OUT, name + '.wav')
     with wave.open(wav, 'wb') as f:

@@ -28,3 +28,5 @@ SR=48000 VOICE_WAV=pam_clean.wav VOICE_ORDER=voix-pam-sons-order.json python3 sc
 ```
 
 `voix-pam-sons-order.json` donne, pour chaque réplique dans l'ordre, le passage [début, fin] en secondes dans l'enregistrement (`null` : pas de voix).
+
+Nettoyage de la voix (dans cet ordre) : `adeclip` pour réparer la saturation, passe-haut 100 Hz contre le ronflement grave, `noisereduce` avec le bruit de la pièce prélevé entre les répliques, puis porte de bruit douce, dé-esseur, compression 2,5:1 sans gain de rattrapage. Ne pas compresser avec un gros gain : cela remonte le bruit de fond.
