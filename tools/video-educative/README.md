@@ -25,8 +25,11 @@ DRY=1 python3 script_sons.py frames   # écrans seuls, sans voix
 ```bash
 # pam_clean.wav : l'enregistrement nettoyé, mono 48 kHz
 SR=48000 VOICE_WAV=pam_clean.wav VOICE_ORDER=voix-pam-sons-order.json python3 script_sons.py video
+# musique fournie (sinon groove synthétisé) : ajouter MUSIC_FILE=ma-musique.mp3
 ```
 
-`voix-pam-sons-order.json` donne, pour chaque réplique dans l'ordre, le passage [début, fin] en secondes dans l'enregistrement (`null` : pas de voix).
+`voix-pam-sons-order.json` donne, pour chaque réplique (par clé), le passage [début, fin] en secondes dans l'enregistrement (`null` : pas de voix).
 
 Nettoyage de la voix (dans cet ordre) : `adeclip` pour réparer la saturation, passe-haut 100 Hz contre le ronflement grave, `noisereduce` avec le bruit de la pièce prélevé entre les répliques, puis porte de bruit douce, dé-esseur, compression 2,5:1 sans gain de rattrapage. Ne pas compresser avec un gros gain : cela remonte le bruit de fond.
+
+`anim.py` : les écrans portent des jetons `[[NOM args]]` (entrée des éléments, bouche et yeux d'Amara, sauts, minuteur, confettis, barre d'avancement) résolus image par image. Le rendu complet prend environ 8 minutes sur 4 cœurs.
