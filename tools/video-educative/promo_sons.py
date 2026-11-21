@@ -31,7 +31,7 @@ out(1080, 1920, base(1080, 1920) + biglogo(540, 190, 90) + tc(540, 400, 'Un, deu
     + pill(540, 1610, 'Vidéo complète + bricolage sur YouTube', PUR, 42), 'promo/reel_bg.png', jpg=False)
 out(1080, 1920, base(1080, 1920) + biglogo(540, 330, 110) + amara(540, 640, 1.1, L='up', R='up')
     + tc(540, 1280, '14 JOURS', 150, RED) + tc(540, 1420, 'GRATUITS', 150, RED) + tc(540, 1530, 'Une activité de 10 minutes chaque jour', 46, PUR, 'nx')
-    + pill(540, 1600, 'lesmounas.school/connect', PUR, 54), 'promo/reel_fin.png', jpg=False)
+    + pill(540, 1600, 'lesmounas.school/commencer', PUR, 54), 'promo/reel_fin.png', jpg=False)
 
 # --- carrousel 9 slides 1080x1350 ---
 W, H = 1080, 1350
@@ -65,5 +65,5 @@ slide(8, head('TON DÉFI', ['Invente une phrase', 'avec les trois sons'], RED) +
       + rich(540, 760, 'L{1un}di, {1un} r{3oi} bl{2eu}', 84) + rich(540, 880, 'compte tr{3oi}s {2œu}fs.', 84)
       + tc(540, 1080, 'Écris la tienne en commentaire !', 46, PUR, 'nx'))
 slide(9, amara(540, 420, 0.95, L='up', R='up') + tc(540, 900, 'La vidéo complète', 80) + tc(540, 990, 'est sur YouTube', 80)
-      + pill(540, 1040, '14 jours gratuits · lesmounas.school/connect', RED, 38))
+      + pill(540, 1040, '14 jours gratuits · lesmounas.school/commencer', RED, 38))
 print('ok')
