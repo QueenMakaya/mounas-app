@@ -17,9 +17,9 @@ Gardé pour une autre leçon (dit seulement aux parents, sur la fiche) : le « e
 
 ## Le déroulé de la vidéo
 
-0. Page titre : « Un, deux, trois : les trois sons ».
-1. Mot aux parents : le matériel (quatre feuilles, feutres, ruban adhésif, ciseaux).
-2. Intro : on compte un, deux, trois, et on annonce la marelle des trois sons.
+0. Page titre : « Un, deux, trois : les trois sons » (musique seule).
+1. Accroche pour l'enfant : Amara dit bonjour, on compte un, deux, trois, et on annonce la marelle des trois sons.
+2. Mot aux parents : le matériel (quatre feuilles, feutres, ruban adhésif, ciseaux).
 3. Au marché de Mounaville : un parfum, deux œufs, trois noix de coco.
 4. Les trois sons, l'un après l'autre : les lettres, la bouche, des mots, les autres façons d'écrire, le piège.
 5. Jeu du corps : un saut pour « un », deux sauts pour « eu », trois sauts pour « oi ».
@@ -28,6 +28,21 @@ Gardé pour une autre leçon (dit seulement aux parents, sur la fiche) : le « e
 8. Atelier : la marelle des trois sons (trois feuilles au sol, douze cartes-mots).
 9. On joue : trois défis, plus un défi perso (inventer une phrase avec les trois sons).
 10. Récap et au revoir.
+
+## Ce qui garde les enfants attentifs (et ce qu'on applique)
+
+Tiré des conseils de YouTube pour les contenus enfants et famille, et de la recherche sur les vidéos éducatives.
+
+| Principe | Dans la vidéo |
+|---|---|
+| S'adresser à l'enfant dès les premières secondes | L'accroche d'Amara passe avant le mot aux parents |
+| Un personnage qui regarde et parle à l'enfant | Amara cligne des yeux, bouge, et sa bouche suit la voix |
+| Montrer ce qu'on dit, au moment où on le dit | Chaque mot entre à l'écran quand Pam le prononce, le son est coloré |
+| Laisser des pauses pour répondre | « À toi ! » avec un minuteur après chaque « Répète avec moi », silence avant chaque réponse du jeu |
+| Découper en petits morceaux | Une idée par écran, une barre d'avancement en bas |
+| Répéter, mais avec du sens | Les trois pastilles un · eu · oi reviennent partout, récap à la fin |
+| Faire bouger le corps et les mains | Jeu des sauts, doigts levés au quiz, bricolage |
+| Rester calme : pas de surcharge | Animations courtes et utiles, bruitages à notes claires, musique qui baisse sous la voix |
 
 ## Publication Skool (texte proposé)
 

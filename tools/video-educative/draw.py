@@ -65,34 +65,32 @@ def pill(cx, y, s, col=RED, size=30, fg='#fff', h=None, font='black'):
     return (f'<rect x="{cx - w/2}" y="{y}" width="{w}" height="{h}" rx="{h/2}" fill="{col}"/>'
             + text(cx, y + h/2 + size*0.35, s, size, fg, font))
 
-def bg(title=None, col=RED, deco=True):
-    dots = ''.join(f'<circle cx="{x}" cy="{y}" r="2.2" fill="#EADFCF"/>' for x in range(40, 1920, 50) for y in range(140, 1080, 50))
+def bg(title=None, col=RED, deco=True, prog=True):
+    dots = ('<defs><pattern id="dots" x="15" y="115" width="50" height="50" patternUnits="userSpaceOnUse">'
+            '<circle cx="25" cy="25" r="2.2" fill="#EADFCF"/></pattern></defs><rect y="115" width="1920" height="965" fill="url(#dots)"/>')
     d = ''
     if deco:
         d = (f'<circle cx="1870" cy="40" r="105" fill="{TEAL}" opacity=".45"/><circle cx="160" cy="210" r="22" fill="{PUR}" opacity=".5"/>'
-             f'<circle cx="80" cy="1020" r="115" fill="{YEL}" opacity=".8"/><circle cx="1830" cy="1020" r="40" fill="{RED}" opacity=".6"/>')
-    return (f'<rect width="1920" height="1080" fill="{CREAM}"/>{dots}{d}{logo()}'
-            + (pill(960, 36, title, col) if title else ''))
+             f'<circle cx="80" cy="1020" r="115" fill="{YEL}" opacity=".8"/><circle cx="1830" cy="1010" r="40" fill="{RED}" opacity=".6"/>')
+    return (f'<!--T:{title}--><rect width="1920" height="1080" fill="{CREAM}"/>{dots}{d}{logo()}'
+            + (pill(960, 36, title, col) if title else '') + ('[[PROG]]' if prog else ''))
 
 def svg(*parts):
-    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">' + ''.join(parts) + '</svg>'
+    """Chaque morceau est séparé : le moteur fait entrer en douceur ceux qui sont nouveaux."""
+    P = '<!--P-->'
+    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" width="1920" height="1080">'
+            + P.join(p for p in parts if p) + P + '</svg>')
+
+def at(t, el):
+    """Fait entrer el à t secondes après le début de l'écran (pour suivre la voix)."""
+    return f'<!--AT {t:.2f}-->{el}'
 
 def confetti(seed=1, n=70):
-    r = random.Random(seed); out = []
-    for _ in range(n):
-        x, y = r.randint(20, 1900), r.randint(20, 1060)
-        out.append(f'<rect x="{x}" y="{y}" width="12" height="6" fill="{r.choice([YEL, RED, PUR, TEAL])}" transform="rotate({r.randint(0,180)} {x} {y})"/>')
-    return ''.join(out)
+    return f'[[CONF {seed} {n}]]'
 
 # ---------- personnages ----------
-def _face(mouth='smile'):
-    m = {'smile': '<path d="M-22 26 Q0 48 22 26 Q0 34 -22 26Z" fill="#fff"/>',
-         'o': '<ellipse cx="0" cy="34" rx="11" ry="13" fill="#3A1410"/>',
-         'wide': '<ellipse cx="0" cy="34" rx="20" ry="17" fill="#3A1410"/><ellipse cx="0" cy="41" rx="11" ry="6" fill="#E0566F"/>',
-         'flat': '<ellipse cx="0" cy="34" rx="15" ry="7" fill="#3A1410"/>'}[mouth]
-    return (f'<circle cx="-30" cy="-2" r="15" fill="#fff"/><circle cx="30" cy="-2" r="15" fill="#fff"/>'
-            f'<circle cx="-28" cy="0" r="8" fill="{HAIR}"/><circle cx="32" cy="0" r="8" fill="{HAIR}"/>'
-            f'<circle cx="-56" cy="36" r="15" fill="{RED}" opacity=".45"/><circle cx="56" cy="36" r="15" fill="{RED}" opacity=".45"/>{m}')
+def _face(mouth='smile', ph=0.0):
+    return (f'[[EYES {ph}]]<circle cx="-56" cy="36" r="15" fill="{RED}" opacity=".45"/><circle cx="56" cy="36" r="15" fill="{RED}" opacity=".45"/>[[MOUTH {mouth}]]')
 
 def _arm(side, pose):
     s = -1 if side == 'L' else 1
@@ -111,15 +109,17 @@ def amara(x, y, sc=1.0, L='down', R='up', mouth='smile'):
          f'<path d="M-94 190 H94" stroke="{YEL}" stroke-width="10" stroke-dasharray="20 14"/>'
          f'{hair}<circle cx="0" cy="0" r="92" fill="{SKIN}"/><circle cx="68" cy="-78" r="15" fill="{YEL}"/>{_face(mouth)}'
          f'{_arm("R", R) if R == "nose" else ""}')
-    return f'<g transform="translate({x} {y}) scale({sc})">{g}</g>'
+    w = f'<g [[WAVE 112 175]]>{_arm("R", R)}</g>' if R == 'up' and L != 'up' else None
+    if w: g = g.replace(_arm("R", R), w, 1)
+    return f'<g data-char="amara" transform="translate({x} {y}) scale({sc})"><g [[BOB 0 5]]>{g}</g></g>'
 
 def kofi(x, y, sc=1.0, L='down', R='up', mouth='smile'):
     g = (f'{_arm("L", L)}{_arm("R", R)}<rect x="-22" y="80" width="44" height="60" fill="{SKIN}"/>'
          f'<path d="M-100 130 Q-104 122 -92 122 H92 Q104 122 100 130 L110 420 H-110Z" fill="{TEAL}"/>'
          f'<circle cx="0" cy="250" r="34" fill="{YEL}"/>'
          f'<path d="M-96 -18 A96 100 0 0 1 96 -18 Q60 -62 0 -60 Q-60 -62 -96 -18Z" fill="{HAIR}"/><circle cx="0" cy="0" r="92" fill="{SKIN}"/>'
-         f'<path d="M-90 -22 A92 92 0 0 1 90 -22 Q50 -58 0 -56 Q-50 -58 -90 -22Z" fill="{HAIR}"/>{_face(mouth)}')
-    return f'<g transform="translate({x} {y}) scale({sc})">{g}</g>'
+         f'<path d="M-90 -22 A92 92 0 0 1 90 -22 Q50 -58 0 -56 Q-50 -58 -90 -22Z" fill="{HAIR}"/>{_face('mute', 0.6)}')
+    return f'<g data-char="kofi" transform="translate({x} {y}) scale({sc})"><g [[BOB 0.4 5]]>{g}</g></g>'
 
 # ---------- composants ----------
 def card(x, y, w, h, col=PUR, fill='#fff', sw=6, rx=26):
