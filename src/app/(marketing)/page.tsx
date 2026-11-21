@@ -9,7 +9,7 @@ import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/conf
 export const metadata: Metadata = {
   title: 'Les Mounas : l’app pour apprendre à lire en français, 10 minutes par jour',
   description:
-    'Chaque jour, un mot mystère : syllabes, sons, écriture, dictée et calcul pour les enfants de 0 à 6 ans, avec une touche de culture afro. Démo sans inscription et 14 jours gratuits.',
+    'Chaque jour, un mot mystère : syllabes, sons, écriture, dictée et calcul pour les enfants de 0 à 6 ans, avec une touche de culture afro. Rien à télécharger, démo sans inscription et 14 jours gratuits.',
   openGraph: {
     title: 'Les Mounas : l’app pour apprendre à lire en français, 10 minutes par jour',
     description:
@@ -66,7 +66,10 @@ export default function LandingPage() {
               Essai gratuit 14 jours
             </a>
           </div>
-          <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
+          <p className="mt-5 text-base font-bold" style={{ color: COLORS.tealDark }}>
+            📲 Rien à télécharger : ça s&apos;ouvre ici, dans ton navigateur, sur téléphone, tablette ou ordinateur.
+          </p>
+          <p className="mt-3 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
             Quelques questions, et la démo s&apos;ouvre sur un mot à son niveau : pas de compte, pas de carte.
             <br />
             Puis 14 jours gratuits, et 10 $/mois sans engagement.
@@ -102,8 +105,8 @@ export default function LandingPage() {
             },
             {
               color: COLORS.teal,
-              title: 'Sur WhatsApp',
-              body: 'Rien à installer. Tout arrive dans la conversation que tu utilises déjà.',
+              title: 'Rien à télécharger',
+              body: 'Ni App Store, ni Play Store. Tout s’ouvre d’un simple lien, sur WhatsApp ou dans ton navigateur.',
             },
             {
               color: COLORS.purple,
@@ -178,7 +181,7 @@ export default function LandingPage() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base" style={{ color: 'rgba(253,246,236,0.85)' }}>
             Raising bilingual kids in the diaspora? Les Mounas sends you one playful 10-minute French
-            activity a day, right on WhatsApp — no app to install, cancel anytime.
+            activity a day, right on WhatsApp — nothing to download, cancel anytime.
           </p>
           <div className="mt-8">
             <a

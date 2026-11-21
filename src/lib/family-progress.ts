@@ -16,7 +16,7 @@
 
 import { airtableToken } from '@/lib/airtable-token';
 import { getMissions } from '@/lib/missions';
-import { LEVELS, levelById } from '@/lib/calcul';
+import { LEVELS, levelById, timeText } from '@/lib/calcul';
 import { mergeSnapshots, parseSnapshot, streakOf, type ProgressEvent, type Snapshot } from '@/lib/progress-snapshot';
 
 // Addressed by id, like the Signups table: survives a rename.
@@ -115,10 +115,12 @@ function calculFields(c: Snapshot['calcul']): Record<string, unknown> {
     .slice(0, 7)
     .map(([d, x]) => `${d} : ${x.done} calcul${x.done > 1 ? 's' : ''}, ${x.done ? Math.round((x.ok / x.done) * 100) : 0} % justes`);
   const mastered = LEVELS.filter((l) => c.stats[l.id]?.mastered).map((l) => l.label);
+  const page = c.pages[c.level];
+  const record = page ? [`Série de 10 (${levelById(c.level).label}) : record ${timeText(page.best)}, première fois ${timeText(page.first)}`] : [];
   return {
     'Niveau calcul': levelById(c.level).label,
     'Calculs faits': total,
-    'Calcul · derniers jours': [...days, ...(mastered.length ? ['', `Maîtrisés : ${mastered.join(', ')}`] : [])].join('\n'),
+    'Calcul · derniers jours': [...days, ...record, ...(mastered.length ? ['', `Maîtrisés : ${mastered.join(', ')}`] : [])].join('\n'),
   };
 }
 

@@ -1,0 +1,141 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Fiche · Un, deux, trois : les trois sons</title>
+<style>
+@page{size:Letter;margin:0}
+:root{--y:#FEBD57;--r:#F30041;--p:#4D0065;--t:#00A99C;--g:#D98A00;--c:#FDF6EC;--mute:#B9A9C2;--ink:#3b2b45}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Nunito B';color:var(--ink);font-size:11.2pt;line-height:1.35}
+.page{width:8.5in;height:11in;padding:.5in .6in .45in;position:relative;page-break-after:always;overflow:hidden}
+.page:last-child{page-break-after:auto}
+h1,h2,h3,.f{font-family:'Fraunces Black';font-weight:normal;margin:0}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.logo{font-family:'Fraunces Black';font-size:21pt;letter-spacing:.5px}
+.tag{font-family:'Fraunces Black';font-size:8.5pt;color:#fff;background:var(--p);border-radius:99px;padding:4px 13px;letter-spacing:.5px}
+h1{font-size:27pt;color:var(--p);line-height:1.05}
+.sub{font-family:'Nunito XB';color:var(--r);font-size:12pt;margin:3px 0 10px}
+.c1{color:var(--t)}.c2{color:var(--r)}.c3{color:var(--g)}.m{color:var(--mute)}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.son{border:2.5px solid;border-radius:14px;padding:10px 11px 9px}
+.son.s1{border-color:var(--t)}.son.s2{border-color:var(--r)}.son.s3{border-color:var(--g)}
+.head{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.num{width:40px;height:40px;border-radius:50%;color:#fff;font-family:'Fredoka SB';font-size:22pt;display:flex;align-items:center;justify-content:center;flex:none}
+.s1 .num,.b1{background:var(--t)}.s2 .num,.b2{background:var(--r)}.s3 .num,.b3{background:var(--g)}
+.big{font-family:'Fraunces Black';font-size:33pt;line-height:1}
+.mot{font-family:'Fraunces Black';font-size:10pt;color:var(--p);margin-left:auto;text-align:right;line-height:1.15}
+.lab{font-family:'Fraunces Black';font-size:8.2pt;letter-spacing:.6px;text-transform:uppercase;color:var(--p);margin:7px 0 1px}
+.son p{margin:0;font-size:10pt}
+.gr{font-family:'Fraunces Black';font-size:13pt;display:inline-block;min-width:27px}
+.w{font-family:'Fraunces Black';color:var(--p)}
+.trap{background:#FFF0F3;border-radius:9px;padding:5px 8px;margin-top:7px;font-size:9.6pt}
+.trap b{font-family:'Nunito XB';color:var(--r)}
+.note{background:var(--c);border-radius:12px;padding:8px 13px;margin-top:10px;font-size:10pt}
+.note b{font-family:'Nunito XB';color:var(--p)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:6px}
+.step{background:var(--c);border-radius:12px;padding:8px 10px;font-size:9.7pt}
+.step b{font-family:'Fraunces Black';color:var(--r);display:block;font-size:10.5pt}
+h2{font-size:14.5pt;color:var(--p);margin:9px 0 3px;display:flex;align-items:center;gap:8px}
+h2 .n{width:25px;height:25px;border-radius:50%;background:var(--y);color:var(--p);font-family:'Fredoka SB';font-size:13pt;display:flex;align-items:center;justify-content:center;flex:none}
+.cons{font-size:10.3pt;margin:0 0 6px}
+.bank{display:flex;flex-wrap:wrap;gap:6px 8px;margin-bottom:8px}
+.bank span{font-family:'Fraunces Black';font-size:13pt;color:var(--p);border:1.6px dashed var(--mute);border-radius:8px;padding:1px 10px}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.box{border:2.2px solid;border-radius:12px;height:.92in;padding:5px 9px;display:flex;gap:7px;align-items:flex-start}
+.box .num{width:28px;height:28px;font-size:15pt}.box .f{font-size:17pt}
+.fill{display:grid;grid-template-columns:repeat(4,1fr);gap:5px 12px;font-family:'Fraunces Black';font-size:17pt;color:var(--p)}
+.fill i{display:inline-block;width:38px;border-bottom:2.5px solid var(--p);margin:0 2px}
+.rowz{display:grid;grid-template-columns:54px 1fr;gap:4px 8px;align-items:center;font-family:'Fraunces Black';font-size:16pt;color:var(--p)}
+.rowz .k{font-size:15pt}.rowz div span{margin-right:22px}
+.phr{font-family:'Fraunces Black';font-size:19pt;color:var(--p);border:2.2px solid var(--p);border-radius:12px;padding:6px 14px;text-align:center}
+.line{border-bottom:1.6px solid var(--mute);height:.29in}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sol{position:absolute;left:.6in;right:.6in;bottom:.5in;font-size:7.6pt;color:#8b7b95;transform:rotate(180deg);text-align:center}
+.foot{position:absolute;left:.6in;right:.6in;bottom:.26in;font-size:8pt;color:#8b7b95;display:flex;justify-content:space-between}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1.52in;border-top:1.6px dashed #9c8ca6;border-left:1.6px dashed #9c8ca6;margin-top:8px}
+.cards div{border-right:1.6px dashed #9c8ca6;border-bottom:1.6px dashed #9c8ca6;display:flex;align-items:center;justify-content:center;font-family:'Fraunces Black';font-size:35pt;color:var(--p);position:relative}
+.cards small{position:absolute;right:8px;bottom:5px;width:19px;height:19px;border-radius:50%;color:#fff;font-family:'Fredoka SB';font-size:10pt;display:flex;align-items:center;justify-content:center}
+</style></head><body>
+
+<section class="page">
+ <div class="top"><div class="logo"><span style="color:var(--y)">M</span><span style="color:#00CFBF">O</span><span style="color:var(--y)">U</span><span class="c2">N</span><span style="color:var(--p)">A</span><span class="c2">S</span></div><div class="tag">LA LEÇON · POUR LE PARENT</div></div>
+ <h1>Un, deux, trois : les trois sons</h1>
+ <div class="sub">Trois chiffres, trois sons : « un », « eu », « oi ». À regarder avec la vidéo, dix minutes par jour.</div>
+ <div class="cols">
+  <div class="son s1"><div class="head"><div class="num">1</div><div class="big c1">un</div><div class="mot">comme dans<br><span class="c1">un</span></div></div>
+   <p>Le son passe par le nez. Pince ton nez : il change !</p>
+   <div class="lab">Il s'écrit</div>
+   <p><span class="gr c1">un</span> <span class="w">l<span class="c1">un</span>di, br<span class="c1">un</span>, chac<span class="c1">un</span>, auc<span class="c1">un</span>, empr<span class="c1">un</span>ter</span></p>
+   <p><span class="gr c1">um</span> <span class="w">parf<span class="c1">um</span>, h<span class="c1">um</span>ble</span></p>
+   <div class="trap"><b>Le piège :</b> une voyelle juste après le n, et le son disparaît. <span class="w">une, lune, brune</span></div></div>
+  <div class="son s2"><div class="head"><div class="num">2</div><div class="big c2">eu</div><div class="mot">comme dans<br>d<span class="c2">eu</span><span class="m">x</span></div></div>
+   <p>La bouche fait un petit rond, comme pour un bisou.</p>
+   <div class="lab">Il s'écrit</div>
+   <p><span class="gr c2">eu</span> <span class="w">bl<span class="c2">eu</span>, f<span class="c2">eu</span>, j<span class="c2">eu</span>, chev<span class="c2">eu</span>, j<span class="c2">eu</span>di, p<span class="c2">eu</span></span></p>
+   <p><span class="gr c2">œu</span> <span class="w">v<span class="c2">œu</span>, n<span class="c2">œu</span><span class="m">d</span>, des <span class="c2">œu</span><span class="m">fs</span></span></p>
+   <p><span class="gr c2">e</span> <span class="w">d<span class="c2">e</span>, l<span class="c2">e</span>, j<span class="c2">e</span>, m<span class="c2">e</span>, p<span class="c2">e</span>tit</span> (le e tout seul)</p>
+   <div class="lab">Lettres muettes</div>
+   <p><span class="w">deu<span class="m">x</span>, nœu<span class="m">d</span>, il pleu<span class="m">t</span>, heureu<span class="m">x</span></span></p></div>
+  <div class="son s3"><div class="head"><div class="num">3</div><div class="big c3">oi</div><div class="mot">comme dans<br>tr<span class="c3">oi</span><span class="m">s</span></div></div>
+   <p>La bouche s'ouvre en grand. On n'entend ni « o », ni « i ».</p>
+   <div class="lab">Il s'écrit</div>
+   <p><span class="gr c3">oi</span> <span class="w">r<span class="c3">oi</span>, m<span class="c3">oi</span>, ét<span class="c3">oi</span>le, p<span class="c3">oi</span>sson, <span class="c3">oi</span>seau</span></p>
+   <p><span class="gr c3">oî</span> <span class="w">b<span class="c3">oî</span>te</span> &nbsp; <span class="gr c3">oê</span> <span class="w">p<span class="c3">oê</span>le</span></p>
+   <p><span class="gr c3">oy</span> <span class="w">v<span class="c3">oy</span>age, n<span class="c3">oy</span>au</span> (le y vaut deux i)</p>
+   <div class="lab">Lettres muettes</div>
+   <p><span class="w">troi<span class="m">s</span>, toi<span class="m">t</span>, noi<span class="m">x</span>, froi<span class="m">d</span>, doi<span class="m">gt</span></span></p>
+   <div class="trap"><b>Le piège :</b> o, i, n, c'est un autre son. <span class="w">point, loin, coin</span></div></div>
+ </div>
+ <div class="note"><b>Bon à savoir.</b> Devant un r ou une consonne qu'on entend, « eu » et « œu » s'ouvrent un peu plus : <span class="w">fleur, peur, sœur, un œuf</span>. C'est le son cousin : on le garde pour une autre leçon. Et selon les régions, « un » se prononce presque comme « in » (brun, brin) : les deux façons sont justes.</div>
+ <h2><span class="n" style="background:var(--p);color:#fff">★</span>La leçon en quatre petits temps</h2>
+ <div class="steps">
+  <div class="step"><b>1. On compte</b>Un, deux, trois sur les doigts. Dans chaque mot, on cherche le son caché.</div>
+  <div class="step"><b>2. On regarde</b>Pour chaque son : les lettres, puis les autres façons de l'écrire.</div>
+  <div class="step"><b>3. On cherche</b>D'autres mots avec le même son, dans la maison et dans les livres.</div>
+  <div class="step"><b>4. On joue</b>Les exercices de la page deux, puis la marelle des trois sons.</div>
+ </div>
+ <h2><span class="n">+</span>Le jeu du corps (sans matériel)</h2>
+ <p class="cons">Tu dis un mot. Ton enfant saute : <span class="w c1">un saut</span> pour le son « un », <span class="w c2">deux sauts</span> pour « eu », <span class="w c3">trois sauts</span> pour « oi ». Mots à dire : lundi, bleu, étoile, parfum, feu, roi, brun, nœud, boîte, jeudi, voyage, chacun. Mots pièges (on ne saute pas) : lune, point.</p>
+ <h2><span class="n">+</span>Le défi du nez</h2>
+ <p class="cons">Dis « eu » en pinçant ton nez : ça marche. Dis « un » en pinçant ton nez : le son change, parce qu'il passe par le nez.</p>
+ <div class="foot"><span>Les Mounas · lesmounas.school</span><span>Un, deux, trois : les trois sons · 1/3</span></div>
+</section>
+
+<section class="page">
+ <div class="top"><div class="logo"><span style="color:var(--y)">M</span><span style="color:#00CFBF">O</span><span style="color:var(--y)">U</span><span class="c2">N</span><span style="color:var(--p)">A</span><span class="c2">S</span></div><div class="tag" style="background:var(--r)">MES EXERCICES · PRÉNOM : ............................</div></div>
+ <h2 style="margin-top:4px"><span class="n">1</span>J'écoute et je classe</h2>
+ <p class="cons">Lis chaque mot à voix haute. Écris-le dans la bonne maison.</p>
+ <div class="bank"><span>lundi</span><span>bleu</span><span>roi</span><span>parfum</span><span>nœud</span><span>boîte</span><span>brun</span><span>feu</span><span>voyage</span><span>jeu</span><span>étoile</span><span>chacun</span></div>
+ <div class="tri"><div class="box" style="border-color:var(--t)"><div class="num b1">1</div><div class="f c1">un</div></div><div class="box" style="border-color:var(--r)"><div class="num b2">2</div><div class="f c2">eu</div></div><div class="box" style="border-color:var(--g)"><div class="num b3">3</div><div class="f c3">oi</div></div></div>
+ <h2><span class="n">2</span>Je complète avec un, eu ou oi</h2>
+ <div class="fill"><div>l<i></i>di</div><div>bl<i></i></div><div>r<i></i></div><div>br<i></i></div><div>f<i></i></div><div>ét<i></i>le</div><div>chac<i></i></div><div>j<i></i>di</div><div>p<i></i>sson</div><div>d<i></i>x</div><div>tr<i></i>s</div><div>v<i></i>ture</div></div>
+ <h2><span class="n">3</span>Je barre le mot piège</h2>
+ <p class="cons">Dans chaque ligne, un mot n'a pas le bon son. Barre-le.</p>
+ <div class="rowz"><div class="k c1">un</div><div><span>lundi</span><span>brun</span><span>lune</span><span>chacun</span></div>
+  <div class="k c2">eu</div><div><span>bleu</span><span>rue</span><span>jeu</span><span>nœud</span></div>
+  <div class="k c3">oi</div><div><span>roi</span><span>toit</span><span>point</span><span>noix</span></div></div>
+ <h2><span class="n">4</span>Je lis et je colorie les sons</h2>
+ <p class="cons">Colorie en vert le son « un », en rouge le son « eu », en jaune le son « oi ».</p>
+ <div class="phr">Lundi, un roi bleu compte trois œufs.</div>
+ <div class="two">
+  <div><h2><span class="n">5</span>J'invente ma phrase</h2><p class="cons">Avec les trois sons !</p><div class="line"></div><div class="line"></div></div>
+  <div><h2><span class="n">6</span>La dictée des trois mots</h2><p class="cons">Un adulte dicte : lundi, bleu, trois.</p><div class="line"></div><div class="line"></div></div>
+ </div>
+ <h2><span class="n">7</span>La chasse aux sons</h2>
+ <p class="cons">Trouve dans la maison une chose pour chaque son, et dessine-la. (Idées : un parfum, un feu, une boîte...)</p>
+ <div class="tri"><div class="box" style="border-color:var(--t);height:.82in"><div class="num b1">1</div></div><div class="box" style="border-color:var(--r);height:.82in"><div class="num b2">2</div></div><div class="box" style="border-color:var(--g);height:.82in"><div class="num b3">3</div></div></div>
+ <div class="sol">Réponses · 1 : un = lundi, parfum, brun, chacun ; eu = bleu, nœud, feu, jeu ; oi = roi, boîte, voyage, étoile · 2 : lundi, bleu, roi, brun, feu, étoile, chacun, jeudi, poisson, deux, trois, voiture · 3 : lune, rue, point</div>
+ <div class="foot"><span>Les Mounas · lesmounas.school</span><span>Un, deux, trois : les trois sons · 2/3</span></div>
+</section>
+
+<section class="page">
+ <div class="top"><div class="logo"><span style="color:var(--y)">M</span><span style="color:#00CFBF">O</span><span style="color:var(--y)">U</span><span class="c2">N</span><span style="color:var(--p)">A</span><span class="c2">S</span></div><div class="tag" style="background:#00A99C">L'ATELIER · LA MARELLE DES TROIS SONS</div></div>
+ <p class="cons" style="margin-top:4px"><span class="w">À préparer :</span> trois feuilles (un grand <span class="w c1">1 · un</span>, un grand <span class="w c2">2 · eu</span>, un grand <span class="w c3">3 · oi</span>), collées au sol par un adulte avec du ruban adhésif. Puis un adulte découpe les douze cartes ci-dessous.</p>
+ <p class="cons"><span class="w">On joue :</span> 1. Pioche une carte, lis le mot, saute sur la bonne feuille. &nbsp;2. Un adulte dit le mot sans montrer la carte : écoute et saute. &nbsp;3. Saute sur une feuille et trouve un nouveau mot avec ce son.</p>
+ <div class="cards">
+  <div>lundi<small class="b1">1</small></div><div>bleu<small class="b2">2</small></div><div>roi<small class="b3">3</small></div>
+  <div>brun<small class="b1">1</small></div><div>feu<small class="b2">2</small></div><div>étoile<small class="b3">3</small></div>
+  <div>parfum<small class="b1">1</small></div><div>jeu<small class="b2">2</small></div><div>boîte<small class="b3">3</small></div>
+  <div>chacun<small class="b1">1</small></div><div>nœud<small class="b2">2</small></div><div>voyage<small class="b3">3</small></div>
+ </div>
+ <p class="cons" style="margin-top:9px;font-size:9.4pt">Le petit chiffre dans le coin donne la réponse : cache-le avec ton pouce pour jouer, puis vérifie. Pour aller plus loin, ajoute tes propres cartes au dos d'une feuille : aucun, cheveu, jeudi, vœu, poisson, noix, toit.</p>
+ <div class="foot"><span>Les Mounas · lesmounas.school</span><span>Un, deux, trois : les trois sons · 3/3</span></div>
+</section>
+</body></html>

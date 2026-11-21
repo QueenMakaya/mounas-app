@@ -60,6 +60,15 @@ export default async function BienvenuePage() {
         )}
 
         <section className="mt-10 rounded-[28px] bg-white p-6 text-left ring-1 ring-ink/5">
+          <h2 className="font-display text-xl font-bold text-ink">📲 Rien à télécharger</h2>
+          <p className="mt-2 text-ink-soft">
+            Inutile de chercher Les Mounas dans l&apos;App Store ou le Play Store : tout s&apos;ouvre dans ton navigateur, à
+            l&apos;adresse <strong className="text-ink">lesmounas.school</strong>. Pour la retrouver en un geste, ajoute-la à
+            ton écran d&apos;accueil depuis le menu de ton navigateur (« Sur l&apos;écran d&apos;accueil »).
+          </p>
+        </section>
+
+        <section className="mt-5 rounded-[28px] bg-white p-6 text-left ring-1 ring-ink/5">
           <h2 className="font-display text-xl font-bold text-ink">💬 Le rituel du jour sur WhatsApp</h2>
           <p className="mt-2 text-ink-soft">
             Chaque jour, on t&apos;envoie le mot du jour et une petite activité sur WhatsApp. Pense à enregistrer notre

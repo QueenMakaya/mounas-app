@@ -46,18 +46,22 @@ const INCLUDED = [
 
 const STEPS = [
   { n: '1', title: 'Écrivez-nous', body: `Le bouton ouvre WhatsApp avec le message « ${EXPO.keyword} » déjà prêt.` },
-  { n: '2', title: 'Essayez avec votre enfant', body: 'Sa première leçon est gratuite : un mot à son niveau, tout de suite.' },
+  { n: '2', title: 'Essayez avec votre enfant', body: 'Sa première leçon est gratuite et s’ouvre d’un simple lien : rien à télécharger.' },
   { n: '3', title: 'Confirmez votre place', body: 'Convaincu·e ? Vous réglez, et votre famille est inscrite pour un an.' },
 ];
 
 const FAQ = [
+  {
+    q: 'Faut-il télécharger une application ?',
+    a: "Non, il n'y a rien à télécharger. Les Mounas s'ouvre d'un simple lien, dans le navigateur de votre téléphone, de votre tablette ou de votre ordinateur.",
+  },
   {
     q: 'À quel âge commencer ?',
     a: "De 3 à 8 ans. Quelques questions suffisent pour placer votre enfant au bon niveau, et il avance ensuite à son rythme.",
   },
   {
     q: 'De quoi a-t-on besoin ?',
-    a: "D'un téléphone ou d'une tablette, et de 10 minutes par jour avec votre enfant. Rien à installer.",
+    a: "D'un téléphone ou d'une tablette avec Internet, et de 10 minutes par jour avec votre enfant.",
   },
   {
     q: 'Et si cela ne nous convient pas ?',
@@ -165,6 +169,8 @@ export default function ExpoPage() {
               <WhatsAppButton label={cta} track="Expo : WhatsApp (haut)" outline />
             </div>
             <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
+              <strong style={{ color: COLORS.tealDark }}>📲 Rien à télécharger : la leçon s&apos;ouvre tout de suite, sur votre téléphone.</strong>
+              <br />
               La première leçon est gratuite : pas de compte, pas de carte. 🛡️ {GUARANTEE}.
             </p>
           </div>

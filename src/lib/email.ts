@@ -118,13 +118,13 @@ export async function sendGuideEmail(to: string): Promise<SendResult> {
 
   const text =
     `Bonjour !\n\nMerci de rejoindre Les Mounas 💜\n\n${guideText}` +
-    `Et si tu essayais l'app avec ton enfant ce soir ? Toute l'app est ouverte pendant 60 minutes, sans compte et sans carte. 10 minutes suffisent :\n${demoUrl}\n\n` +
+    `Et si tu essayais l'app avec ton enfant ce soir ? Toute l'app est ouverte pendant 60 minutes, sans compte, sans carte et sans rien télécharger (elle s'ouvre dans ton navigateur). 10 minutes suffisent :\n${demoUrl}\n\n` +
     `Une question ? Réponds à cet email ou écris-nous sur WhatsApp.\n\nÀ très vite,\nPam et Les Mounas`;
   const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1A1A1A;line-height:1.55;max-width:560px">
   <p>Bonjour !</p>
   <p>Merci de rejoindre Les Mounas 💜</p>
   ${guideHtml}
-  <p style="margin-top:28px">Et si tu essayais l'app avec ton enfant ce soir ? Le mot du jour, les jeux de sons, la dictée, le calcul : toute l'app est ouverte pendant 60 minutes, <b>sans compte et sans carte</b>. 10 minutes suffisent.</p>
+  <p style="margin-top:28px">Et si tu essayais l'app avec ton enfant ce soir ? Le mot du jour, les jeux de sons, la dictée, le calcul : toute l'app est ouverte pendant 60 minutes, <b>sans compte, sans carte et sans rien télécharger</b> (elle s'ouvre dans ton navigateur). 10 minutes suffisent.</p>
   <p><a href="${demoUrl}" style="display:inline-block;background:#5B1F8C;color:#FDF6EC;padding:12px 24px;border-radius:999px;font-weight:bold;text-decoration:none">👀 Essayer l'app gratuitement</a></p>
   <p>Une question ? Réponds à cet email ou écris-nous sur <a href="${whatsappLink()}">WhatsApp</a>.</p>
   <p>À très vite,<br>Pam et Les Mounas</p>
