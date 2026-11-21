@@ -73,6 +73,14 @@ def sfx(name):
         return _seq([659.25, 783.99, 1046.5], 0.075, 0.45, 9, 0.22)
     if name == 'oops':     # piège : deux notes qui descendent
         return _seq([440.0, 349.23], 0.16, 0.5, 7, 0.24)
+    if name == 'djembe':   # un coup grave puis un coup clair
+        n = int(SR*0.3); t = np.arange(n)/SR
+        low = np.sin(2*np.pi*(78*t + 2.2*(1-np.exp(-35*t)))) * np.exp(-11*t)
+        hi = 0.7*np.sin(2*np.pi*330*t) * np.exp(-30*t) * np.minimum(t/0.002, 1)
+        out = np.zeros(int(SR*0.75)); out[:n] += 0.6*low; o = int(SR*0.22); out[o:o+n] += 0.45*hi; o = int(SR*0.4); out[o:o+n] += 0.6*low[:len(out)-o]
+        return out
+    if name == 'chant':    # trois notes tenues, comme une voix qui chante
+        return _seq([523.25, 659.25, 783.99], 0.22, 0.9, 2.5, 0.16)
     if name == 'tada':
         return _seq([523.25, 659.25, 783.99, 1046.5], 0.10, 1.0, 4, 0.2)
     raise KeyError(name)
