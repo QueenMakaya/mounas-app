@@ -33,7 +33,7 @@ type Props = {
   mode: DiscoverMode;
   /** Shows the "Je lis / J’écoute" switch (every level). */
   onModeChange?: (mode: DiscoverMode) => void;
-  /** Extra tools under the listen controls (the sound tiles). */
+  /** The listen tools (slate, sound tiles): kept under the cards once they are turned. */
   extra?: React.ReactNode;
 };
 
@@ -186,8 +186,15 @@ export default function MysteryWord({ word, syllables, theme, graphemes, reveale
           ) : (
             <p className="font-display text-lg font-bold text-ink">🗣️ Papa ou maman dit le mot à voix haute.</p>
           )}
-          <p className="mx-auto mt-4 max-w-sm font-bold text-ink-soft">Épelle-le avec les sons, ou écris-le sur une feuille… puis vérifie !</p>
-          {extra}
+          <p className="mx-auto mt-4 max-w-sm font-bold text-ink-soft">Écris-le ici avec ton doigt, ou épelle-le avec les étiquettes… puis vérifie !</p>
+        </div>
+      )}
+
+      {/* Same slot before and after the cards turn: what the child wrote stays to compare. */}
+      {listen && extra}
+
+      {!revealed && listen && (
+        <div className="text-center">
           <button
             type="button"
             onClick={reveal}

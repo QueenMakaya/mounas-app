@@ -74,13 +74,17 @@ export default function SoundFishing({ activity: a, library, canSpeak, speak, on
                 onClick={() => fishOut(f.card.id, f.has, f.card.word)}
                 aria-label={isCaught ? `${word}, pêché` : word}
                 aria-pressed={isCaught}
-                className={`relative flex min-h-14 items-center gap-1.5 rounded-full py-2 pl-3 pr-5 font-display text-2xl font-bold shadow-[0_4px_0_rgba(26,26,26,0.2)] transition-transform active:scale-95 ${
-                  isCaught ? 'animate-pop bg-mamber text-ink' : 'bg-white text-ink'
-                } ${tries.shake(f.card.id) ? 'animate-shake ring-2 ring-mred' : ''}`}
-                style={{ transform: isCaught ? undefined : `rotate(${i % 2 ? 2 : -2}deg)` }}
+                // A fish never leaves the pond: on a phone a long word (bibliothèque,
+                // arc-en-ciel) is written smaller, and may break rather than overflow.
+                className={`relative flex min-h-14 max-w-full items-center gap-1.5 rounded-[1.75rem] py-2 pl-3 pr-4 text-left font-display font-bold leading-tight shadow-[0_4px_0_rgba(26,26,26,0.2)] transition-transform active:scale-95 sm:pr-5 sm:text-2xl ${
+                  word.length > 11 ? 'text-lg' : word.length > 8 ? 'text-xl' : 'text-2xl'
+                } ${isCaught ? 'animate-pop bg-mamber text-ink' : 'bg-white text-ink'} ${tries.shake(f.card.id) ? 'animate-shake ring-2 ring-mred' : ''}`}
+                style={{ transform: isCaught ? undefined : `rotate(${i % 2 ? 1.5 : -1.5}deg)` }}
               >
-                <span aria-hidden="true" className="text-xl">{isCaught ? '✓' : '🐟'}</span>
-                {isCaught && f.text ? <Highlight word={word} text={f.text} at={f.at} /> : word}
+                <span aria-hidden="true" className="flex-shrink-0 text-xl">{isCaught ? '✓' : '🐟'}</span>
+                <span className="min-w-0 [overflow-wrap:anywhere]">
+                  {isCaught && f.text ? <Highlight word={word} text={f.text} at={f.at} /> : word}
+                </span>
                 {handOn === f.card.id && <HintHand />}
               </button>
             );
