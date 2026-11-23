@@ -37,44 +37,52 @@ J'aime la gym.
 Hop ! Une roue.
 
 **Page 6**
+J'aime courir.
+Je cours vite, vite, vite !
+J'aime tous les sports.
+
+**Page 7**
 J'aime les bonbons.
 Beaucoup de bonbons !
 Miam, miam, miam !
 
-**Page 7**
+**Page 8**
 J'aime les cadeaux.
 J'aime les surprises.
 J'aime les licornes de toutes les couleurs !
 
-**Page 8**
+**Page 9**
 Je dessine.
 Je crée.
 Je fais beaucoup de travail !
 
-**Page 9**
+**Page 10**
 Je danse.
 Je chante.
 Je crie : « Aaaah ! »
 
-**Page 10**
-Des fois, je rêve.
-Je rêve à mon histoire.
-
 **Page 11**
-Je peux faire tout ce que je veux.
-Et même…
-j'écris mon histoire dans la vie !
+Des fois, je rêve.
+Je rêve à mes aventures.
 
 **Page 12**
-Et c'est tout.
-… Non ! Tu sais quoi ?
+Je peux tout faire !
+Mon histoire, c'est moi qui l'écris.
+
+**Page 13**
+Tu sais quoi ?
+Je vais voir mes sœurs.
+Je vais voir le monde !
+
+**Page 14**
+Tu viens avec moi ?
 Un, deux, trois… on y va !
 
 ---
 
 ### Mots du chapitre 1
 
-histoire · sœur · danser · chanter · sport · gym · bonbon · dessiner · rêver · écrire
+histoire · sœur · danser · chanter · sport · gym · bonbon · courir · dessiner · rêver · aventure · monde
 
 ### Questions pour l'enfant
 
@@ -90,11 +98,11 @@ histoire · sœur · danser · chanter · sport · gym · bonbon · dessiner · 
 Dans chaque chapitre, Makayla va voir une sœur dans un pays, avec un sport ou
 une danse, et une petite surprise à la fin.
 
-- Chapitre 2 · Une sœur au Sénégal : on danse au son du tam-tam.
-- Chapitre 3 · Une sœur au Canada : on glisse sur la neige.
-- Chapitre 4 · Une sœur au Brésil : on joue au ballon.
-- Chapitre 5 · Une sœur au Japon : on fait de la gym.
-- Chapitre 6 · Une sœur en Côte d'Ivoire : on court sur la plage.
+- Chapitre 2 · Makayla va voir sa sœur à Abidjan (Côte d'Ivoire).
+- Chapitre 3 · Une sœur au Sénégal : on danse au son du tam-tam.
+- Chapitre 4 · Une sœur au Canada : on glisse sur la neige.
+- Chapitre 5 · Une sœur au Brésil : on joue au ballon.
+- Chapitre 6 · Une sœur au Japon : on fait de la gym.
 
 Phrase qui revient à chaque chapitre : « Tu sais quoi ? » (Makayla la bavarde)
 et « Un, deux, trois… on y va ! » (le départ vers le prochain pays).
