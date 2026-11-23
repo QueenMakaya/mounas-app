@@ -8,75 +8,80 @@ Chaque page = une image.
 
 ---
 
-## Chapitre 1 · Voici Makayla !
+## Chapitre 1 · Mon histoire à moi
+
+*Raconté par Makayla, avec ses mots à elle.*
 
 **Page 1**
-Voici Makayla.
-Makayla a 5 ans.
+— Aujourd'hui, je parle de mon histoire.
+Mon histoire à moi !
 
 **Page 2**
-Makayla parle.
-Elle parle, parle, parle !
-— Bla, bla, bla ! dit Makayla.
+Je suis Makayla.
+J'ai 5 ans.
 
 **Page 3**
-— Tu sais quoi ? dit Makayla.
+Tu sais quoi ?
 J'ai 1000 sœurs !
 Oui, 1000 !
 
 **Page 4**
-Une sœur ici.
-Une sœur là.
-Des sœurs partout dans le monde !
+J'aime danser.
+J'aime chanter.
+La, la, la !
 
 **Page 5**
-Makayla aime les bonbons.
-Miam, miam, miam !
+J'aime le sport.
+Beaucoup de sport !
+J'aime la gym.
+Hop ! Une roue.
 
 **Page 6**
-Makayla aime les cadeaux.
-Makayla aime les surprises.
-— Oh ! Une surprise ? Pour moi ?
+J'aime les bonbons.
+Beaucoup de bonbons !
+Miam, miam, miam !
 
 **Page 7**
-Makayla aime les licornes.
-Une licorne rose, bleue, jaune, verte…
-Une licorne de toutes les couleurs !
+J'aime les cadeaux.
+J'aime les surprises.
+J'aime les licornes de toutes les couleurs !
 
 **Page 8**
-Makayla aime la danse.
-Elle tourne, tourne, tourne.
+Je dessine.
+Je crée.
+Je fais beaucoup de travail !
 
 **Page 9**
-Makayla aime la gym.
-Hop ! Une roue.
-Hop ! Un saut.
+Je danse.
+Je chante.
+Je crie : « Aaaah ! »
 
 **Page 10**
-Makayla aime courir.
-Elle court vite, vite, vite !
-Makayla aime tous les sports.
+Des fois, je rêve.
+Je rêve à mon histoire.
 
 **Page 11**
-— Tu sais quoi ? dit Makayla.
-Je vais voir mes sœurs.
-Je vais voir le monde !
+Je peux faire tout ce que je veux.
+Et même…
+j'écris mon histoire dans la vie !
 
 **Page 12**
-— Tu viens avec moi ?
+Et c'est tout.
+… Non ! Tu sais quoi ?
 Un, deux, trois… on y va !
 
 ---
 
 ### Mots du chapitre 1
 
-Makayla · sœur · monde · bonbon · cadeau · surprise · licorne · danse · gym · sport
+histoire · sœur · danser · chanter · sport · gym · bonbon · dessiner · rêver · écrire
 
 ### Questions pour l'enfant
 
 1. Quel âge a Makayla ?
 2. Combien de sœurs a Makayla ?
 3. Et toi, tu aimes quoi ?
+4. Et toi, c'est quoi ton histoire ?
 
 ---
 
