@@ -134,5 +134,6 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   pour comparer ; plus besoin d'une feuille à côté du téléphone.
 - [x] **La pêche sur téléphone** : les mots longs (réfrigérateur, bibliothèque…) sortaient de l'étang. Ils s'écrivent
   maintenant plus petit et ne dépassent plus. Même correction dans « Trouve le mot » (deux colonnes sur téléphone).
-- [ ] **ARAIGNÉE sans comptine** : ce n'est pas le téléphone, la fiche Airtable (recJyQZ0LydXB7hDn) n'a ni
-  « Song title » ni « Song lyrics » ; l'app propose donc « Dis ta phrase ». Comptine à écrire dans Airtable (puis à enregistrer).
+- [x] **ARAIGNÉE sans comptine** : ce n'était pas le téléphone, la fiche Airtable (recJyQZ0LydXB7hDn) n'avait ni
+  « Song title » ni « Song lyrics ». Comptine « L'araignée tisse sa toile » ajoutée dans Airtable (avec Anansi,
+  l'araignée des contes akan) ; il reste à l'enregistrer : n° 156 dans docs/voix/comptines.md.

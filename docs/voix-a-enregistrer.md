@@ -76,7 +76,7 @@ Texte complet : [`docs/voix/missions.md`](voix/missions.md).
 
 Texte complet : [`docs/voix/phrases-exemple.md`](voix/phrases-exemple.md).
 
-## K. Les comptines (155 comptines, 717 lignes, environ 40 min)
+## K. Les comptines (156 comptines, 722 lignes, environ 40 min)
 
 Texte complet : [`docs/voix/comptines.md`](voix/comptines.md). L'app les lit ligne par ligne : lis-les une ligne à la fois.
 

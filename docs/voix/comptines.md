@@ -1,4 +1,4 @@
-# Voix de Pam · Comptines (155 comptines, 717 lignes)
+# Voix de Pam · Comptines (156 comptines, 722 lignes)
 
 Une comptine à la fois, **une ligne à la fois** avec environ 1 s de silence entre deux lignes, et 3 s entre deux comptines. Tu peux les faire en plusieurs fichiers (par exemple A à F, G à O, P à Z). Ne dis pas les titres.
 
@@ -1184,4 +1184,10 @@ De grands yeux, la bouche ouverte,
 Oh ! Oh ! Qu'est-ce que c'est ?
 Une surprise, quelle découverte !
 
+## 156. ARAIGNÉE (ajoutée le 23 novembre)
 
+A-rai-gnée, a-rai-gnée,
+Tu tisses ta toile toute la journée,
+Un fil par-ci, un fil par-là,
+Comme Anansi, tu ne t'arrêtes pas !
+(faire grimper ses doigts comme une araignée)
