@@ -45,17 +45,19 @@ def note(x, y, s=1, col=TEALT, ph=0):
     return (f'<g transform="translate({x} {y}) scale({s})"><g [[BOB {ph} 9]]><ellipse cx="0" cy="0" rx="22" ry="16" fill="{col}" transform="rotate(-20)"/>'
             f'<path d="M19 -4 V-92 Q52 -84 56 -48" stroke="{col}" stroke-width="9" fill="none" stroke-linecap="round"/></g></g>')
 
+FINGERS = [(-150, -40, -48, 150), (-78, -150, -14, 210), (-8, -172, 0, 230), (62, -150, 14, 210), (124, -96, 28, 170)]
 def hand(cx, cy, s=1, letters='aeiou', n=5):
     """Une main ouverte : une voyelle sur chaque doigt (n = nombre de doigts déjà nommés)."""
-    fingers = [(-150, -40, -48, 150), (-78, -150, -14, 210), (-8, -172, 0, 230), (62, -150, 14, 210), (124, -96, 28, 170)]
     g = f'<rect x="-110" y="-60" width="230" height="240" rx="70" fill="{SKIN}"/>'
-    import math
-    for i, (fx, fy, rot, ln) in enumerate(fingers):
+    for fx, fy, rot, ln in FINGERS:
         g += f'<g transform="rotate({rot} {fx} {fy + ln})"><rect x="{fx - 30}" y="{fy}" width="60" height="{ln}" rx="30" fill="{SKIN}"/></g>'
-        if i < n:
-            r = math.radians(rot); px, py = 0, -(ln + 46)
-            tx = fx + px * math.cos(r) - py * math.sin(r); ty = fy + ln + px * math.sin(r) + py * math.cos(r)
-            g += f'<circle cx="{tx:.0f}" cy="{ty:.0f}" r="42" fill="{CV}"/>' + text(round(tx), round(ty + 20), letters[i], 60, '#fff', 'black')
+    return f'<g transform="translate({cx} {cy}) scale({s})">{g}</g>' + ''.join(hand_dot(cx, cy, s, i, letters[i]) for i in range(n))
+
+def hand_dot(cx, cy, s, i, letter):
+    import math
+    fx, fy, rot, ln = FINGERS[i]; r = math.radians(rot); py = -(ln + 46)
+    tx = fx - py * math.sin(r); ty = fy + ln + py * math.cos(r)
+    g = f'<circle cx="{tx:.0f}" cy="{ty:.0f}" r="42" fill="{CV}"/>' + text(round(tx), round(ty + 20), letter, 60, '#fff', 'black')
     return f'<g transform="translate({cx} {cy}) scale({s})">{g}</g>'
 
 def thumb(cx, cy, s=1):

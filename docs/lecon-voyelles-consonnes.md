@@ -3,7 +3,7 @@
 Les lettres qui chantent, les lettres qui frappent. Format interactif (voir `tools/video-educative/FORMAT.md`).
 
 - Fiche Skool (3 pages, à imprimer) : `public/promo/voyelles-consonnes/fiche-voyelles-consonnes.pdf`
-- Vidéo activité : brouillon avec voix de synthèse (5 min 18), rendu par `tools/video-educative/script_voyelles.py`. La version finale attend la voix de Pam ; les mots seront alors calés sur ses pauses.
+- Vidéo activité avec la voix de Pam : `public/promo/voyelles-consonnes/video.mp4` (16:9, 6 min 49, animée), rendue par `tools/video-educative/script_voyelles.py`. Deux répliques du jeu « la danse des lettres » ne sont pas dans l'enregistrement (« Debout ! C'est la danse des lettres. » et la règle du jeu) : ces deux écrans passent en musique seule.
 
 ## L'idée unique
 

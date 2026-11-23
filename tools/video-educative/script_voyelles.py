@@ -18,8 +18,8 @@ def duo(y=930, hl=None):
         o += f'<g opacity="{1 if hl in (None, k) else .3}">' + pill(x, y, lab, c, 40) + '</g>'
     return o
 VLET = ['a', 'e', 'i', 'o', 'u', 'y']
-def six(y=560, k=6, size=190):
-    return [text(260 + i * 280, y, v, size, CV) for i, v in enumerate(VLET[:k])]
+def six(y=560, k=6, size=190, ts=None):
+    return [(at(ts[i], text(260 + i * 280, y, v, size, CV)) if ts else text(260 + i * 280, y, v, size, CV)) for i, v in enumerate(VLET[:k])]
 
 # ============ 0. PAGE TITRE ============
 def ouverture():
@@ -91,9 +91,9 @@ S('r')
 def fete(k=0):
     it = [baobab(960, 760, .95)]
     if k >= 1: it.append(awa(520, 470, .78, sing=(k == 2)))
-    if k == 2: it += [text(770 + i * 150, 330 - (i % 2) * 60, v, 120, CV) for i, v in enumerate('AOI')] + [note(700, 240, .9), note(1230, 250, .9, CV, .4)]
+    if k == 2: it += [at([2.85, 3.85, 4.9][i], text(770 + i * 150, 330 - (i % 2) * 60, v, 120, CV)) for i, v in enumerate('AOI')] + [note(700, 240, .9), note(1230, 250, .9, CV, .4)]
     if k >= 3: it += [kofi(1400, 560, .8, L='out', R='out'), djembe(1400, 850, .78)]
-    if k == 3: it += [text(1130 + i * 150, 330 - (i % 2) * 60, v, 120, CC) for i, v in enumerate('BDK')]
+    if k == 3: it += [at([3.75, 4.65, 5.7][i], text(1130 + i * 150, 330 - (i % 2) * 60, v, 120, CC)) for i, v in enumerate('BDK')]
     return svg(bg('LA FÊTE À MOUNAVILLE', TEAL, deco=False), houses(590), *it, amara(180, 660, .7, L='hip', R='down'))
 say(fete(0), "Sur la place de Mounaville, sous le grand baobab, tout le monde se prépare pour la fête.")
 say(fete(1), "Voici tata Awa. C'est une griotte : elle garde les histoires et les chansons du village.")
@@ -107,7 +107,7 @@ say(scr('LE SECRET DES LETTRES', PUR, h1('C\'est exactement comme les lettres !'
 # ============ 4. LES VOYELLES ============
 say(scr('LES LETTRES QUI CHANTENT', CV, text(960, 520, 'les voyelles', 220, CV), note(330, 320, 1.4), note(1600, 330, 1.4, CV, .5), amara(960, 860, .55, L='up', R='up')),
     "D'abord, les lettres qui chantent. On les appelle les voyelles.", sfx_name='whoosh')
-say(scr('LES LETTRES QUI CHANTENT', CV, h1('Il y en a six', 250, CV), *six(), duo(900, 0)),
+say(scr('LES LETTRES QUI CHANTENT', CV, h1('Il y en a six', 250, CV), *six(ts=[2.3, 3.35, 4.5, 5.7, 6.9, 7.8]), duo(900, 0)),
     "Il y en a six : A, E, I, O, U, et Y.", "Il y en a six : a, e, i, o, u, et i grec.")
 say(scr('L\'ASTUCE', YEL, h1('Voyelle commence comme voix', 250, PUR),
         rich(960, 520, '|voy|elle', 200, CV), rich(960, 760, '|voi|x', 200, CV), note(420, 700, 1.5), note(1500, 480, 1.5, CV, .5)),
@@ -119,8 +119,8 @@ say(appel('a'), "Quand tu dis une voyelle, ta bouche est ouverte, et rien ne se 
 hold(appel('a', True), 2.6, 'pop')
 say(appel('o'), "O !", "o !"); hold(appel('o', True), 2.6, 'pop')
 say(appel('i'), "I !", "i !"); hold(appel('i', True), 2.6, 'pop')
-say(scr('L\'ASTUCE DES DOIGTS', YEL, h1('Une voyelle sur chaque doigt', 250, PUR), hand(700, 650, 1.15), at(4.5, thumb(1300, 700, 1.3)),
-        at(4.5, text(1300, 930, 'et le y lève le pouce !', 50, PUR, 'nx'))),
+say(scr('L\'ASTUCE DES DOIGTS', YEL, h1('Une voyelle sur chaque doigt', 250, PUR), hand(700, 650, 1.15, n=0), *[at(t_, hand_dot(700, 650, 1.15, i, 'aeiou'[i])) for i, t_ in enumerate([2.15, 3.2, 4.25, 5.4, 6.25])], at(7.3, thumb(1300, 700, 1.3)),
+        at(8.9, text(1300, 930, 'et le y lève le pouce !', 50, PUR, 'nx'))),
     "Compte-les sur tes doigts : A, E, I, O, U. Et le Y ? Il lève le pouce de l'autre main !",
     "Compte-les sur tes doigts : a, e, i, o, u. Et le i grec ? Il lève le pouce de l'autre main !")
 
@@ -149,16 +149,16 @@ say(bouche(3), "Tes dents sur ta lèvre : F, V.", "Tes dents sur ta lèvre : fff
 
 # ============ 6. ENSEMBLE ============
 say(scr('ENSEMBLE, ELLES DANSENT', PUR, h1('Une frappe + un chant', 250, PUR),
-        djembe(430, 600, .9, 'b'), text(720, 620, '+', 150, '#7A6A80', 'fr'), card(830, 440, 260, 300, CV, sw=9) + text(960, 660, 'a', 220, CV),
-        text(1220, 620, '=', 150, '#7A6A80', 'fr'), at(4.6, card(1330, 440, 400, 300, PUR, sw=9) + rich(1530, 660, vc('ba'), 220))),
+        at(6.3, djembe(430, 600, .9, 'b')), at(7.3, text(720, 620, '+', 150, '#7A6A80', 'fr') + card(830, 440, 260, 300, CV, sw=9) + text(960, 660, 'a', 220, CV)),
+        at(8.35, text(1220, 620, '=', 150, '#7A6A80', 'fr')), at(8.35, card(1330, 440, 400, 300, PUR, sw=9) + rich(1530, 660, vc('ba'), 220))),
     "Et le plus beau, c'est quand elles jouent ensemble. Une frappe, plus un chant : B, A... BA !",
     "Et le plus beau, c'est quand elles jouent ensemble. Une frappe, plus un chant : beu, a... ba !", sfx_name='djembe')
 say(scr('L\'ASTUCE', YEL, h1('Consonne veut dire : qui sonne avec', 250, PUR),
         rich(960, 540, '|con|sonne', 200, CC), text(960, 740, 'elle sonne avec une voyelle', 70, PUR), djembe(330, 800, .6), note(1600, 760, 1.5)),
     "Astuce : consonne, ça veut dire qui sonne avec. Une consonne sonne avec une voyelle.", sfx_name='ding')
 say(scr('ENSEMBLE, ELLES DANSENT', PUR, h1('Dans chaque morceau, une voyelle chante', 250, PUR), baobab(330, 900, .75),
-        at(3.2, card(640, 430, 300, 240, PUR, sw=6) + rich(790, 600, vc('ba'), 150)), at(4.0, card(980, 430, 220, 240, PUR, sw=6) + rich(1090, 600, vc('o'), 150)),
-        at(4.8, card(1240, 430, 380, 240, PUR, sw=6) + rich(1430, 600, vc('bab'), 150)), text(1130, 800, 'baobab', 90, PUR)),
+        at(4.25, card(640, 430, 300, 240, PUR, sw=6) + rich(790, 600, vc('ba'), 150)), at(4.65, card(980, 430, 220, 240, PUR, sw=6) + rich(1090, 600, vc('o'), 150)),
+        at(5.0, card(1240, 430, 380, 240, PUR, sw=6) + rich(1430, 600, vc('bab'), 150)), text(1130, 800, 'baobab', 90, PUR)),
     "Écoute le mot baobab. BA, O, BAB. Dans chaque morceau, il y a une voyelle qui chante.",
     "Écoute le mot baobab. Ba. O. Bab. Dans chaque morceau, il y a une voyelle qui chante.")
 
@@ -167,7 +167,7 @@ say(scr('DEBOUT ! LA DANSE DES LETTRES', TEAL, h1('On joue avec tout le corps', 
     "Debout ! C'est la danse des lettres.", sfx_name='tada')
 say(scr('DEBOUT ! LA DANSE DES LETTRES', TEAL, h1('Regarde la lettre, et danse !', 240, TEALT),
         card(200, 340, 700, 440, CV, sw=8) + text(550, 470, 'voyelle', 100, CV) + note(430, 640, 1.3) + note(640, 620, 1.3, CV, .4) + text(550, 740, 'ouvre les bras et chante', 46, PUR, 'nx'),
-        at(4.2, card(1020, 340, 700, 440, CC, sw=8) + text(1370, 470, 'consonne', 100, CC) + djembe(1370, 610, .45) + text(1370, 740, 'tape dans tes mains', 46, PUR, 'nx'))),
+        at(2.6, card(1020, 340, 700, 440, CC, sw=8) + text(1370, 470, 'consonne', 100, CC) + djembe(1370, 610, .45) + text(1370, 740, 'tape dans tes mains', 46, PUR, 'nx'))),
     "Si tu vois une voyelle, ouvre grand les bras et chante. Si tu vois une consonne, tape dans tes mains, comme sur un djembé.")
 def danse(L, kind=None, hop=False):
     c = PUR if kind is None else (CV if kind == 'v' else CC)
@@ -250,7 +250,7 @@ say(defi(2, ['Change de consonne : colle un petit papier', 'avec un b, un k ou u
     "Défi numéro deux. Change de consonne : colle un petit papier avec un B, un K, ou un T, et lis encore.",
     "Défi numéro deux. Change de consonne : colle un petit papier avec un bé, un ka, ou un té, et lis encore.")
 say(defi(3, ['Trouve un mot qui commence par ta syllabe'], card(240, 420, 640, 330, PUR, sw=6) + rich(560, 560, vc('ma'), 130) + text(560, 690, 'comme mangue', 64, PUR),
-         at(4.6, card(1040, 420, 640, 330, PUR, sw=6) + rich(1360, 560, vc('ko'), 130) + text(1360, 690, 'comme kora', 64, PUR))),
+         at(8.25, card(1040, 420, 640, 330, PUR, sw=6) + rich(1360, 560, vc('ko'), 130) + text(1360, 690, 'comme kora', 64, PUR))),
     "Défi numéro trois. Trouve un mot qui commence par ta syllabe. MA, comme mangue. KO, comme kora.",
     "Défi numéro trois. Trouve un mot qui commence par ta syllabe. Ma, comme mangue. Ko, comme kora.")
 say(defi(0, ['Écris ton prénom : les voyelles en vert,', 'les consonnes en rouge'], card(360, 470, 1200, 280, PUR, sw=6) + rich(960, 670, vc('Amara'), 200), duo(860)),

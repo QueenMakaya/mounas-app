@@ -38,6 +38,7 @@ if os.environ.get('VOICE_WAV'):
 def _pam(key):
     o = _order[key]
     if o is None: return np.zeros(int(SR * 1.2), dtype=np.float32)
+    if isinstance(o, (int, float)): return np.zeros(int(SR * o), dtype=np.float32)   # réplique non enregistrée : silence de o secondes
     s = _voice[int(o[0]*SR):int(o[1]*SR)].astype(np.float32).copy()
     # même volume pour chaque réplique : niveau mesuré sur les passages parlés, gain borné à ±6 dB
     h = int(SR * 0.05); k = len(s) // h
