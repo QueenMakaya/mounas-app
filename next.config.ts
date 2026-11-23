@@ -1,7 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // /expo was the first address of the Abidjan page: keep it working.
+  async redirects() {
+    return [{ source: "/expo", destination: "/abidjan", permanent: false }];
+  },
 };
 
 export default nextConfig;

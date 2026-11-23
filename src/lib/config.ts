@@ -66,19 +66,20 @@ export function whatsappLink(message?: string): string {
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
 }
 
-// ── Africa Expo Abidjan (/expo) ──
-// The salon offer: one year, paid once, for the first families who write on
+// ── Abidjan (/abidjan, first shown at the Africa Expo) ──
+// The launch offer: one year, paid once, for the first families who write on
 // WhatsApp. Everything the page and the printed material promise lives here.
 export const EXPO = {
-  event: 'Africa Expo Abidjan',
-  dates: '28 et 29 novembre',
+  /** Shown at the top of the page during an event; empty both once it is over and the page stays valid. */
+  event: 'Africa Expo Abidjan' as string,
+  dates: '28 et 29 novembre' as string,
   /** Places in the « Familles Fondatrices » offer. */
   places: 20,
   /** One year, paid once. */
   price: '30 000 FCFA',
   pricePerMonth: '2 500 FCFA',
-  /** First words of the WhatsApp message, so the salon leads are easy to spot. */
-  keyword: 'LES MOUNAS EXPO',
+  /** First words of the WhatsApp message, so the Abidjan leads are easy to spot. */
+  keyword: 'MOUNAS ABIDJAN',
 } as const;
 
 /**
@@ -91,5 +92,5 @@ export const EXPO_PLACES_TAKEN = Math.min(
   Math.max(0, Math.floor(Number(process.env.NEXT_PUBLIC_EXPO_PLACES_TAKEN) || 0)),
 );
 
-/** Optional card payment link for the salon offer; the button only shows once it is set. */
+/** Optional card payment link for the Abidjan offer; the button only shows once it is set. */
 export const EXPO_PAYMENT_LINK = process.env.NEXT_PUBLIC_EXPO_PAYMENT_LINK || '';

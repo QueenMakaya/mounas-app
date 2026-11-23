@@ -3,8 +3,8 @@
 import { useSyncExternalStore } from 'react';
 
 /**
- * Remembers, on this device, that the family arrived through the Africa Expo
- * page (/expo). The demo and the first word then show the salon offer where
+ * Remembers, on this device, that the family arrived through the Abidjan
+ * page (/abidjan). The demo and the first word then show the launch offer where
  * other visitors see the standard trial, so the price they were promised on
  * the roll-up is the price they meet again. Kept three weeks, then forgotten.
  */
@@ -31,7 +31,7 @@ function isExpoVisit(): boolean {
 
 const subscribe = () => () => {};
 
-/** True once mounted in the browser of a family that came through /expo. */
+/** True once mounted in the browser of a family that came through /abidjan. */
 export function useExpoVisit(): boolean {
   return useSyncExternalStore(subscribe, isExpoVisit, () => false);
 }
