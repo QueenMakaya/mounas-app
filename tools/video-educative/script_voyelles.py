@@ -170,7 +170,7 @@ say(scr('DEBOUT ! LA DANSE DES LETTRES', TEAL, h1('On joue avec tout le corps', 
     "Debout ! C'est la danse des lettres.", sfx_name='tada')
 say(scr('DEBOUT ! LA DANSE DES LETTRES', TEAL, h1('Regarde la lettre, et danse !', 240, TEALT),
         card(200, 340, 700, 440, CV, sw=8) + text(550, 470, 'voyelle', 100, CV) + note(430, 640, 1.3) + note(640, 620, 1.3, CV, .4) + text(550, 740, 'ouvre les bras et chante', 46, PUR, 'nx'),
-        at(2.6, card(1020, 340, 700, 440, CC, sw=8) + text(1370, 470, 'consonne', 100, CC) + djembe(1370, 610, .45) + text(1370, 740, 'tape dans tes mains', 46, PUR, 'nx'))),
+        at(3.3, card(1020, 340, 700, 440, CC, sw=8) + text(1370, 470, 'consonne', 100, CC) + djembe(1370, 610, .45) + text(1370, 740, 'tape dans tes mains', 46, PUR, 'nx'))),
     "Si tu vois une voyelle, ouvre grand les bras et chante. Si tu vois une consonne, tape dans tes mains, comme sur un djembé.")
 def danse(L, kind=None, hop=False, k=None):
     c = PUR if kind is None else (CV if kind == 'v' else CC)
@@ -253,8 +253,8 @@ say(defi(1, ['Lis les cinq syllabes', 'en tapant le rythme sur la table'], *[car
 say(defi(2, ['Change de consonne : colle un petit papier', 'avec un b, un k ou un t'], djembe(420, 720, .85, 'b'), djembe(960, 720, .85, 'k'), djembe(1500, 720, .85, 't')),
     "Défi numéro deux. Change de consonne : colle un petit papier avec un B, un K, ou un T, et lis encore.",
     "Défi numéro deux. Change de consonne : colle un petit papier avec un bé, un ka, ou un té, et lis encore.")
-say(defi(3, ['Trouve un mot qui commence par ta syllabe'], card(240, 420, 640, 330, PUR, sw=6) + rich(560, 560, vc('ma'), 130) + text(560, 690, 'comme maman', 64, PUR),
-         at(5.2, card(1040, 420, 640, 330, PUR, sw=6) + rich(1360, 560, vc('ko'), 130) + text(1360, 690, 'comme kora', 64, PUR))),
+say(defi(3, ['Trouve un mot qui commence par ta syllabe'], at(4.6, card(240, 420, 640, 330, PUR, sw=6) + rich(560, 560, vc('ma'), 130) + text(560, 690, 'comme maman', 64, PUR)),
+         at(7.3, card(1040, 420, 640, 330, PUR, sw=6) + rich(1360, 560, vc('ko'), 130) + text(1360, 690, 'comme kora', 64, PUR))),
     "Défi numéro trois. Trouve un mot qui commence par ta syllabe. MA, comme maman. KO, comme kora.",
     "Défi numéro trois. Trouve un mot qui commence par ta syllabe. Ma, comme maman. Ko, comme kora.")
 say(defi(0, ['Écris ton prénom : les voyelles en vert,', 'les consonnes en rouge'], card(360, 470, 1200, 280, PUR, sw=6) + rich(960, 670, vc('Amara'), 200), duo(860)),
