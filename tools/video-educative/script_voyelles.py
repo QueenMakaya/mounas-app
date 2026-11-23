@@ -6,6 +6,7 @@ from draw_afro import *
 _sec = ['x']; _n = [0]
 def S(name): _sec[0] = name; _n[0] = 0
 def say(*a, **k):
+    if 'key' in k: return _say(*a, **k)          # clé explicite : réplique ajoutée après coup
     key = f'{_sec[0]}{_n[0]}'; _n[0] += 1
     return _say(*a, key=key, **k)
 def scr(title, col, *parts, deco=True): return svg(bg(title, col, deco), *parts)
@@ -113,12 +114,14 @@ say(scr('L\'ASTUCE', YEL, h1('Voyelle commence comme voix', 250, PUR),
         rich(960, 520, '|voy|elle', 200, CV), rich(960, 760, '|voi|x', 200, CV), note(420, 700, 1.5), note(1500, 480, 1.5, CV, .5)),
     "Astuce : voyelle, ça commence comme voix. Les voyelles, ce sont les lettres de la voix.", sfx_name='ding')
 def appel(v, t=False):
-    return scr('RÉPÈTE APRÈS MOI', CV, text(640, 640, v, 420, CV), amara(1400, 480, 1.25, L='down', R='down', mouth={'a': 'wide', 'o': 'o', 'i': 'flat'}[v]),
+    return scr('RÉPÈTE APRÈS MOI', CV, text(640, 640, v, 420, CV), amara(1400, 480, 1.25, L='down', R='down', mouth={'a': 'wide', 'e': 'mid', 'i': 'flat', 'o': 'o', 'u': 'o', 'y': 'flat'}[v]),
                pill(640, 760, 'bouche ouverte, rien ne se touche', PUR, 38), toi(640, 860) if t else '')
 say(appel('a'), "Quand tu dis une voyelle, ta bouche est ouverte, et rien ne se touche. Répète après moi : A !", "Quand tu dis une voyelle, ta bouche est ouverte, et rien ne se touche. Répète après moi : a !")
 hold(appel('a', True), 2.6, 'pop')
-say(appel('o'), "O !", "o !"); hold(appel('o', True), 2.6, 'pop')
-say(appel('i'), "I !", "i !"); hold(appel('i', True), 2.6, 'pop')
+# les six voyelles, dans l'ordre (o et i gardent leur clé d'origine dans l'enregistrement)
+for v_, txt_, tts_, key_ in [('e', "E !", "euh !", 'x_e'), ('i', "I !", "i !", 'r10'), ('o', "O !", "o !", 'r9'), ('u', "U !", "u !", 'x_u'), ('y', "Y !", "i grec !", 'x_y')]:
+    say(appel(v_), txt_, tts_, key=key_); hold(appel(v_, True), 2.6, 'pop')
+_n[0] += 2
 say(scr('L\'ASTUCE DES DOIGTS', YEL, h1('Une voyelle sur chaque doigt', 250, PUR), hand(700, 650, 1.15, n=0), *[at(t_, hand_dot(700, 650, 1.15, i, 'aeiou'[i])) for i, t_ in enumerate([2.15, 3.2, 4.25, 5.4, 6.25])], at(7.3, thumb(1300, 700, 1.3)),
         at(8.9, text(1300, 930, 'et le y lève le pouce !', 50, PUR, 'nx'))),
     "Compte-les sur tes doigts : A, E, I, O, U. Et le Y ? Il lève le pouce de l'autre main !",
@@ -169,15 +172,16 @@ say(scr('DEBOUT ! LA DANSE DES LETTRES', TEAL, h1('Regarde la lettre, et danse !
         card(200, 340, 700, 440, CV, sw=8) + text(550, 470, 'voyelle', 100, CV) + note(430, 640, 1.3) + note(640, 620, 1.3, CV, .4) + text(550, 740, 'ouvre les bras et chante', 46, PUR, 'nx'),
         at(2.6, card(1020, 340, 700, 440, CC, sw=8) + text(1370, 470, 'consonne', 100, CC) + djembe(1370, 610, .45) + text(1370, 740, 'tape dans tes mains', 46, PUR, 'nx'))),
     "Si tu vois une voyelle, ouvre grand les bras et chante. Si tu vois une consonne, tape dans tes mains, comme sur un djembé.")
-def danse(L, kind=None, hop=False):
+def danse(L, kind=None, hop=False, k=None):
     c = PUR if kind is None else (CV if kind == 'v' else CC)
     return scr('DEBOUT ! LA DANSE DES LETTRES', TEAL, text(680, 640, L, 460, c),
                (text(680, 800, 'une voyelle : on chante !' if kind == 'v' else 'une consonne : on frappe !', 70, c) if kind else pill(680, 760, 'voyelle ou consonne ?', PUR, 46)),
+               (f'<circle cx="230" cy="470" r="90" fill="{YEL}"/>' + text(230, 512, str(k), 120, PUR, 'fr') + '[[RING 230 470 104]]') if k else '',
                f'<ellipse cx="1420" cy="975" rx="150" ry="20" fill="#000" opacity=".12"/>',
                f'<g [[HOP {120 if hop else 0}]]>' + amara(1420, 460, 1.1, L='up' if kind == 'v' else 'down', R='up' if kind == 'v' else 'down', mouth='wide' if kind == 'v' else 'smile') + '</g>')
 for L, name, tname, kind in [('a', 'A.', 'a.', 'v'), ('m', 'M.', 'ème.', 'c'), ('o', 'O.', 'o.', 'v'), ('k', 'K.', 'ka.', 'c')]:
     say(danse(L), name, tname, pad=0.3)
-    hold(danse(L), 2.6)
+    countdown(lambda k: danse(L, k=k), 3)
     if kind == 'v':
         say(danse(L, 'v'), f"{name[0]} : une voyelle ! On chante !", f"{tname[:-1]} : une voyelle ! On chante !", pad=0.2, sfx_name='chant'); hold(danse(L, 'v'), 0.8)
     else:
@@ -249,10 +253,10 @@ say(defi(1, ['Lis les cinq syllabes', 'en tapant le rythme sur la table'], *[car
 say(defi(2, ['Change de consonne : colle un petit papier', 'avec un b, un k ou un t'], djembe(420, 720, .85, 'b'), djembe(960, 720, .85, 'k'), djembe(1500, 720, .85, 't')),
     "Défi numéro deux. Change de consonne : colle un petit papier avec un B, un K, ou un T, et lis encore.",
     "Défi numéro deux. Change de consonne : colle un petit papier avec un bé, un ka, ou un té, et lis encore.")
-say(defi(3, ['Trouve un mot qui commence par ta syllabe'], card(240, 420, 640, 330, PUR, sw=6) + rich(560, 560, vc('ma'), 130) + text(560, 690, 'comme mangue', 64, PUR),
-         at(8.25, card(1040, 420, 640, 330, PUR, sw=6) + rich(1360, 560, vc('ko'), 130) + text(1360, 690, 'comme kora', 64, PUR))),
-    "Défi numéro trois. Trouve un mot qui commence par ta syllabe. MA, comme mangue. KO, comme kora.",
-    "Défi numéro trois. Trouve un mot qui commence par ta syllabe. Ma, comme mangue. Ko, comme kora.")
+say(defi(3, ['Trouve un mot qui commence par ta syllabe'], card(240, 420, 640, 330, PUR, sw=6) + rich(560, 560, vc('ma'), 130) + text(560, 690, 'comme maman', 64, PUR),
+         at(5.2, card(1040, 420, 640, 330, PUR, sw=6) + rich(1360, 560, vc('ko'), 130) + text(1360, 690, 'comme kora', 64, PUR))),
+    "Défi numéro trois. Trouve un mot qui commence par ta syllabe. MA, comme maman. KO, comme kora.",
+    "Défi numéro trois. Trouve un mot qui commence par ta syllabe. Ma, comme maman. Ko, comme kora.")
 say(defi(0, ['Écris ton prénom : les voyelles en vert,', 'les consonnes en rouge'], card(360, 470, 1200, 280, PUR, sw=6) + rich(960, 670, vc('Amara'), 200), duo(860)),
     "Et ton défi à toi : écris ton prénom. Les voyelles en vert, les consonnes en rouge.")
 

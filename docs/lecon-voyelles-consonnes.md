@@ -3,7 +3,7 @@
 Les lettres qui chantent, les lettres qui frappent. Format interactif (voir `tools/video-educative/FORMAT.md`).
 
 - Fiche Skool (3 pages, à imprimer) : `public/promo/voyelles-consonnes/fiche-voyelles-consonnes.pdf`
-- Vidéo activité avec la voix de Pam : `public/promo/voyelles-consonnes/video.mp4` (16:9, 6 min 49, animée), rendue par `tools/video-educative/script_voyelles.py`. Deux répliques du jeu « la danse des lettres » ne sont pas dans l'enregistrement (« Debout ! C'est la danse des lettres. » et la règle du jeu) : ces deux écrans passent en musique seule.
+- Vidéo activité avec la voix de Pam : `public/promo/voyelles-consonnes/video.mp4` (16:9, animée), rendue par `tools/video-educative/script_voyelles.py`. En attente d'un petit enregistrement complémentaire : « Debout ! C'est la danse des lettres. », la règle du jeu, « E ! », « U ! », « Y ! » et le défi trois avec « MA, comme maman ».
 
 ## L'idée unique
 
@@ -42,10 +42,10 @@ Une voyelle chante comme la voix de tata Awa, la griotte : la bouche est ouverte
 1. Accroche : c'est la fête à Mounaville ; des lettres qui chantent, des lettres qui frappent ; annonce du tambour à syllabes.
 2. Mot aux parents : deux feuilles, un feutre vert, un feutre rouge, des ciseaux.
 3. La fête : tata Awa chante, Kofi frappe son djembé.
-4. Les voyelles : les six, l'astuce « voix », appel et réponse (a, o, i), les doigts.
+4. Les voyelles : les six, l'astuce « voix », appel et réponse sur les six voyelles (a, e, i, o, u, y), les doigts.
 5. Les consonnes : les vingt, ce qui se touche dans la bouche.
 6. Ensemble : b + a = ba, l'astuce « qui sonne avec », ba · o · bab.
-7. La danse des lettres (jeu du corps) : a, m, o, k.
+7. La danse des lettres (jeu du corps) : a, m, o, k, avec un compte à rebours avant chaque réponse.
 8. Quiz : combien de voyelles dans kora, Amara, stylo (piège du y).
 9. Le défi des lèvres (maman) et l'astuce du menton (baobab).
 10. Atelier : le tambour à syllabes.
@@ -85,58 +85,65 @@ Un seul fichier, environ deux secondes de silence entre chaque réplique. Les li
 14. Il y en a six : A, E, I, O, U, et Y.
 15. Astuce : voyelle, ça commence comme voix. Les voyelles, ce sont les lettres de la voix.
 16. Quand tu dis une voyelle, ta bouche est ouverte, et rien ne se touche. Répète après moi : A !
-17. O !
+17. E !
 18. I !
-19. Compte-les sur tes doigts : A, E, I, O, U. Et le Y ? Il lève le pouce de l'autre main !
-20. Maintenant, les lettres qui frappent. On les appelle les consonnes.
-21. Toutes les autres lettres sont des consonnes. Il y en a vingt !
-22. Pour dire une consonne, quelque chose se touche dans ta bouche. Tes lèvres : M, P, B.
-23. Ta langue : T, D, L.
-24. Tes dents sur ta lèvre : F, V.
-25. Et le plus beau, c'est quand elles jouent ensemble. Une frappe, plus un chant : B, A... BA !
-26. Astuce : consonne, ça veut dire qui sonne avec. Une consonne sonne avec une voyelle.
-27. Écoute le mot baobab. BA, O, BAB. Dans chaque morceau, il y a une voyelle qui chante.
-28. Debout ! C'est la danse des lettres.
-29. Si tu vois une voyelle, ouvre grand les bras et chante. Si tu vois une consonne, tape dans tes mains, comme sur un djembé.
-30. A.
-31. A : une voyelle ! On chante !
-32. M.
-33. M : une consonne ! On frappe !
-34. O.
-35. O : une voyelle ! On chante !
-36. K.
-37. K : une consonne ! On frappe !
-38. Petit quiz ! Combien de voyelles dans ce mot ? Montre le nombre avec tes doigts.
-39. Kora. C'est l'instrument à cordes des griots.
+19. O !
+20. U !
+21. Y !
+22. Compte-les sur tes doigts : A, E, I, O, U. Et le Y ? Il lève le pouce de l'autre main !
+23. Maintenant, les lettres qui frappent. On les appelle les consonnes.
+24. Toutes les autres lettres sont des consonnes. Il y en a vingt !
+25. Pour dire une consonne, quelque chose se touche dans ta bouche. Tes lèvres : M, P, B.
+26. Ta langue : T, D, L.
+27. Tes dents sur ta lèvre : F, V.
+28. Et le plus beau, c'est quand elles jouent ensemble. Une frappe, plus un chant : B, A... BA !
+29. Astuce : consonne, ça veut dire qui sonne avec. Une consonne sonne avec une voyelle.
+30. Écoute le mot baobab. BA, O, BAB. Dans chaque morceau, il y a une voyelle qui chante.
+31. Debout ! C'est la danse des lettres.
+32. Si tu vois une voyelle, ouvre grand les bras et chante. Si tu vois une consonne, tape dans tes mains, comme sur un djembé.
+33. A.
+34. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
+35. A : une voyelle ! On chante !
+36. M.
+37. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
+38. M : une consonne ! On frappe !
+39. O.
 40. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-41. Deux voyelles : O, et A.
-42. Amara.
+41. O : une voyelle ! On chante !
+42. K.
 43. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-44. Trois voyelles : A, A, A ! Mon prénom chante beaucoup !
-45. Attention, un piège : stylo.
-46. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-47. Deux ! Le Y est une voyelle, lui aussi. Bien joué !
-48. Voici le défi des lèvres ! Essaie de dire maman, sans que tes lèvres se touchent.
-49. Impossible ! Le M est une consonne : tes lèvres doivent frapper.
-50. Maintenant, pose ta main sous ton menton, et dis : baobab.
-51. Ton menton est descendu trois fois : une fois pour chaque voyelle. C'est l'astuce du menton !
-52. C'est l'heure de l'atelier ! On fabrique le tambour à syllabes.
-53. Sur la première feuille, dessine un grand djembé. Écris dessus la consonne M, en rouge.
-54. Un adulte coupe deux petites fentes, juste à côté du M.
-55. Dans l'autre feuille, un adulte découpe une longue bande. Écris les voyelles en vert, l'une sous l'autre : A, E, I, O, U.
-56. Mets sur pause, et reviens quand ton tambour et ta bande sont prêts.
-57. Glisse la bande dans les deux fentes.
-58. Tire tout doucement, et lis : MA !
-59. ME !
-60. MI !
-61. MO !
-62. MU !
-63. Ton tambour à syllabes est prêt !
-64. Défi numéro un. Lis les cinq syllabes, en tapant le rythme sur la table.
-65. Défi numéro deux. Change de consonne : colle un petit papier avec un B, un K, ou un T, et lis encore.
-66. Défi numéro trois. Trouve un mot qui commence par ta syllabe. MA, comme mangue. KO, comme kora.
-67. Et ton défi à toi : écris ton prénom. Les voyelles en vert, les consonnes en rouge.
-68. Bravo ! Tu connais le secret des lettres.
-69. Les voyelles chantent : A, E, I, O, U, Y. Les consonnes frappent. Et ensemble, elles font danser les mots.
-70. Dernière astuce : ce soir, explique-le à quelqu'un de ta famille. Quand on explique, on retient encore mieux !
-71. À bientôt chez les Mounas !
+44. K : une consonne ! On frappe !
+45. Petit quiz ! Combien de voyelles dans ce mot ? Montre le nombre avec tes doigts.
+46. Kora. C'est l'instrument à cordes des griots.
+47. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
+48. Deux voyelles : O, et A.
+49. Amara.
+50. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
+51. Trois voyelles : A, A, A ! Mon prénom chante beaucoup !
+52. Attention, un piège : stylo.
+53. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
+54. Deux ! Le Y est une voyelle, lui aussi. Bien joué !
+55. Voici le défi des lèvres ! Essaie de dire maman, sans que tes lèvres se touchent.
+56. Impossible ! Le M est une consonne : tes lèvres doivent frapper.
+57. Maintenant, pose ta main sous ton menton, et dis : baobab.
+58. Ton menton est descendu trois fois : une fois pour chaque voyelle. C'est l'astuce du menton !
+59. C'est l'heure de l'atelier ! On fabrique le tambour à syllabes.
+60. Sur la première feuille, dessine un grand djembé. Écris dessus la consonne M, en rouge.
+61. Un adulte coupe deux petites fentes, juste à côté du M.
+62. Dans l'autre feuille, un adulte découpe une longue bande. Écris les voyelles en vert, l'une sous l'autre : A, E, I, O, U.
+63. Mets sur pause, et reviens quand ton tambour et ta bande sont prêts.
+64. Glisse la bande dans les deux fentes.
+65. Tire tout doucement, et lis : MA !
+66. ME !
+67. MI !
+68. MO !
+69. MU !
+70. Ton tambour à syllabes est prêt !
+71. Défi numéro un. Lis les cinq syllabes, en tapant le rythme sur la table.
+72. Défi numéro deux. Change de consonne : colle un petit papier avec un B, un K, ou un T, et lis encore.
+73. Défi numéro trois. Trouve un mot qui commence par ta syllabe. MA, comme maman. KO, comme kora.
+74. Et ton défi à toi : écris ton prénom. Les voyelles en vert, les consonnes en rouge.
+75. Bravo ! Tu connais le secret des lettres.
+76. Les voyelles chantent : A, E, I, O, U, Y. Les consonnes frappent. Et ensemble, elles font danser les mots.
+77. Dernière astuce : ce soir, explique-le à quelqu'un de ta famille. Quand on explique, on retient encore mieux !
+78. À bientôt chez les Mounas !
