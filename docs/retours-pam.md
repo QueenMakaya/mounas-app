@@ -122,3 +122,18 @@ Liste vivante des améliorations demandées. On coche quand c'est fait (avec la 
   Fins de partie contre l'ordinateur : « Ton équipe a gagné ! » / « L'ordinateur a gagné. On rejoue ? » (nouvelles phrases à enregistrer,
   voir docs/voix-a-enregistrer.md, partie G).
 - [ ] **Visuels de la campagne** (carrousel, reels, stories, carte WhatsApp) : ils montrent encore le Soleil et la Lune et les anciennes pièces, à refaire.
+
+## 23 novembre 2026
+
+- [x] **Le mot mystère, « Je lis » : on vérifie avant de répondre.** Une fois les cartes retournées, un bouton
+  « 🔈 On vérifie : écouter le mot » dit le mot sans rien enregistrer ; ensuite seulement le parent choisit
+  « Lu tout seul » ou « On le lit ensemble ». « On le lit ensemble » l'affiche clairement (plus de confusion avec
+  « lu tout seul »), et « ↩ Changer ma réponse » permet de revenir au choix (aussi en « J'écoute »).
+- [x] **« J'écoute » : l'enfant écrit le mot à l'écran.** Une ardoise (« ✍️ J'écris ici », par défaut) à côté des
+  étiquettes : il écrit avec le doigt, puis « Je vérifie ». Son mot reste affiché juste sous les cartes retournées
+  pour comparer ; plus besoin d'une feuille à côté du téléphone.
+- [x] **La pêche sur téléphone** : les mots longs (réfrigérateur, bibliothèque…) sortaient de l'étang. Ils s'écrivent
+  maintenant plus petit et ne dépassent plus. Même correction dans « Trouve le mot » (deux colonnes sur téléphone).
+- [x] **ARAIGNÉE sans comptine** : ce n'était pas le téléphone, la fiche Airtable (recJyQZ0LydXB7hDn) n'avait ni
+  « Song title » ni « Song lyrics ». Comptine « L'araignée tisse sa toile » ajoutée dans Airtable (avec Anansi,
+  l'araignée des contes akan) ; il reste à l'enregistrer : n° 156 dans docs/voix/comptines.md.

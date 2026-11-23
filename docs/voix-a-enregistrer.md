@@ -61,9 +61,10 @@ Texte complet : [`docs/voix/missions.md`](voix/missions.md).
 
 Texte complet : [`docs/voix/phrases-exemple.md`](voix/phrases-exemple.md).
 
-## 6. Les comptines (155 comptines, 717 lignes, environ 40 min)
+## 6. Les comptines (156 comptines, 722 lignes, environ 40 min)
 
 Texte complet : [`docs/voix/comptines.md`](voix/comptines.md). L'app les lit ligne par ligne : lis-les une ligne à la fois.
+La n° 156, ARAIGNÉE, a été ajoutée le 23 nov. (à la fin du fichier).
 
 ---
 
@@ -80,4 +81,4 @@ Et tout ce qui ne te plaît pas en écoutant l'app : dis-moi lequel, je le rempl
 ## Plus tard
 
 Les 37 nouveaux mots (« À produire ») n'ont pas encore de phrase d'exemple ni de syllabes dans Airtable, et
-65 mots n'ont pas encore de comptine. Quand ils seront écrits, je te prépare la liste à lire.
+64 mots n'ont pas encore de comptine. Quand ils seront écrits, je te prépare la liste à lire.
