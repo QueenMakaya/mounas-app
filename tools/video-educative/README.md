@@ -5,6 +5,7 @@ Moteur léger pour les vidéos éducatives Les Mounas (écrans SVG, voix brouill
 - `engine.py` : timeline (`say`, `hold`, `countdown`), voix brouillon Kokoro, bruitages et musique synthétisés, rendu ffmpeg.
 - `draw.py` : palette, fond, Amara, Kofi, cartes, pastilles.
 - `script_sons.py` : épisode « Un, deux, trois : les trois sons ».
+- `script_voyelles.py` + `draw_afro.py` : épisode « Voyelles et consonnes » (djembé, tata Awa la griotte, baobab, main aux voyelles).
 - `fiche-sons.html` + `fiche-pdf.js` : la fiche Skool, exportée en PDF avec Playwright (`node fiche-pdf.js <html> <pdf>`).
 
 ## Lancer

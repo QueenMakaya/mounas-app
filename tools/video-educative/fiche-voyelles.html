@@ -1,0 +1,128 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Fiche · Voyelles et consonnes</title><style>
+@page{size:Letter;margin:0}
+:root{--y:#FEBD57;--r:#F30041;--p:#4D0065;--t:#00A99C;--g:#D98A00;--c:#FDF6EC;--mute:#B9A9C2;--ink:#3b2b45}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Nunito B';color:var(--ink);font-size:11.2pt;line-height:1.35}
+.page{width:8.5in;height:11in;padding:.5in .6in .45in;position:relative;page-break-after:always;overflow:hidden}
+.page:last-child{page-break-after:auto}
+h1,h2,h3,.f{font-family:'Fraunces Black';font-weight:normal;margin:0}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.logo{font-family:'Fraunces Black';font-size:21pt;letter-spacing:.5px}
+.tag{font-family:'Fraunces Black';font-size:8.5pt;color:#fff;background:var(--p);border-radius:99px;padding:4px 13px;letter-spacing:.5px}
+h1{font-size:27pt;color:var(--p);line-height:1.05}
+.sub{font-family:'Nunito XB';color:var(--r);font-size:12pt;margin:3px 0 10px}
+.c1{color:var(--t)}.c2{color:var(--r)}.c3{color:var(--g)}.m{color:var(--mute)}
+.cols{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+.son{border:2.5px solid;border-radius:14px;padding:10px 11px 9px}
+.son.s1{border-color:var(--t)}.son.s2{border-color:var(--r)}.son.s3{border-color:var(--g)}
+.head{display:flex;align-items:center;gap:9px;margin-bottom:3px}
+.num{width:40px;height:40px;border-radius:50%;color:#fff;font-family:'Fredoka SB';font-size:22pt;display:flex;align-items:center;justify-content:center;flex:none}
+.s1 .num,.b1{background:var(--t)}.s2 .num,.b2{background:var(--r)}.s3 .num,.b3{background:var(--g)}
+.big{font-family:'Fraunces Black';font-size:33pt;line-height:1}
+.mot{font-family:'Fraunces Black';font-size:10pt;color:var(--p);margin-left:auto;text-align:right;line-height:1.15}
+.lab{font-family:'Fraunces Black';font-size:8.2pt;letter-spacing:.6px;text-transform:uppercase;color:var(--p);margin:7px 0 1px}
+.son p{margin:0;font-size:10pt}
+.gr{font-family:'Fraunces Black';font-size:13pt;display:inline-block;min-width:27px}
+.w{font-family:'Fraunces Black';color:var(--p)}
+.trap{background:#FFF0F3;border-radius:9px;padding:5px 8px;margin-top:7px;font-size:9.6pt}
+.trap b{font-family:'Nunito XB';color:var(--r)}
+.note{background:var(--c);border-radius:12px;padding:8px 13px;margin-top:10px;font-size:10pt}
+.note b{font-family:'Nunito XB';color:var(--p)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:6px}
+.step{background:var(--c);border-radius:12px;padding:8px 10px;font-size:9.7pt}
+.step b{font-family:'Fraunces Black';color:var(--r);display:block;font-size:10.5pt}
+h2{font-size:14.5pt;color:var(--p);margin:9px 0 3px;display:flex;align-items:center;gap:8px}
+h2 .n{width:25px;height:25px;border-radius:50%;background:var(--y);color:var(--p);font-family:'Fredoka SB';font-size:13pt;display:flex;align-items:center;justify-content:center;flex:none}
+.cons{font-size:10.3pt;margin:0 0 6px}
+.bank{display:flex;flex-wrap:wrap;gap:6px 8px;margin-bottom:8px}
+.bank span{font-family:'Fraunces Black';font-size:13pt;color:var(--p);border:1.6px dashed var(--mute);border-radius:8px;padding:1px 10px}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.box{border:2.2px solid;border-radius:12px;height:.92in;padding:5px 9px;display:flex;gap:7px;align-items:flex-start}
+.box .num{width:28px;height:28px;font-size:15pt}.box .f{font-size:17pt}
+.fill{display:grid;grid-template-columns:repeat(4,1fr);gap:5px 12px;font-family:'Fraunces Black';font-size:17pt;color:var(--p)}
+.fill i{display:inline-block;width:38px;border-bottom:2.5px solid var(--p);margin:0 2px}
+.rowz{display:grid;grid-template-columns:54px 1fr;gap:4px 8px;align-items:center;font-family:'Fraunces Black';font-size:16pt;color:var(--p)}
+.rowz .k{font-size:15pt}.rowz div span{margin-right:22px}
+.phr{font-family:'Fraunces Black';font-size:19pt;color:var(--p);border:2.2px solid var(--p);border-radius:12px;padding:6px 14px;text-align:center}
+.line{border-bottom:1.6px solid var(--mute);height:.29in}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.sol{position:absolute;left:.6in;right:.6in;bottom:.5in;font-size:7.6pt;color:#8b7b95;transform:rotate(180deg);text-align:center}
+.foot{position:absolute;left:.6in;right:.6in;bottom:.26in;font-size:8pt;color:#8b7b95;display:flex;justify-content:space-between}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1.52in;border-top:1.6px dashed #9c8ca6;border-left:1.6px dashed #9c8ca6;margin-top:8px}
+.cards div{border-right:1.6px dashed #9c8ca6;border-bottom:1.6px dashed #9c8ca6;display:flex;align-items:center;justify-content:center;font-family:'Fraunces Black';font-size:35pt;color:var(--p);position:relative}
+.cards small{position:absolute;right:8px;bottom:5px;width:19px;height:19px;border-radius:50%;color:#fff;font-family:'Fredoka SB';font-size:10pt;display:flex;align-items:center;justify-content:center}
+
+.cv{color:var(--t)}.cc{color:var(--r)}
+.two2{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.son.sv{border-color:var(--t)}.son.sc{border-color:var(--r)}
+.tips{display:grid;grid-template-columns:1fr 1fr;gap:7px 12px;margin-top:4px}
+.tip{background:var(--c);border-radius:11px;padding:7px 10px;font-size:9.6pt;display:flex;gap:8px}
+.tip b{font-family:'Fraunces Black';color:var(--p);font-size:10.3pt}
+.tip .k{width:24px;height:24px;border-radius:50%;background:var(--y);color:var(--p);font-family:'Fredoka SB';font-size:12pt;display:flex;align-items:center;justify-content:center;flex:none}
+.abc{display:grid;grid-template-columns:repeat(13,1fr);gap:2px 0;font-family:'Fraunces Black';font-size:30pt;text-align:center;color:transparent;-webkit-text-stroke:1.3px #4D0065;line-height:1.1}
+.grid{display:grid;grid-template-columns:54px repeat(5,1fr);border-top:1.6px solid var(--mute);border-left:1.6px solid var(--mute)}
+.grid div{border-right:1.6px solid var(--mute);border-bottom:1.6px solid var(--mute);height:.36in;display:flex;align-items:center;justify-content:center;font-family:'Fraunces Black';font-size:15pt}
+.cnt{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 14px;font-family:'Fraunces Black';font-size:15pt;color:var(--p)}
+.cnt i{display:inline-block;width:34px;height:28px;border:2px solid var(--p);border-radius:7px;vertical-align:middle;margin-left:8px}
+.cut{border:1.8px dashed #9c8ca6}
+</style></head><body>
+<section class="page">
+ <div class="top"><div class="logo"><span style="color:var(--y)">M</span><span style="color:#00CFBF">O</span><span style="color:var(--y)">U</span><span class="c2">N</span><span style="color:var(--p)">A</span><span class="c2">S</span></div><div class="tag">LA LEÇON · POUR LE PARENT</div></div>
+ <h1>Voyelles et consonnes</h1>
+ <div class="sub">Les lettres qui chantent, les lettres qui frappent. À regarder avec la vidéo, dix minutes par jour.</div>
+ <div class="two2">
+  <div class="son sv"><div class="head"><div class="big cv" style="font-size:25pt">Les voyelles</div><div class="mot">elles chantent,<br>comme la voix</div></div>
+   <p class="w cv" style="font-size:25pt;letter-spacing:9px;margin:2px 0">a e i o u y</p>
+   <p>Il y en a <span class="w">six</span>. La bouche est ouverte, rien ne se touche, l'air sort librement. On peut les chanter : « aaaa ».</p></div>
+  <div class="son sc"><div class="head"><div class="big cc" style="font-size:25pt">Les consonnes</div><div class="mot">elles frappent,<br>comme le djembé</div></div>
+   <p class="w cc" style="font-size:17pt;letter-spacing:3px;margin:4px 0 7px">b c d f g h j k l m n p q r s t v w x z</p>
+   <p>Il y en a <span class="w">vingt</span>. Quelque chose se touche : les lèvres (m, p, b), la langue (t, d, l), les dents sur la lèvre (f, v).</p></div>
+ </div>
+ <div class="note" style="margin-top:8px"><b>Ensemble.</b> Une frappe + un chant = une syllabe : <span class="w"><span class="cc">b</span> + <span class="cv">a</span> = <span class="cc">b</span><span class="cv">a</span></span>. Dans chaque syllabe, il y a une voyelle : <span class="w"><span class="cc">b</span><span class="cv">a</span> · <span class="cv">o</span> · <span class="cc">b</span><span class="cv">a</span><span class="cc">b</span></span>. Le y est une voyelle spéciale, vue dans la leçon du Y (stylo, crayon).</div>
+ <h2><span class="n" style="background:var(--p);color:#fff">★</span>Dix astuces pour que ça reste</h2>
+ <div class="tips"><div class="tip"><div class="k">1</div><div><b>L'image qui reste.</b> Tata Awa la griotte chante (les voyelles). Kofi frappe son djembé (les consonnes). Rappelle l'image avant chaque lecture.</div></div><div class="tip"><div class="k">2</div><div><b>Un geste par idée.</b> Voyelle : on ouvre les bras et on chante. Consonne : on tape dans ses mains.</div></div><div class="tip"><div class="k">3</div><div><b>Les doigts.</b> a, e, i, o, u sur les cinq doigts. Le y lève le pouce de l'autre main.</div></div><div class="tip"><div class="k">4</div><div><b>Deux couleurs, toujours les mêmes.</b> Voyelles en vert, consonnes en rouge, sur tous les mots qu'on écrit cette semaine.</div></div><div class="tip"><div class="k">5</div><div><b>Les mots-indices.</b> Voyelle commence comme voix. Consonne veut dire « qui sonne avec ».</div></div><div class="tip"><div class="k">6</div><div><b>Le menton.</b> Une main sous le menton : il descend à chaque voyelle. Ba-o-bab : trois fois.</div></div><div class="tip"><div class="k">7</div><div><b>Le prénom d'abord.</b> On commence par les lettres de son prénom : c'est le mot qu'un enfant retient le mieux.</div></div><div class="tip"><div class="k">8</div><div><b>Appel et réponse.</b> Tu chantes « A ! », ton enfant répond « A ! », comme dans les chants qu'on se renvoie.</div></div><div class="tip"><div class="k">9</div><div><b>Trois petits rendez-vous.</b> On y revient demain, dans trois jours, puis dans une semaine. Deux minutes suffisent.</div></div><div class="tip"><div class="k">10</div><div><b>L'enfant explique.</b> Le soir, ton enfant l'explique à quelqu'un de la famille. Expliquer, c'est retenir.</div></div></div>
+ <h2><span class="n">+</span>D'où viennent les images de la leçon</h2>
+ <p class="cons"><span class="w">La griotte</span> (ou le griot) est, en Afrique de l'Ouest, la gardienne des histoires, des généalogies et des chants. <span class="w">Le djembé</span> est un tambour en forme de calice, joué à mains nues. <span class="w">La kora</span> est l'instrument à cordes des griots. <span class="w">Le baobab</span> est l'arbre sous lequel on se rassemble pour parler. Raconte-les à ton enfant : une lettre accrochée à une histoire se retient mieux.</p>
+ <div class="foot"><span>Les Mounas · lesmounas.school</span><span>Voyelles et consonnes · 1/3</span></div>
+</section>
+<section class="page">
+ <div class="top"><div class="logo"><span style="color:var(--y)">M</span><span style="color:#00CFBF">O</span><span style="color:var(--y)">U</span><span class="c2">N</span><span style="color:var(--p)">A</span><span class="c2">S</span></div><div class="tag" style="background:var(--r)">MES EXERCICES · PRÉNOM : ............................</div></div>
+ <h2 style="margin-top:4px"><span class="n">1</span>Je colorie l'alphabet</h2>
+ <p class="cons">Les voyelles en vert, les consonnes en rouge. Combien de voyelles ? ........</p>
+ <div class="abc"><span>a</span><span>b</span><span>c</span><span>d</span><span>e</span><span>f</span><span>g</span><span>h</span><span>i</span><span>j</span><span>k</span><span>l</span><span>m</span><span>n</span><span>o</span><span>p</span><span>q</span><span>r</span><span>s</span><span>t</span><span>u</span><span>v</span><span>w</span><span>x</span><span>y</span><span>z</span></div>
+ <h2><span class="n">2</span>Mon prénom</h2>
+ <p class="cons">Écris ton prénom : les voyelles en vert, les consonnes en rouge. Puis compte.</p>
+ <div class="two"><div class="line" style="height:.5in"></div><div class="cnt" style="grid-template-columns:1fr 1fr;align-self:end"><div>voyelles<i></i></div><div>consonnes<i></i></div></div></div>
+ <h2><span class="n">3</span>Combien de voyelles ?</h2>
+ <p class="cons">Entoure les voyelles, puis écris le nombre.</p>
+ <div class="cnt"><div>kora<i></i></div><div>baobab<i></i></div><div>djembé<i></i></div><div>mangue<i></i></div><div>Kofi<i></i></div><div>stylo<i></i></div></div>
+ <h2><span class="n">4</span>Je fabrique des syllabes</h2>
+ <p class="cons">Une consonne qui frappe + une voyelle qui chante. Remplis le tableau, puis lis chaque ligne en tapant le rythme.</p>
+ <div class="grid"><div></div><div class="cv">a</div><div class="cv">e</div><div class="cv">i</div><div class="cv">o</div><div class="cv">u</div><div class="cc">m</div><div style="color:#cbbfd2;font-size:12pt">ma</div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div class="cc">b</div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div class="cc">k</div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div class="cc">t</div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div><div style="color:#cbbfd2;font-size:12pt"></div></div>
+ <h2><span class="n">5</span>L'astuce du menton</h2>
+ <p class="cons">Une main sous ton menton. Dis le mot : combien de fois ton menton descend-il ?</p>
+ <div class="cnt"><div>baobab<i></i></div><div>kora<i></i></div><div>karité<i></i></div></div>
+ <h2><span class="n">6</span>La main des voyelles</h2>
+ <p class="cons">Au dos de la feuille, trace le contour de ta main. Écris a, e, i, o, u au bout des doigts. Et le y ? Sur le pouce de l'autre main !</p>
+ <div class="sol">Réponses · 1 : six voyelles (a, e, i, o, u, y) · 3 : kora 2, baobab 3, djembé 2, mangue 3, Kofi 2, stylo 2 (y et o) · 4 : ma me mi mo mu, ba be bi bo bu, ka ke ki ko ku, ta te ti to tu · 5 : baobab 3, kora 2, karité 3</div>
+ <div class="foot"><span>Les Mounas · lesmounas.school</span><span>Voyelles et consonnes · 2/3</span></div>
+</section>
+<section class="page">
+ <div class="top"><div class="logo"><span style="color:var(--y)">M</span><span style="color:#00CFBF">O</span><span style="color:var(--y)">U</span><span class="c2">N</span><span style="color:var(--p)">A</span><span class="c2">S</span></div><div class="tag" style="background:#00A99C">L'ATELIER · LE TAMBOUR À SYLLABES</div></div>
+ <p class="cons" style="margin-top:4px"><span class="w">Un adulte découpe</span> le tambour et la bande en suivant les pointillés, puis ouvre les deux fentes (traits pleins) à côté du m. <span class="w">L'enfant</span> repasse le m en rouge et les voyelles en vert, glisse la bande dans les fentes, tire doucement et lit : ma, me, mi, mo, mu.</p>
+ <div style="display:flex;gap:.3in;align-items:flex-start;margin-top:10px">
+  <div>
+   <div class="cut" style="width:5.2in;height:4in;position:relative;border-radius:10px">
+     <div style="position:absolute;left:.35in;top:.3in"><svg viewBox="-130 -160 260 380" width="2.3in"><g transform="translate(0 0) scale(1)"><path d="M-112 -118 L112 -118 C112 10 44 30 36 78 L74 205 L-74 205 L-36 78 C-44 30 -112 10 -112 -118Z" fill="#8A4B22" stroke="#5E3214" stroke-width="7"/><path d="M-66 190 L66 190" stroke="#4D0065" stroke-width="16"/><path d="M-40 78 L40 78" stroke="#FEBD57" stroke-width="12"/><path d="M-108 -112 L-90 -30 L-72 -112" stroke="#FEBD57" stroke-width="6" fill="none" stroke-linejoin="round"/><path d="M-72 -112 L-54 -30 L-36 -112" stroke="#FEBD57" stroke-width="6" fill="none" stroke-linejoin="round"/><path d="M-36 -112 L-18 -30 L0 -112" stroke="#FEBD57" stroke-width="6" fill="none" stroke-linejoin="round"/><path d="M0 -112 L18 -30 L36 -112" stroke="#FEBD57" stroke-width="6" fill="none" stroke-linejoin="round"/><path d="M36 -112 L54 -30 L72 -112" stroke="#FEBD57" stroke-width="6" fill="none" stroke-linejoin="round"/><path d="M72 -112 L90 -30 L108 -112" stroke="#FEBD57" stroke-width="6" fill="none" stroke-linejoin="round"/><path d="M-104 -26 L104 -26" stroke="#FEBD57" stroke-width="7"/><ellipse cx="0" cy="-118" rx="112" ry="30" fill="#F7E8CC" stroke="#5E3214" stroke-width="7"/><circle cx="0" cy="-40" r="62" fill="#F7E8CC" stroke="#5E3214" stroke-width="6"/><text x="0" y="-8" font-family="Fraunces Black" font-size="92" fill="#F30041" text-anchor="middle" opacity="1" xml:space="preserve">m</text></g></svg></div>
+     <div style="position:absolute;left:3.25in;top:1.25in;width:1.35in;border-top:3px solid #4D0065"></div>
+     <div style="position:absolute;left:3.25in;top:2.75in;width:1.35in;border-top:3px solid #4D0065"></div>
+     <div style="position:absolute;left:3.3in;top:.75in;font-size:8pt;color:#8b7b95">fente</div><div style="position:absolute;left:3.3in;top:2.85in;font-size:8pt;color:#8b7b95">fente</div>
+   </div>
+   <p class="cons" style="margin-top:10px"><span class="w">Pour changer de consonne :</span> découpe ces étiquettes et pose-les sur le m.</p>
+   <div style="display:grid;grid-template-columns:repeat(6,.82in);gap:0"><div class="cut" style="height:.82in;display:flex;align-items:center;justify-content:center;font-family:Fraunces Black;font-size:34pt;color:transparent;-webkit-text-stroke:1.4px #F30041">b</div><div class="cut" style="height:.82in;display:flex;align-items:center;justify-content:center;font-family:Fraunces Black;font-size:34pt;color:transparent;-webkit-text-stroke:1.4px #F30041">k</div><div class="cut" style="height:.82in;display:flex;align-items:center;justify-content:center;font-family:Fraunces Black;font-size:34pt;color:transparent;-webkit-text-stroke:1.4px #F30041">t</div><div class="cut" style="height:.82in;display:flex;align-items:center;justify-content:center;font-family:Fraunces Black;font-size:34pt;color:transparent;-webkit-text-stroke:1.4px #F30041">s</div><div class="cut" style="height:.82in;display:flex;align-items:center;justify-content:center;font-family:Fraunces Black;font-size:34pt;color:transparent;-webkit-text-stroke:1.4px #F30041">l</div><div class="cut" style="height:.82in;display:flex;align-items:center;justify-content:center;font-family:Fraunces Black;font-size:34pt;color:transparent;-webkit-text-stroke:1.4px #F30041">p</div></div>
+   <p class="cons" style="margin-top:12px;font-size:9.6pt"><span class="w">On joue :</span> 1. Lis les cinq syllabes en tapant le rythme sur la table. &nbsp;2. Change de consonne et lis encore. &nbsp;3. Trouve un mot qui commence par ta syllabe : ma comme maman, ko comme kora, ba comme baobab.</p>
+  </div>
+  <div class="cut" style="width:1.2in;height:8.2in;border-radius:8px;display:flex;flex-direction:column;justify-content:space-around;align-items:center;font-family:Fraunces Black;font-size:50pt;color:transparent;-webkit-text-stroke:1.5px #00A99C;padding:.2in 0"><span>a</span><span>e</span><span>i</span><span>o</span><span>u</span></div>
+ </div>
+ <div class="foot"><span>Les Mounas · lesmounas.school</span><span>Voyelles et consonnes · 3/3</span></div>
+</section></body></html>
