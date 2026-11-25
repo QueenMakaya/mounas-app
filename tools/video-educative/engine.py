@@ -39,7 +39,14 @@ def _pam(key):
     o = _order[key]
     if o is None: return np.zeros(int(SR * 1.2), dtype=np.float32)
     if isinstance(o, (int, float)): return np.zeros(int(SR * o), dtype=np.float32)   # réplique non enregistrée : silence de o secondes
-    s = _voice[int(o[0]*SR):int(o[1]*SR)].astype(np.float32).copy()
+    if isinstance(o[0], (list, tuple)):      # plusieurs passages remis dans l'ordre, avec un petit silence entre eux
+        parts = []
+        for a_, b_ in o:
+            p = _voice[int(a_*SR):int(b_*SR)].astype(np.float32).copy(); f = int(SR * 0.03)
+            p[:f] *= np.linspace(0, 1, f); p[-f:] *= np.linspace(1, 0, f); parts += [p, np.zeros(int(SR * 0.28), dtype=np.float32)]
+        s = np.concatenate(parts[:-1])
+    else:
+        s = _voice[int(o[0]*SR):int(o[1]*SR)].astype(np.float32).copy()
     # même volume pour chaque réplique : niveau mesuré sur les passages parlés, gain borné à ±6 dB
     h = int(SR * 0.05); k = len(s) // h
     r = np.sqrt((s[:k*h].reshape(k, h) ** 2).mean(1)); act = r[r > r.max() * 0.1]

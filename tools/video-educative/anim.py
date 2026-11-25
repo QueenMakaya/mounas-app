@@ -23,13 +23,14 @@ EYES_SHUT = (f'<path d="M-44 -1 q14 9 28 0 M16 -1 q14 9 28 0" stroke="{HAIR}" st
 def prepare(svg, prev):
     """Les morceaux nouveaux par rapport à l'écran précédent entrent en douceur, l'un après l'autre."""
     if P not in svg: return svg
-    parts = svg.split(P); old = set(prev.split(P)) if prev else set()
+    strip = lambda s: re.sub(r'^<!--AT [\d.]+-->', '', s)
+    parts = svg.split(P); old = set(strip(x) for x in prev.split(P)) if prev else set()
     title = lambda s: (re.search(r'<!--T:(.*?)-->', s) or [None, ''])[1]
     new_section = (not prev) or title(prev) != title(svg)
     out = [parts[0]]; k = 0
     for p in parts[1:-1]:
         m = re.match(r'<!--AT ([\d.]+)-->', p)
-        if p in old and not m:
+        if p in old and not m:      # déjà à l'écran : ne bouge pas
             out.append(p); continue
         if 'data-char' in p and not new_section and not m:
             out.append(p); continue

@@ -6,6 +6,7 @@ Moteur léger pour les vidéos éducatives Les Mounas (écrans SVG, voix brouill
 - `draw.py` : palette, fond, Amara, Kofi, cartes, pastilles.
 - `script_sons.py` : épisode « Un, deux, trois : les trois sons ».
 - `script_voyelles.py` + `draw_afro.py` : épisode « Voyelles et consonnes » (djembé, tata Awa la griotte, baobab, main aux voyelles).
+- `script_nez.py` + `draw_nez.py` : épisode « Les sons du nez » (Samba l'éléphant, balafon, carte d'Afrique).
 - `fiche-sons.html` + `fiche-pdf.js` : la fiche Skool, exportée en PDF avec Playwright (`node fiche-pdf.js <html> <pdf>`).
 
 ## Lancer
