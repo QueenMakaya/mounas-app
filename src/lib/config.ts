@@ -83,9 +83,10 @@ export const EXPO = {
 } as const;
 
 /**
- * Places already taken, updated by hand as families confirm
- * (NEXT_PUBLIC_EXPO_PLACES_TAKEN, then redeploy). The page never shows a
- * number that isn't true: at 20 the offer reads as full.
+ * Places already taken, as a floor set by hand (NEXT_PUBLIC_EXPO_PLACES_TAKEN,
+ * then redeploy). The real count comes from Airtable, one row per confirmed
+ * payment (src/lib/expo-places.ts); the page shows the larger of the two and
+ * never a number that isn't true: at 20 the offer reads as full.
  */
 export const EXPO_PLACES_TAKEN = Math.min(
   EXPO.places,
