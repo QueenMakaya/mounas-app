@@ -3,7 +3,7 @@
 Trois sons qui passent par le nez, comme « un ». Format interactif (voir `tools/video-educative/FORMAT.md`).
 
 - Fiche Skool (3 pages, à imprimer) : `public/promo/sons-du-nez/fiche-sons-du-nez.pdf`
-- Vidéo activité : brouillon avec voix de synthèse (5 min 55), rendu par `tools/video-educative/script_nez.py`. La version finale attend la voix de Pam ; les mots seront alors calés sur ses pauses.
+- Vidéo activité avec la voix de Pam : `public/promo/sons-du-nez/video.mp4` (16:9, 7 min 54, animée), rendue par `tools/video-educative/script_nez.py`. Les mots sont calés sur ses pauses (`voix-pam-nez-order.json`).
 
 ## Le contenu de la leçon
 

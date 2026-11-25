@@ -43,7 +43,7 @@ S('intro')
 say(svg(bg(None), confetti(4), text(760, 360, 'Pose un doigt', 130, PUR), text(760, 500, 'sur ton nez !', 130, PUR), nose(760, 760, 1.5), amara(1500, 520, 1.15, R='nose')),
     "Coucou ! C'est Amara. Pose un doigt sur ton nez. Prêt ? Prête ?")
 say(scr('LES SONS DU NEZ', PUR, h1('Trois sons qui passent par le nez', 260, PUR),
-        *[at(t_, badge(x - 150, 580, n, NEZ[n][1], 80) + text(x + 40, 630, NEZ[n][0], 170, NEZ[n][1])) for n, x, t_ in ((1, 420, 3.2), (2, 960, 3.9), (3, 1500, 4.6))], amara(960, 900, .5, L='up', R='up')),
+        *[at(t_, badge(x - 150, 580, n, NEZ[n][1], 80) + text(x + 40, 630, NEZ[n][0], 170, NEZ[n][1])) for n, x, t_ in ((1, 420, 4.45), (2, 960, 5.45), (3, 1500, 6.3))], amara(960, 900, .5, L='up', R='up')),
     "Aujourd'hui, on découvre trois sons qui passent par le nez : on, an, in.", "Aujourd'hui, on découvre trois sons qui passent par le nez : on, an, hein.")
 def bala3(x=560, y=420, w=250, h=460, hl=None, words=None, gap=30):
     return ''.join(lame(x + i * (w + gap), y, w, h, n, hl=(hl == n), words=(words or {}).get(n, ())) for i, n in enumerate((1, 2, 3)))
@@ -75,7 +75,7 @@ def savane(k=0):
     it = [baobab(330, 760, .9), baobab(1700, 740, .6)]
     it.append(samba(960, 430, .8, sing=(k >= 2)))
     if k == 1: it.append(pill(960, 250, 'le plus grand nez de la savane : sa trompe !', PUR, 44))
-    if k == 2: it += [at([3.4, 4.3, 5.2][i], text(1250 + i * 190, 330 - (i % 2) * 70, NEZ[n][0], 130, NEZ[n][1])) for i, n in enumerate((1, 2, 3))] + [note(1180, 200, .9), note(1760, 220, .9, CON, .4)]
+    if k == 2: it += [at([4.35, 5.95, 7.55][i], text(1250 + i * 190, 330 - (i % 2) * 70, NEZ[n][0], 130, NEZ[n][1])) for i, n in enumerate((1, 2, 3))] + [note(1180, 200, .9), note(1760, 220, .9, CON, .4)]
     return svg(bg('DANS LA SAVANE', TEAL, deco=False), f'<rect x="0" y="740" width="1920" height="340" fill="#E9D58A"/>', *it, amara(1500, 700, .62, L='hip', R='out'), kofi(1680, 720, .58, L='out', R='hip'))
 say(savane(0), "Dans la savane, tout près de Mounaville, vit Samba l'éléphant.")
 say(savane(1), "Samba a le plus grand nez de toute la savane : sa trompe !")
@@ -121,7 +121,7 @@ say(son_intro(1), "Premier son du nez : on.", sfx_name='whoosh')
 say(lettres(1, 'o', 'n'), "Le son on s'écrit o, n.", "Le son on s'écrit o, ène.")
 say(repete(1, 'ta bouche fait un rond, comme un ballon'), "Ta bouche fait un rond, comme un ballon. Répète après moi : on !")
 hold(repete(1, 'ta bouche fait un rond, comme un ballon', True), 2.6, 'pop')
-say(mots(1, 'LE SON « ON »', ['mout|on|', 'ball|on|', 'balaf|on|'], 'On l\'entend dans...'), "On l'entend dans mouton, dans ballon, et dans balafon.")
+say(mots(1, 'LE SON « ON »', ['mout|on|', 'ball|on|', 'balaf|on|'], 'On l\'entend dans...', ts=[1.3, 3.3, 4.9]), "On l'entend dans mouton, dans ballon, et dans balafon.")
 say(scr('LE SAVAIS-TU ?', YEL, h1('Le balafon vient d\'Afrique de l\'Ouest', 250, PUR), balafon(960, 600, 1.15), pill(960, 880, 'on tape sur des lames en bois', PUR, 44)),
     "Le balafon, c'est un instrument d'Afrique de l'Ouest : on tape sur des lames en bois.", sfx_name='chant')
 # --- an ---
@@ -129,16 +129,16 @@ say(son_intro(2), "Deuxième son du nez : an.", sfx_name='whoosh')
 say(lettres(2, 'a', 'n'), "Le son an s'écrit a, n.", "Le son an s'écrit a, ène.")
 say(repete(2, 'ta bouche s\'ouvre en grand, comme chez le dentiste'), "Ta bouche s'ouvre en grand, comme chez le dentiste. Répète après moi : an !")
 hold(repete(2, 'ta bouche s\'ouvre en grand, comme chez le dentiste', True), 2.6, 'pop')
-say(mots(2, 'LE SON « AN »', ['mam|an|', 'm|an|gue'], 'On l\'entend dans...', 130), "On l'entend dans maman, et dans mangue.")
-say(mots(2, 'LE SON « AN »', ['d|en|t', 'v|en|t', '|en|f|an|t'], 'Mais aussi e, n', 120, gr='en'), "Mais il s'écrit aussi e, n, comme dans dent, et dans vent. Et dans enfant, il y a les deux !",
+say(mots(2, 'LE SON « AN »', ['mam|an|', 'm|an|gue'], 'On l\'entend dans...', 130, ts=[1.1, 2.0]), "On l'entend dans maman, et dans mangue.")
+say(mots(2, 'LE SON « AN »', ['d|en|t', 'v|en|t', '|en|f|an|t'], 'Mais aussi e, n', 120, gr='en', ts=[4.4, 5.2, 7.0]), "Mais il s'écrit aussi e, n, comme dans dent, et dans vent. Et dans enfant, il y a les deux !",
     "Mais il s'écrit aussi e, ène, comme dans dent, et dans vent. Et dans enfant, il y a les deux !")
 # --- in ---
 say(son_intro(3), "Troisième son du nez : in.", "Troisième son du nez : hein.", sfx_name='whoosh')
 say(lettres(3, 'i', 'n'), "Le son in s'écrit i, n.", "Le son hein s'écrit i, ène.")
 say(repete(3, 'ta bouche s\'étire, comme pour un sourire'), "Ta bouche s'étire, comme pour un sourire. Répète après moi : in !", "Ta bouche s'étire, comme pour un sourire. Répète après moi : hein !")
 hold(repete(3, 'ta bouche s\'étire, comme pour un sourire', True), 2.6, 'pop')
-say(mots(3, 'LE SON « IN »', ['lap|in|', 'mat|in|'], 'On l\'entend dans...', 130), "On l'entend dans lapin, et dans matin.")
-say(mots(3, 'LE SON « IN »', ['p|ain|', 'm|ain|'], 'Et parfois a, i, n', 130, gr='ain'), "Et parfois, il s'écrit a, i, n, comme dans pain, et dans main.", "Et parfois, il s'écrit a, i, ène, comme dans pain, et dans main.")
+say(mots(3, 'LE SON « IN »', ['lap|in|', 'mat|in|'], 'On l\'entend dans...', 130, ts=[1.2, 2.3]), "On l'entend dans lapin, et dans matin.")
+say(mots(3, 'LE SON « IN »', ['p|ain|', 'm|ain|'], 'Et parfois a, i, n', 130, gr='ain', ts=[4.4, 5.6]), "Et parfois, il s'écrit a, i, n, comme dans pain, et dans main.", "Et parfois, il s'écrit a, i, ène, comme dans pain, et dans main.")
 
 # ============ 6. L'ASTUCE DU M ============
 say(scr('L\'ASTUCE', YEL, h1('Devant un b ou un p, le n se déguise en m', 250, PUR),
@@ -146,7 +146,7 @@ say(scr('L\'ASTUCE', YEL, h1('Devant un b ou un p, le n se déguise en m', 250, 
         text(1330, 480, 'devant', 60, PUR, 'nx'), text(1330, 600, 'b  p', 150, PUR), samba(1700, 760, .32)),
     "Astuce : devant un b ou un p, le n se déguise en m.", "Astuce : devant un bé ou un pé, le ène se déguise en ème.", sfx_name='ding')
 say(scr('L\'ASTUCE', YEL, h1('Devant un b ou un p, le n se déguise en m', 250, PUR),
-        rich(480, 520, 't|am|bour', 120, CAN), rich(1440, 520, 'p|om|pier', 120, CON), rich(480, 760, 't|im|bre', 120, CIN), rich(1440, 760, 'S|am|ba', 120, CAN), samba(960, 560, .42)),
+        at(.3, rich(480, 520, 't|am|bour', 120, CAN)), at(1.95, rich(1440, 520, 'p|om|pier', 120, CON)), at(3.65, rich(480, 760, 't|im|bre', 120, CIN)), at(4.7, rich(1440, 760, 'S|am|ba', 120, CAN)), samba(960, 560, .42)),
     "Tambour. Pompier. Timbre. Et même Samba !")
 
 # ============ 7. LE PIÈGE ============
@@ -177,7 +177,7 @@ def regles():
     o = []
     for n, x in zip((1, 2, 3), (400, 960, 1520)):
         g, c = NEZ[n]
-        o.append(at([0, .9, 4.0, 7.0][n], card(x - 240, 330, 480, 440, c, sw=8) + text(x, 480, f'« {g} »', 120, c) + lines(x, 600, {1: ['un rond', 'avec tes bras'], 2: ['les bras', 'grands ouverts'], 3: ['des oreilles', 'de lapin']}[n], 50, PUR, 'nx')))
+        o.append(at([0, .3, 3.65, 7.0][n], card(x - 240, 330, 480, 440, c, sw=8) + text(x, 480, f'« {g} »', 120, c) + lines(x, 600, {1: ['un rond', 'avec tes bras'], 2: ['les bras', 'grands ouverts'], 3: ['des oreilles', 'de lapin']}[n], 50, PUR, 'nx')))
     return scr('DEBOUT ! LA DANSE DE SAMBA', TEAL, h1('Écoute le mot, et danse !', 240, TEALT), *o)
 say(regles(), "Si tu entends on, fais un rond avec tes bras. Si tu entends an, ouvre grand les bras. Si tu entends in, fais des oreilles de lapin.",
     "Si tu entends on, fais un rond avec tes bras. Si tu entends an, ouvre grand les bras. Si tu entends hein, fais des oreilles de lapin.")
@@ -222,7 +222,11 @@ def magique(k, t=False):
     ws = [('|un|', CUN), ('b|on|', CON), ('p|ain|', CIN), ('bl|an|c', CAN)]
     o = [card(140 + i * 420, 400, 380, 260, c, sw=8) + rich(330 + i * 420, 580, w, 130, c) for i, (w, c) in enumerate(ws[:k])]
     return scr('LA PHRASE MAGIQUE', YEL, h1('Tous les sons du nez dans une seule phrase', 250, PUR), *o, toi(960, 760) if t else '', samba(960, 900, .28) if not t else '')
-say(magique(4), "Voici la phrase magique, avec tous les sons du nez : un bon pain blanc.", sfx_name='tada')
+def magique_at():
+    ws = [('|un|', CUN), ('b|on|', CON), ('p|ain|', CIN), ('bl|an|c', CAN)]
+    o = [at(4.6 + i * .45, card(140 + i * 420, 400, 380, 260, c, sw=8) + rich(330 + i * 420, 580, w, 130, c)) for i, (w, c) in enumerate(ws)]
+    return scr('LA PHRASE MAGIQUE', YEL, h1('Tous les sons du nez dans une seule phrase', 250, PUR), *o, samba(960, 900, .28))
+say(magique_at(), "Voici la phrase magique, avec tous les sons du nez : un bon pain blanc.", sfx_name='tada')
 say(magique(4), "Un. Bon. Pain. Blanc. Répète-la trois fois !")
 hold(magique(4, True), 5.0, 'pop')
 
@@ -270,7 +274,7 @@ say(defi(1, ['Pioche une carte, lis le mot,', 'et pose-la sur la bonne lame'], b
 say(defi(2, ['Joue du balafon : tape sur une lame,', 'et dis tous ses mots'], bala3(640, 430, 250, 480, hl=1, words={1: WORDS[1]}), balafon(330, 640, .42)),
     "Défi numéro deux. Joue du balafon : tape sur une lame, et dis tous ses mots.", sfx_name='chant')
 say(defi(3, ['Trouve un nouveau mot pour chaque lame'],
-         *[at(t_, card(200 + i * 520, 430, 480, 320, NEZ[n][1], sw=7) + text(440 + i * 520, 560, NEZ[n][0], 130, NEZ[n][1]) + text(440 + i * 520, 690, 'comme ' + w, 60, PUR)) for i, (n, w, t_) in enumerate(((1, 'pont', 3.0), (2, 'maman', 4.6), (3, 'matin', 6.2)))]),
+         *[at(t_, card(200 + i * 520, 430, 480, 320, NEZ[n][1], sw=7) + text(440 + i * 520, 560, NEZ[n][0], 130, NEZ[n][1]) + text(440 + i * 520, 690, 'comme ' + w, 60, PUR)) for i, (n, w, t_) in enumerate(((1, 'pont', 5.5), (2, 'maman', 8.1), (3, 'matin', 10.7)))]),
     "Défi numéro trois. Trouve un nouveau mot pour chaque lame. ON, comme pont. AN, comme maman. IN, comme matin.",
     "Défi numéro trois. Trouve un nouveau mot pour chaque lame. On, comme pont. An, comme maman. Hein, comme matin.")
 say(defi(0, ['Cherche un son du nez dans ton prénom,', 'ou dans celui de quelqu\'un de ta famille'], card(260, 480, 1400, 250, PUR, sw=6) + rich(620, 650, 'S|am|ba', 130, CAN) + rich(1300, 650, 'Mart|in|', 130, CIN), trio(860)),
