@@ -2,7 +2,7 @@
 
 Vidéo : `public/promo/emotions/emotions-texte.mp4` (9:16, 1080×1920, 84 s, texte à l'écran seulement).
 Voix : la voix clonée de Pam (HeyGen, « Pam Maman Les Mounas »). Chaque mot entre quand la voix le dit.
-Musique : groove Mounas synthétisé, il baisse sous la voix. Sous-titres : `emotions-texte.srt`.
+Musique : piano tendre synthétisé (choisi par Pam), il baisse sous la voix. Sous-titres : `emotions-texte.srt`.
 Refaire le rendu : `tools/video-texte/emotions.py` (le texte de chaque scène est en haut du fichier).
 
 ## Angle
