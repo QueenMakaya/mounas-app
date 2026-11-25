@@ -102,6 +102,12 @@ MOUTH = {1: 'o', 2: 'wide', 3: 'flat'}
 def son_intro(n):
     g, c = NEZ[n]
     return scr(ORD[n], c, badge(520, 520, n, c, 120), text(960, 620, g, 340, c), amara(1500, 470, 1.0, L='down', R='up', mouth=MOUTH[n]))
+def lettres(n, a, b):
+    g, c = NEZ[n]
+    return scr(ORD[n], c, h1(f'Le son « {g} » s\'écrit {a}, {b}', 250, c),
+               card(360, 400, 220, 260, PUR) + text(470, 590, a, 190, PUR), text(660, 580, '+', 130, '#7A6A80', 'fr'),
+               card(740, 400, 220, 260, PUR) + text(850, 590, b, 190, PUR), text(1040, 580, '=', 130, '#7A6A80', 'fr'),
+               card(1120, 400, 330, 260, c, sw=9) + text(1285, 590, g, 190, c), amara(1680, 540, .8, L='down', R='down', mouth=MOUTH[n]), trio(900, n))
 def repete(n, tip, t=False):
     g, c = NEZ[n]
     return scr('RÉPÈTE APRÈS MOI', c, text(680, 620, f'« {g} »', 300, c), amara(1400, 480, 1.25, L='down', R='down', mouth=MOUTH[n]), pill(680, 740, tip, PUR, 38), toi(680, 840) if t else '')
@@ -112,24 +118,27 @@ def mots(n, title, ws, sub=None, size=110, ts=None, gr=None):
     return scr(title, c, h1(sub, 250, c) if sub else '', left, *[(at(ts[i], rich(x, 620, s, size, c)) if ts else rich(x, 620, s, size, c)) for i, (x, s) in enumerate(zip(xs, ws))], trio(900, n))
 # --- on ---
 say(son_intro(1), "Premier son du nez : on.", sfx_name='whoosh')
-say(repete(1, 'ta bouche fait un rond, comme un ballon'), "Il s'écrit o, n. Ta bouche fait un rond, comme un ballon. Répète après moi : on !", "Il s'écrit o, ène. Ta bouche fait un rond, comme un ballon. Répète après moi : on !")
+say(lettres(1, 'o', 'n'), "Le son on s'écrit o, n.", "Le son on s'écrit o, ène.")
+say(repete(1, 'ta bouche fait un rond, comme un ballon'), "Ta bouche fait un rond, comme un ballon. Répète après moi : on !")
 hold(repete(1, 'ta bouche fait un rond, comme un ballon', True), 2.6, 'pop')
 say(mots(1, 'LE SON « ON »', ['mout|on|', 'ball|on|', 'balaf|on|'], 'On l\'entend dans...'), "On l'entend dans mouton, dans ballon, et dans balafon.")
 say(scr('LE SAVAIS-TU ?', YEL, h1('Le balafon vient d\'Afrique de l\'Ouest', 250, PUR), balafon(960, 600, 1.15), pill(960, 880, 'on tape sur des lames en bois', PUR, 44)),
     "Le balafon, c'est un instrument d'Afrique de l'Ouest : on tape sur des lames en bois.", sfx_name='chant')
 # --- an ---
 say(son_intro(2), "Deuxième son du nez : an.", sfx_name='whoosh')
+say(lettres(2, 'a', 'n'), "Le son an s'écrit a, n.", "Le son an s'écrit a, ène.")
 say(repete(2, 'ta bouche s\'ouvre en grand, comme chez le dentiste'), "Ta bouche s'ouvre en grand, comme chez le dentiste. Répète après moi : an !")
 hold(repete(2, 'ta bouche s\'ouvre en grand, comme chez le dentiste', True), 2.6, 'pop')
-say(mots(2, 'LE SON « AN »', ['mam|an|', 'm|an|gue'], 'Il s\'écrit a, n', 130, gr='an'), "Il s'écrit a, n, comme dans maman, et dans mangue.", "Il s'écrit a, ène, comme dans maman, et dans mangue.")
+say(mots(2, 'LE SON « AN »', ['mam|an|', 'm|an|gue'], 'On l\'entend dans...', 130), "On l'entend dans maman, et dans mangue.")
 say(mots(2, 'LE SON « AN »', ['d|en|t', 'v|en|t', '|en|f|an|t'], 'Mais aussi e, n', 120, gr='en'), "Mais il s'écrit aussi e, n, comme dans dent, et dans vent. Et dans enfant, il y a les deux !",
     "Mais il s'écrit aussi e, ène, comme dans dent, et dans vent. Et dans enfant, il y a les deux !")
 # --- in ---
 say(son_intro(3), "Troisième son du nez : in.", "Troisième son du nez : hein.", sfx_name='whoosh')
+say(lettres(3, 'i', 'n'), "Le son in s'écrit i, n.", "Le son hein s'écrit i, ène.")
 say(repete(3, 'ta bouche s\'étire, comme pour un sourire'), "Ta bouche s'étire, comme pour un sourire. Répète après moi : in !", "Ta bouche s'étire, comme pour un sourire. Répète après moi : hein !")
 hold(repete(3, 'ta bouche s\'étire, comme pour un sourire', True), 2.6, 'pop')
-say(mots(3, 'LE SON « IN »', ['lap|in|', 'mat|in|'], 'Il s\'écrit i, n', 130, gr='in'), "Il s'écrit i, n, comme dans lapin, et dans matin.", "Il s'écrit i, ène, comme dans lapin, et dans matin.")
-say(mots(3, 'LE SON « IN »', ['p|ain|', 'm|ain|'], 'Et parfois a, i, n', 130, gr='ain'), "Et parfois a, i, n, comme dans pain, et dans main.", "Et parfois a, i, ène, comme dans pain, et dans main.")
+say(mots(3, 'LE SON « IN »', ['lap|in|', 'mat|in|'], 'On l\'entend dans...', 130), "On l'entend dans lapin, et dans matin.")
+say(mots(3, 'LE SON « IN »', ['p|ain|', 'm|ain|'], 'Et parfois a, i, n', 130, gr='ain'), "Et parfois, il s'écrit a, i, n, comme dans pain, et dans main.", "Et parfois, il s'écrit a, i, ène, comme dans pain, et dans main.")
 
 # ============ 6. L'ASTUCE DU M ============
 say(scr('L\'ASTUCE', YEL, h1('Devant un b ou un p, le n se déguise en m', 250, PUR),

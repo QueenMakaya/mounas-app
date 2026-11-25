@@ -3,7 +3,7 @@
 Trois sons qui passent par le nez, comme « un ». Format interactif (voir `tools/video-educative/FORMAT.md`).
 
 - Fiche Skool (3 pages, à imprimer) : `public/promo/sons-du-nez/fiche-sons-du-nez.pdf`
-- Vidéo activité : brouillon avec voix de synthèse (5 min 45), rendu par `tools/video-educative/script_nez.py`. La version finale attend la voix de Pam ; les mots seront alors calés sur ses pauses.
+- Vidéo activité : brouillon avec voix de synthèse (5 min 55), rendu par `tools/video-educative/script_nez.py`. La version finale attend la voix de Pam ; les mots seront alors calés sur ses pauses.
 
 ## Le contenu de la leçon
 
@@ -46,7 +46,7 @@ Trois sons qui passent par le nez, comme « un ». Format interactif (voir `tool
 2. Mot aux parents : deux feuilles, trois feutres (vert, rouge, jaune), des ciseaux.
 3. Dans la savane : Samba l'éléphant ; rappel du son « un ».
 4. L'astuce du nez pincé.
-5. Les trois sons, l'un après l'autre : la bouche, « à toi », les mots, les écritures.
+5. Les trois sons, l'un après l'autre : « le son … s'écrit … », la bouche, « à toi », les mots, les autres écritures.
 6. L'astuce du n déguisé en m.
 7. Le piège : banane, savane.
 8. Le voyage de Samba à travers l'Afrique.
@@ -89,67 +89,70 @@ Un seul fichier, environ deux secondes de silence entre chaque réplique. Les li
 13. Garde ton nez pincé, et dis : on.
 14. Ça fait tout drôle ! Le son on passe par ton nez. C'est un son du nez.
 15. Premier son du nez : on.
-16. Il s'écrit o, n. Ta bouche fait un rond, comme un ballon. Répète après moi : on !
-17. On l'entend dans mouton, dans ballon, et dans balafon.
-18. Le balafon, c'est un instrument d'Afrique de l'Ouest : on tape sur des lames en bois.
-19. Deuxième son du nez : an.
-20. Ta bouche s'ouvre en grand, comme chez le dentiste. Répète après moi : an !
-21. Il s'écrit a, n, comme dans maman, et dans mangue.
-22. Mais il s'écrit aussi e, n, comme dans dent, et dans vent. Et dans enfant, il y a les deux !
-23. Troisième son du nez : in.
-24. Ta bouche s'étire, comme pour un sourire. Répète après moi : in !
-25. Il s'écrit i, n, comme dans lapin, et dans matin.
-26. Et parfois a, i, n, comme dans pain, et dans main.
-27. Astuce : devant un b ou un p, le n se déguise en m.
-28. Tambour. Pompier. Timbre. Et même Samba !
-29. Attention, un piège ! S'il y a une voyelle juste après le n, le son du nez disparaît.
-30. Banane. Savane. Pince ton nez : rien ne change. Ce ne sont pas des sons du nez.
-31. Samba part en voyage à travers l'Afrique. Écoute bien le nom des pays !
-32. Au Congo et au Gabon, on entend : on.
-33. Au Soudan et en Ouganda, on entend : an.
-34. Et au Bénin, on entend : in.
-35. Debout ! C'est la danse de Samba.
-36. Si tu entends on, fais un rond avec tes bras. Si tu entends an, ouvre grand les bras. Si tu entends in, fais des oreilles de lapin.
-37. Mouton.
-38. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-39. Mouton : on ! Fais un rond !
-40. Maman.
+16. Le son on s'écrit o, n.
+17. Ta bouche fait un rond, comme un ballon. Répète après moi : on !
+18. On l'entend dans mouton, dans ballon, et dans balafon.
+19. Le balafon, c'est un instrument d'Afrique de l'Ouest : on tape sur des lames en bois.
+20. Deuxième son du nez : an.
+21. Le son an s'écrit a, n.
+22. Ta bouche s'ouvre en grand, comme chez le dentiste. Répète après moi : an !
+23. On l'entend dans maman, et dans mangue.
+24. Mais il s'écrit aussi e, n, comme dans dent, et dans vent. Et dans enfant, il y a les deux !
+25. Troisième son du nez : in.
+26. Le son in s'écrit i, n.
+27. Ta bouche s'étire, comme pour un sourire. Répète après moi : in !
+28. On l'entend dans lapin, et dans matin.
+29. Et parfois, il s'écrit a, i, n, comme dans pain, et dans main.
+30. Astuce : devant un b ou un p, le n se déguise en m.
+31. Tambour. Pompier. Timbre. Et même Samba !
+32. Attention, un piège ! S'il y a une voyelle juste après le n, le son du nez disparaît.
+33. Banane. Savane. Pince ton nez : rien ne change. Ce ne sont pas des sons du nez.
+34. Samba part en voyage à travers l'Afrique. Écoute bien le nom des pays !
+35. Au Congo et au Gabon, on entend : on.
+36. Au Soudan et en Ouganda, on entend : an.
+37. Et au Bénin, on entend : in.
+38. Debout ! C'est la danse de Samba.
+39. Si tu entends on, fais un rond avec tes bras. Si tu entends an, ouvre grand les bras. Si tu entends in, fais des oreilles de lapin.
+40. Mouton.
 41. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-42. Maman : an ! Ouvre grand les bras !
-43. Lapin.
+42. Mouton : on ! Fais un rond !
+43. Maman.
 44. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-45. Lapin : in ! Les oreilles de lapin !
-46. Tambour.
+45. Maman : an ! Ouvre grand les bras !
+46. Lapin.
 47. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-48. Tambour : an ! Ouvre grand les bras !
-49. Petit quiz ! Quel son du nez entends-tu ? Montre un doigt pour on, deux doigts pour an, trois doigts pour in.
-50. Balafon.
-51. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-52. Le son on ! Un doigt.
-53. Éléphant.
+48. Lapin : in ! Les oreilles de lapin !
+49. Tambour.
+50. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
+51. Tambour : an ! Ouvre grand les bras !
+52. Petit quiz ! Quel son du nez entends-tu ? Montre un doigt pour on, deux doigts pour an, trois doigts pour in.
+53. Balafon.
 54. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-55. Le son an ! Deux doigts.
-56. Bénin.
+55. Le son on ! Un doigt.
+56. Éléphant.
 57. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-58. Le son in ! Trois doigts.
-59. Attention, le dernier est un piège : banane.
+58. Le son an ! Deux doigts.
+59. Bénin.
 60. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
-61. Aucun ! Après le n, il y a un e. Pas de son du nez. Bien joué !
-62. Voici la phrase magique, avec tous les sons du nez : un bon pain blanc.
-63. Un. Bon. Pain. Blanc. Répète-la trois fois !
-64. C'est l'heure de l'atelier ! On fabrique le balafon des sons du nez.
-65. Sur la première feuille, dessine trois grandes lames, comme sur un balafon : une verte, une rouge, une jaune.
-66. Sur la lame verte, écris o, n. Sur la rouge, a, n. Sur la jaune, i, n.
-67. Mets sur pause, et reviens quand ton balafon est prêt.
-68. Un adulte t'aide à couper l'autre feuille en douze petites cartes.
-69. Sur chaque carte, écris un mot. Les douze mots sont sur la fiche à imprimer.
-70. Mets sur pause, le temps d'écrire tes cartes.
-71. Pose chaque carte sur la bonne lame. Ton balafon des sons du nez est prêt !
-72. Défi numéro un. Pioche une carte, lis le mot, et pose-la sur la bonne lame.
-73. Défi numéro deux. Joue du balafon : tape sur une lame, et dis tous ses mots.
-74. Défi numéro trois. Trouve un nouveau mot pour chaque lame. ON, comme pont. AN, comme maman. IN, comme matin.
-75. Et ton défi à toi : cherche un son du nez dans ton prénom, ou dans celui de quelqu'un de ta famille.
-76. Bravo ! Tu connais les sons du nez.
-77. On, comme dans mouton. An, comme dans maman. In, comme dans lapin. Et un, comme dans lundi.
-78. Dernière astuce : ce soir, apprends la phrase magique à quelqu'un de ta famille. Un bon pain blanc !
-79. À bientôt chez les Mounas !
+61. Le son in ! Trois doigts.
+62. Attention, le dernier est un piège : banane.
+63. ⏱ (silence : compte à rebours de 3 secondes à l'écran)
+64. Aucun ! Après le n, il y a un e. Pas de son du nez. Bien joué !
+65. Voici la phrase magique, avec tous les sons du nez : un bon pain blanc.
+66. Un. Bon. Pain. Blanc. Répète-la trois fois !
+67. C'est l'heure de l'atelier ! On fabrique le balafon des sons du nez.
+68. Sur la première feuille, dessine trois grandes lames, comme sur un balafon : une verte, une rouge, une jaune.
+69. Sur la lame verte, écris o, n. Sur la rouge, a, n. Sur la jaune, i, n.
+70. Mets sur pause, et reviens quand ton balafon est prêt.
+71. Un adulte t'aide à couper l'autre feuille en douze petites cartes.
+72. Sur chaque carte, écris un mot. Les douze mots sont sur la fiche à imprimer.
+73. Mets sur pause, le temps d'écrire tes cartes.
+74. Pose chaque carte sur la bonne lame. Ton balafon des sons du nez est prêt !
+75. Défi numéro un. Pioche une carte, lis le mot, et pose-la sur la bonne lame.
+76. Défi numéro deux. Joue du balafon : tape sur une lame, et dis tous ses mots.
+77. Défi numéro trois. Trouve un nouveau mot pour chaque lame. ON, comme pont. AN, comme maman. IN, comme matin.
+78. Et ton défi à toi : cherche un son du nez dans ton prénom, ou dans celui de quelqu'un de ta famille.
+79. Bravo ! Tu connais les sons du nez.
+80. On, comme dans mouton. An, comme dans maman. In, comme dans lapin. Et un, comme dans lundi.
+81. Dernière astuce : ce soir, apprends la phrase magique à quelqu'un de ta famille. Un bon pain blanc !
+82. À bientôt chez les Mounas !
