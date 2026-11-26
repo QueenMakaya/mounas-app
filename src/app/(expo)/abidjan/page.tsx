@@ -3,7 +3,13 @@ import Link from 'next/link';
 import DiamondIcon from '@/components/brand/DiamondIcon';
 import MounasLogo from '@/components/brand/MounasLogo';
 import ExpoMark from '@/components/expo/ExpoMark';
-import { COLORS, EXPO, EXPO_PAYMENT_LINK, EXPO_PLACES_TAKEN, GUARANTEE, GUARANTEE_DAYS, whatsappLink } from '@/lib/config';
+import MobileMoneyTrial from '@/components/marketing/MobileMoneyTrial';
+import { COLORS, EXPO, EXPO_PAYMENT_LINK, GUARANTEE, GUARANTEE_DAYS, TRIAL_DAYS, whatsappLink } from '@/lib/config';
+import { expoPlacesTaken } from '@/lib/expo-places';
+
+// The places left are read from Airtable (src/lib/expo-places.ts): the page is
+// rebuilt at most once a minute, so a confirmed payment shows up without a redeploy.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: `Les Mounas à Abidjan : ${EXPO.places} Familles Fondatrices`,
@@ -47,7 +53,7 @@ const INCLUDED = [
 const STEPS = [
   { n: '1', title: 'Écrivez-nous', body: `Le bouton ouvre WhatsApp avec le message « ${EXPO.keyword} » déjà prêt.` },
   { n: '2', title: 'Essayez avec votre enfant', body: 'Sa première leçon est gratuite et s’ouvre d’un simple lien : rien à télécharger.' },
-  { n: '3', title: 'Confirmez votre place', body: 'Convaincu·e ? Vous réglez, et votre famille est inscrite pour un an.' },
+  { n: '3', title: 'Confirmez votre place', body: `Convaincu·e ? Vous réglez ${EXPO.price} par Mobile Money, et votre famille est inscrite pour un an. Ou ouvrez d’abord ${TRIAL_DAYS} jours d’essai gratuit, et réglez après.` },
 ];
 
 const FAQ = [
@@ -103,12 +109,13 @@ function WhatsAppButton({
   );
 }
 
-export default function ExpoPage() {
-  const left = EXPO.places - EXPO_PLACES_TAKEN;
+export default async function ExpoPage() {
+  const taken = await expoPlacesTaken();
+  const left = EXPO.places - taken;
   const full = left <= 0;
   const placesLine = full
     ? `Les ${EXPO.places} places sont prises`
-    : EXPO_PLACES_TAKEN > 0
+    : taken > 0
       ? `Il reste ${left} place${left > 1 ? 's' : ''} sur ${EXPO.places}`
       : `${EXPO.places} places, pas une de plus`;
   const cta = full ? "M'inscrire sur la liste d'attente" : 'Réserver ma place sur WhatsApp';
@@ -272,6 +279,16 @@ export default function ExpoPage() {
 
             <div className="mt-9 flex flex-col items-center gap-3">
               <WhatsAppButton label={cta} track="Expo : WhatsApp (offre)" light />
+              {!full && (
+                <a
+                  href="#essai"
+                  data-track="Expo : essai sans carte"
+                  className="text-base font-bold underline underline-offset-4"
+                  style={{ color: COLORS.cream }}
+                >
+                  📱 Ou essayez {TRIAL_DAYS} jours gratuits d’abord, et réglez après
+                </a>
+              )}
               {EXPO_PAYMENT_LINK && !full && (
                 <a
                   href={EXPO_PAYMENT_LINK}
@@ -288,6 +305,28 @@ export default function ExpoPage() {
             </p>
           </div>
         </section>
+
+        {/* ── TRIAL FIRST, PAY AFTER (no card) ── */}
+        {!full && (
+          <section id="essai" className="scroll-mt-6 px-4 pb-16 sm:px-6">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="text-xs font-bold uppercase tracking-widest" style={{ color: COLORS.tealDark }}>
+                Sans carte bancaire
+              </p>
+              <h2 className="mt-3 text-3xl font-bold sm:text-4xl" style={{ fontFamily: 'var(--font-fraunces)' }}>
+                {TRIAL_DAYS} jours gratuits, puis {EXPO.price} pour l’année
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-base" style={{ color: 'rgba(26,26,26,0.75)' }}>
+                Votre accès s’ouvre tout de suite, sans rien payer. Vous réglez l’offre spéciale ({EXPO.price} pour un an,
+                soit {EXPO.pricePerMonth} par mois) seulement après l’essai, par Wave, Orange Money ou MTN MoMo. Sinon,
+                l’essai s’arrête tout seul.
+              </p>
+              <div className="mt-8">
+                <MobileMoneyTrial formal page="/abidjan" />
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ── HOW IT WORKS ── */}
         <section className="px-4 pb-16 sm:px-6">

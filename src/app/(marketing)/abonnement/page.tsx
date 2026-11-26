@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import DiamondIcon from '@/components/brand/DiamondIcon';
+import NoCardLink from '@/components/site/NoCardLink';
 import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
 import { safeNext } from '@/lib/session';
 
@@ -85,6 +86,7 @@ export default async function AbonnementPage({
           >
             Commencer l&apos;essai gratuit
           </a>
+          <NoCardLink />
           <Link href={loginHref} className="font-bold underline underline-offset-4" style={{ color: COLORS.purple }}>
             Déjà abonné·e ? Se connecter
           </Link>

@@ -60,6 +60,33 @@ export const GUARANTEE_DAYS = 30;
 export const GUARANTEE = `Satisfait ou remboursé ${GUARANTEE_DAYS} jours`;
 export const MONTHLY_PRICE = '10 $';
 
+// ── Essai sans carte, payé ensuite par Mobile Money (/mobile-money) ──
+// For families who can't pay by card (mostly West and Central Africa). The
+// form opens the free trial at once through the Airtable « Accès offerts »
+// table, with an end date; Pam then sends the payment details on WhatsApp.
+export const MOBILE_MONEY = {
+  /** Same names as the « Paiement » choices in « Accès offerts ». */
+  operators: ['Wave', 'Orange Money', 'MTN MoMo'],
+  /** « Offre » written on the row, so these trials are easy to filter. */
+  offer: 'Essai Mobile Money',
+  countries: [
+    "Côte d'Ivoire",
+    'Sénégal',
+    'Cameroun',
+    'Bénin',
+    'Togo',
+    'Burkina Faso',
+    'Mali',
+    'Guinée',
+    'Niger',
+    'Gabon',
+    'Congo',
+    'RD Congo',
+    'Autre pays',
+  ],
+} as const;
+export const MOBILE_MONEY_PATH = '/mobile-money';
+
 /** Build a wa.me link, optionally pre-filling the first message. */
 export function whatsappLink(message?: string): string {
   const base = WHATSAPP_NUMBER ? `https://wa.me/${WHATSAPP_NUMBER}` : 'https://wa.me/';
@@ -83,9 +110,10 @@ export const EXPO = {
 } as const;
 
 /**
- * Places already taken, updated by hand as families confirm
- * (NEXT_PUBLIC_EXPO_PLACES_TAKEN, then redeploy). The page never shows a
- * number that isn't true: at 20 the offer reads as full.
+ * Places already taken, as a floor set by hand (NEXT_PUBLIC_EXPO_PLACES_TAKEN,
+ * then redeploy). The real count comes from Airtable, one row per confirmed
+ * payment (src/lib/expo-places.ts); the page shows the larger of the two and
+ * never a number that isn't true: at 20 the offer reads as full.
  */
 export const EXPO_PLACES_TAKEN = Math.min(
   EXPO.places,
