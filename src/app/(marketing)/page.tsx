@@ -5,6 +5,7 @@ import EbookSignup from '@/components/marketing/EbookSignup';
 import NewsletterSignup from '@/components/marketing/NewsletterSignup';
 import BookingSection from '@/components/marketing/BookingSection';
 import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, whatsappLink } from '@/lib/config';
+import NoCardLink from '@/components/site/NoCardLink';
 
 export const metadata: Metadata = {
   title: 'Les Mounas : l’app pour apprendre à lire en français, 10 minutes par jour',
@@ -66,6 +67,9 @@ export default function LandingPage() {
               Essai gratuit 14 jours
             </a>
           </div>
+          <p className="mt-4">
+            <NoCardLink />
+          </p>
           <p className="mt-5 text-base font-bold" style={{ color: COLORS.tealDark }}>
             📲 Rien à télécharger : ça s&apos;ouvre ici, dans ton navigateur, sur téléphone, tablette ou ordinateur.
           </p>

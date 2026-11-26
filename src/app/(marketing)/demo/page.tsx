@@ -4,6 +4,7 @@ import { headers } from 'next/headers';
 import { startDemo } from '@/app/auth-actions';
 import { getSession } from '@/lib/auth';
 import { COLORS, GUARANTEE, STRIPE_PAYMENT_LINK, TRIAL_DAYS, whatsappLink } from '@/lib/config';
+import NoCardLink from '@/components/site/NoCardLink';
 import { DEMO_AGES, DEMO_MINUTES, demoEnabled, isDemo } from '@/lib/demo';
 import { sourceLabel } from '@/lib/demo-log';
 
@@ -179,6 +180,11 @@ export default async function DemoPage({
               </a>
             )}
           </div>
+          {!member && (
+            <p className="mt-4">
+              <NoCardLink />
+            </p>
+          )}
           <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
             Pendant la démo, rien n&apos;est enregistré sur un compte. {TRIAL_DAYS} jours gratuits ensuite, puis 10 $/mois, sans
             engagement. 🛡️ {GUARANTEE}.

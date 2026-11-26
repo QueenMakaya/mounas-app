@@ -131,3 +131,40 @@ export async function sendGuideEmail(to: string): Promise<SendResult> {
 </div>`;
   return sendEmail(to, 'Ton guide gratuit Les Mounas 📖', text, html);
 }
+
+/**
+ * Welcome email for the free trial without a card (/mobile-money): how to log
+ * in, until when, and that the Mobile Money details come on WhatsApp.
+ */
+export async function sendMobileMoneyWelcome(
+  to: string,
+  { name, until, operator }: { name: string; until: string; operator: string },
+): Promise<SendResult> {
+  const escape = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const loginUrl = `${SITE}/connexion`;
+  const hello = name ? `Bonjour ${name} !` : 'Bonjour !';
+
+  const text =
+    `${hello}\n\nTon essai gratuit Les Mounas est ouvert jusqu'au ${until} 🎉\n\n` +
+    `Pour te connecter :\n1. Ouvre ${loginUrl}\n2. Entre cette adresse : ${to}\n` +
+    `3. Tu reçois un code à 6 chiffres par email (regarde aussi dans les indésirables)\n4. Entre le code, et c'est parti !\n\n` +
+    `10 minutes par jour suffisent. Avant la fin de l'essai, Pam t'écrit sur WhatsApp pour continuer avec ${operator}. ` +
+    `Pas de carte bancaire, rien n'est prélevé sans toi.\n\nUne question ? Réponds à cet email ou écris-nous sur WhatsApp : ${whatsappLink()}\n\nÀ très vite,\nPam et Les Mounas`;
+
+  const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1A1A1A;line-height:1.55;max-width:560px">
+  <p>${escape(hello)}</p>
+  <p>Ton essai gratuit Les Mounas est ouvert <b>jusqu'au ${escape(until)}</b> 🎉</p>
+  <p><b>Pour te connecter :</b></p>
+  <ol>
+    <li>Ouvre <a href="${loginUrl}">lesmounas.school/connexion</a></li>
+    <li>Entre cette adresse : <b>${escape(to)}</b></li>
+    <li>Tu reçois un code à 6 chiffres par email (regarde aussi dans les indésirables)</li>
+    <li>Entre le code, et c'est parti !</li>
+  </ol>
+  <p><a href="${loginUrl}" style="display:inline-block;background:#5B1F8C;color:#FDF6EC;padding:12px 24px;border-radius:999px;font-weight:bold;text-decoration:none">Me connecter</a></p>
+  <p>10 minutes par jour suffisent. Avant la fin de l'essai, Pam t'écrit sur WhatsApp pour continuer avec ${escape(operator)}. Pas de carte bancaire : rien n'est prélevé sans toi.</p>
+  <p>Une question ? Réponds à cet email ou écris-nous sur <a href="${whatsappLink()}">WhatsApp</a>.</p>
+  <p>À très vite,<br>Pam et Les Mounas</p>
+</div>`;
+  return sendEmail(to, 'Ton essai gratuit Les Mounas est ouvert 🎉', text, html);
+}

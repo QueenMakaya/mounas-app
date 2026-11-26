@@ -7,6 +7,7 @@ import { track } from '@vercel/analytics';
 import { startFirstWord } from '@/app/auth-actions';
 import MounasLogo from '@/components/brand/MounasLogo';
 import { GUARANTEE, MONTHLY_PRICE, STRIPE_PAYMENT_LINK, TRIAL_DAYS } from '@/lib/config';
+import NoCardLink from '@/components/site/NoCardLink';
 import ExpoOffer from '@/components/expo/ExpoOffer';
 import { useExpoVisit } from '@/lib/expo-client';
 import { DEMO_MINUTES } from '@/lib/demo';
@@ -296,6 +297,9 @@ export default function OnboardingFlow({ access }: { access: Access }) {
                 </a>
                 <p className="mt-2 text-sm text-ink-soft">
                   Puis {MONTHLY_PRICE}/mois, sans engagement. 🛡️ {GUARANTEE}.
+                </p>
+                <p className="mt-3">
+                  <NoCardLink />
                 </p>
               </section>
             )}

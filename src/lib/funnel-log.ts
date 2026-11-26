@@ -3,7 +3,9 @@
  * sign-up path, so the daily report and the dashboard can follow it:
  *   - « Questionnaire commencé » : first answer given on /commencer;
  *   - « Questionnaire terminé »  : the parent reached the plan and went on;
- *   - « Essai gratuit cliqué »   : any link to the Stripe trial checkout.
+ *   - « Essai gratuit cliqué »   : any link to the Stripe trial checkout;
+ *   - « Essai Mobile Money demandé » : the no-card trial form was sent (logged
+ *     by the server action, src/app/mobile-money-actions.ts).
  * Whether the trial was then really started or abandoned is read from Stripe
  * (checkout sessions), not from here.
  *
@@ -31,6 +33,7 @@ export const FUNNEL_EVENTS = {
   start: 'Questionnaire commencé',
   finish: 'Questionnaire terminé',
   trial: 'Essai gratuit cliqué',
+  mobile: 'Essai Mobile Money demandé',
 } as const;
 export type FunnelEvent = keyof typeof FUNNEL_EVENTS;
 
