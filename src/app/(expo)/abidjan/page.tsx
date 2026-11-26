@@ -3,7 +3,12 @@ import Link from 'next/link';
 import DiamondIcon from '@/components/brand/DiamondIcon';
 import MounasLogo from '@/components/brand/MounasLogo';
 import ExpoMark from '@/components/expo/ExpoMark';
-import { COLORS, EXPO, EXPO_PAYMENT_LINK, EXPO_PLACES_TAKEN, GUARANTEE, GUARANTEE_DAYS, whatsappLink } from '@/lib/config';
+import { COLORS, EXPO, EXPO_PAYMENT_LINK, GUARANTEE, GUARANTEE_DAYS, whatsappLink } from '@/lib/config';
+import { expoPlacesTaken } from '@/lib/expo-places';
+
+// The places left are read from Airtable (src/lib/expo-places.ts): the page is
+// rebuilt at most once a minute, so a confirmed payment shows up without a redeploy.
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: `Les Mounas à Abidjan : ${EXPO.places} Familles Fondatrices`,
@@ -103,12 +108,13 @@ function WhatsAppButton({
   );
 }
 
-export default function ExpoPage() {
-  const left = EXPO.places - EXPO_PLACES_TAKEN;
+export default async function ExpoPage() {
+  const taken = await expoPlacesTaken();
+  const left = EXPO.places - taken;
   const full = left <= 0;
   const placesLine = full
     ? `Les ${EXPO.places} places sont prises`
-    : EXPO_PLACES_TAKEN > 0
+    : taken > 0
       ? `Il reste ${left} place${left > 1 ? 's' : ''} sur ${EXPO.places}`
       : `${EXPO.places} places, pas une de plus`;
   const cta = full ? "M'inscrire sur la liste d'attente" : 'Réserver ma place sur WhatsApp';
