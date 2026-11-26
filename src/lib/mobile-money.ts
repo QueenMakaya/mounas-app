@@ -19,7 +19,7 @@
  */
 
 import { airtableToken } from '@/lib/airtable-token';
-import { MOBILE_MONEY, TRIAL_DAYS } from '@/lib/config';
+import { EXPO, MOBILE_MONEY, TRIAL_DAYS } from '@/lib/config';
 
 const DEFAULT_GIFTS_TABLE = 'tbl0xr6jCtLuGrbQA'; // Accès offerts
 const TIMEOUT_MS = 6000;
@@ -31,6 +31,8 @@ export type MobileMoneyRequest = {
   country: string;
   operator: string;
   childAge: string;
+  /** The page the form was sent from: /mobile-money or /abidjan (QR code of the flyers). */
+  page: string;
 };
 
 export type TrialResult =
@@ -87,10 +89,11 @@ export async function openMobileMoneyTrial(req: MobileMoneyRequest): Promise<Tri
     if (await hasAnyRow(email, t)) return { ok: false, error: 'already_used' };
 
     const notes = [
-      `Essai gratuit sans carte demandé sur le site le ${frenchDate(today)}, ouvert jusqu'au ${frenchDate(until)}.`,
+      `Essai gratuit sans carte demandé sur ${req.page} le ${frenchDate(today)}, ouvert jusqu'au ${frenchDate(until)}.`,
+      `Offre annoncée : ${EXPO.price} pour un an, à payer après l'essai.`,
       `Pays : ${req.country}.`,
       req.childAge ? `Âge de l'enfant : ${req.childAge}.` : '',
-      `À faire : envoyer les détails de paiement ${req.operator} sur WhatsApp avant la fin de l'essai. Paiement reçu → repousser « Expire le », remplir « Référence paiement », changer « Offre » si besoin.`,
+      `À faire : envoyer les détails de paiement ${req.operator} (${EXPO.price}) sur WhatsApp avant la fin de l'essai. Paiement reçu → repousser « Expire le » d'un an, remplir « Référence paiement », « Offre » → « Famille Fondatrice Abidjan » si c'est une place de l'offre.`,
     ]
       .filter(Boolean)
       .join('\n');

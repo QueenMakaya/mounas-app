@@ -1,17 +1,17 @@
 import type { Metadata } from 'next';
 import MobileMoneyTrial from '@/components/marketing/MobileMoneyTrial';
-import { COLORS, GUARANTEE, TRIAL_DAYS } from '@/lib/config';
+import { COLORS, EXPO, GUARANTEE, TRIAL_DAYS } from '@/lib/config';
 
 export const metadata: Metadata = {
   title: 'Essai gratuit sans carte, Mobile Money | Les Mounas',
-  description: `Pas de carte bancaire ? Essaie Les Mounas ${TRIAL_DAYS} jours gratuitement, puis continue avec Wave, Orange Money ou MTN MoMo.`,
+  description: `Pas de carte bancaire ? Essaie Les Mounas ${TRIAL_DAYS} jours gratuitement, puis ${EXPO.price} pour un an avec Wave, Orange Money ou MTN MoMo.`,
 };
 
 const STEPS = [
   { emoji: '📝', text: 'Tu remplis ce petit formulaire : ton essai s’ouvre tout de suite.' },
   { emoji: '📧', text: 'Tu te connectes avec ton email : un code à 6 chiffres, pas de mot de passe.' },
   { emoji: '💬', text: `Avant la fin des ${TRIAL_DAYS} jours, Pam t’écrit sur WhatsApp pour continuer.` },
-  { emoji: '📱', text: 'Tu paies par Mobile Money si tu veux continuer. Sinon, l’essai s’arrête tout seul.' },
+  { emoji: '📱', text: `Tu veux continuer ? Tu paies ${EXPO.price} pour l’année par Mobile Money. Sinon, l’essai s’arrête tout seul.` },
 ];
 
 export default function MobileMoneyPage() {
@@ -34,6 +34,21 @@ export default function MobileMoneyPage() {
           Pas de carte ? Pas de souci. Essaie toute l’app avec ton enfant, et continue ensuite avec Wave, Orange Money
           ou MTN MoMo.
         </p>
+
+        <div className="mx-auto mt-8 max-w-xl rounded-3xl p-6" style={{ backgroundColor: COLORS.purple, color: COLORS.cream }}>
+          <p className="text-xs font-bold uppercase tracking-widest" style={{ color: COLORS.amber }}>
+            Offre spéciale
+          </p>
+          <p className="mt-2 text-4xl font-bold" style={{ fontFamily: 'var(--font-fraunces)' }}>
+            {EXPO.price}
+          </p>
+          <p className="mt-1 text-base" style={{ color: 'rgba(253,246,236,0.85)' }}>
+            pour un an d’accès à toute l’app, soit {EXPO.pricePerMonth} par mois.
+          </p>
+          <p className="mt-3 text-base font-bold">
+            À payer seulement après tes {TRIAL_DAYS} jours d’essai gratuit, par Wave, Orange Money ou MTN MoMo.
+          </p>
+        </div>
 
         <ol className="mx-auto mt-8 grid max-w-xl gap-3 text-left">
           {STEPS.map((s) => (

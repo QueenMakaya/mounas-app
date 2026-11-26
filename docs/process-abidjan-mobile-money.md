@@ -119,16 +119,18 @@ En attendant, la première leçon reste gratuite : https://www.lesmounas.school/
 - Relancer les familles qui ont essayé la leçon sans payer.
 - Vérifier que chaque famille inscrite s'est connectée au moins une fois (table « Familles »).
 
-## Essai gratuit sans carte (formulaire `/mobile-money`)
+## Essai gratuit sans carte, puis 30 000 FCFA pour l'année
 
-Pour toutes les familles sans carte bancaire, partout (pas seulement au salon).
-Le lien « 📱 Pas de carte bancaire ? » est sous chaque bouton « Essai gratuit »
-(accueil, démo, abonnement, fin du questionnaire).
+Le même formulaire est à deux endroits :
+- sur **`/abidjan`** (section « Sans carte bancaire », lien sous le bouton de l'offre) : c'est la page du QR code des flyers et du roll-up, rien à réimprimer ;
+- sur **`/mobile-money`**, pour toutes les autres familles sans carte : le lien « 📱 Pas de carte bancaire ? » est sous chaque bouton « Essai gratuit » du site (accueil, démo, abonnement, fin du questionnaire).
+
+Les deux affichent l'offre spéciale : **30 000 FCFA pour un an** (soit 2 500 FCFA par mois), à payer **après** les 14 jours d'essai.
 
 1. La famille remplit le formulaire : nom, email, WhatsApp, pays, âge de l'enfant, Wave / Orange Money / MTN MoMo.
 2. Le site ajoute **tout seul** une ligne dans « Accès offerts » : Actif coché, Offre **Essai Mobile Money**, « Expire le » = 14 jours (aujourd'hui compris). L'accès est ouvert tout de suite.
 3. La famille reçoit un email « comment se connecter ». Pam reçoit l'alerte « 📱 Nouvel essai Mobile Money » avec un lien WhatsApp déjà rédigé.
-4. **Avant la date « Expire le »**, envoyer le message 2 (paiement) sur WhatsApp.
+4. **Avant la date « Expire le »**, envoyer le message 2 (paiement, 30 000 FCFA) sur WhatsApp.
 5. Paiement reçu (SMS vérifié) : dans la même ligne, repousser « Expire le » (1 mois, ou 1 an pour l'offre Famille Fondatrice — dans ce cas changer aussi « Offre »), remplir « Référence paiement ».
 6. Pas de paiement : rien à faire, l'accès se ferme seul le lendemain de « Expire le ».
 

@@ -2,7 +2,7 @@
 
 import { headers } from 'next/headers';
 import { after } from 'next/server';
-import { MOBILE_MONEY } from '@/lib/config';
+import { EXPO, MOBILE_MONEY } from '@/lib/config';
 import { notifyOwner, sendMobileMoneyWelcome } from '@/lib/email';
 import type { MobileMoneyState } from '@/lib/form-state';
 import { funnelRow, logFunnel } from '@/lib/funnel-log';
@@ -26,14 +26,30 @@ export async function requestMobileMoneyTrial(_prev: MobileMoneyState, formData:
   const operatorRaw = clean(formData.get('operator'), 40);
   const childAge = clean(formData.get('childAge'), 40);
   const source = clean(formData.get('source'), 200);
+  const page = clean(formData.get('page'), 40) === '/abidjan' ? '/abidjan' : '/mobile-money';
+  // « vous » on /abidjan (trade-show parents), « tu » on the rest of the site.
+  const vous = formData.get('formal') === '1';
+  const say = (tu: string, v: string) => (vous ? v : tu);
 
-  if (!name) return { status: 'error', message: 'Indique ton prénom et ton nom.' };
+  if (!name) return { status: 'error', message: say('Indique ton prénom et ton nom.', 'Indiquez votre prénom et votre nom.') };
   if (!EMAIL_RE.test(email)) {
-    return { status: 'error', message: 'Oups, cette adresse email ne semble pas valide. C’est avec elle que tu te connecteras.' };
+    return {
+      status: 'error',
+      message: say(
+        'Oups, cette adresse email ne semble pas valide. C’est avec elle que tu te connecteras.',
+        'Cette adresse email ne semble pas valide. C’est avec elle que vous vous connecterez.',
+      ),
+    };
   }
   const digits = whatsappRaw.replace(/[^0-9]/g, '');
   if (digits.length < 8 || digits.length > 15) {
-    return { status: 'error', message: 'Indique ton numéro WhatsApp avec l’indicatif du pays (ex. +225 07 00 00 00 00).' };
+    return {
+      status: 'error',
+      message: say(
+        'Indique ton numéro WhatsApp avec l’indicatif du pays (ex. +225 07 00 00 00 00).',
+        'Indiquez votre numéro WhatsApp avec l’indicatif du pays (ex. +225 07 00 00 00 00).',
+      ),
+    };
   }
   const whatsapp = `+${digits}`;
   const operator = (MOBILE_MONEY.operators as readonly string[]).includes(operatorRaw) ? operatorRaw : MOBILE_MONEY.operators[0];
@@ -42,33 +58,43 @@ export async function requestMobileMoneyTrial(_prev: MobileMoneyState, formData:
   // Already a subscriber, or already an open access: just log in.
   const access = await findAccess(email);
   if (access.status === 'active') {
-    return { status: 'success', message: 'Tu as déjà accès à toute l’app : connecte-toi avec cette adresse.', email };
+    return {
+      status: 'success',
+      message: say('Tu as déjà accès à toute l’app : connecte-toi avec cette adresse.', 'Vous avez déjà accès à toute l’app : connectez-vous avec cette adresse.'),
+      email,
+    };
   }
 
-  const result = await openMobileMoneyTrial({ email, name, whatsapp, country: countryOk, operator, childAge });
+  const result = await openMobileMoneyTrial({ email, name, whatsapp, country: countryOk, operator, childAge, page });
 
   if (!result.ok) {
     if (result.error === 'already_used') {
       return {
         status: 'error',
-        message: 'Un essai a déjà été ouvert avec cette adresse. Écris-nous sur WhatsApp et on regarde ensemble comment continuer. 💬',
+        message: say(
+          'Un essai a déjà été ouvert avec cette adresse. Écris-nous sur WhatsApp et on regarde ensemble comment continuer. 💬',
+          'Un essai a déjà été ouvert avec cette adresse. Écrivez-nous sur WhatsApp et nous regardons ensemble comment continuer. 💬',
+        ),
       };
     }
     return {
       status: 'error',
-      message: 'Un problème est survenu de notre côté. Réessaie dans un instant, ou écris-nous sur WhatsApp.',
+      message: say(
+        'Un problème est survenu de notre côté. Réessaie dans un instant, ou écris-nous sur WhatsApp.',
+        'Un problème est survenu de notre côté. Réessayez dans un instant, ou écrivez-nous sur WhatsApp.',
+      ),
     };
   }
 
   const until = frenchDate(result.until);
   const h = await headers();
   const row = funnelRow(
-    { event: 'mobile', page: '/mobile-money', source },
+    { event: 'mobile', page, source },
     h.get('user-agent') ?? '',
     h.get('x-vercel-ip-country') ?? '',
   );
 
-  const sent = await sendMobileMoneyWelcome(email, { name: name.split(/\s+/)[0], until, operator });
+  const sent = await sendMobileMoneyWelcome(email, { name: name.split(/\s+/)[0], until, operator, vous });
 
   after(async () => {
     if (row) await logFunnel(row);
@@ -77,20 +103,27 @@ export async function requestMobileMoneyTrial(_prev: MobileMoneyState, formData:
       `Bonjour ${firstName} ! C'est Pam, des Mounas 🌱 Ton essai gratuit est ouvert jusqu'au ${until}. Est-ce que la connexion a marché ?`,
     )}`;
     await notifyOwner(`📱 Nouvel essai Mobile Money : ${name} (${countryOk})`, [
-      `${name} vient d'ouvrir un essai gratuit sans carte. Son accès est ouvert tout de suite, jusqu'au ${until} inclus.`,
+      `${name} vient d'ouvrir un essai gratuit sans carte (depuis ${page}). Son accès est ouvert tout de suite, jusqu'au ${until} inclus.`,
       `Email : ${email}`,
       `WhatsApp : ${whatsapp} (écrire : ${reply})`,
       `Pays : ${countryOk} · Paiement souhaité : ${operator}${childAge ? ` · Enfant : ${childAge}` : ''}`,
       sent.ok ? "L'email d'accueil (comment se connecter) lui a été envoyé." : "⚠️ L'email d'accueil n'est PAS parti : envoie-lui le lien de connexion sur WhatsApp.",
-      `À faire avant le ${until} : lui envoyer sur WhatsApp les détails de paiement ${operator}. Paiement reçu → dans Airtable « Accès offerts », repousser « Expire le » et remplir « Référence paiement ». Sans paiement, l'accès se ferme tout seul.`,
+      `Offre annoncée : ${EXPO.price} pour un an, à payer après l'essai.`,
+      `À faire avant le ${until} : lui envoyer sur WhatsApp les détails de paiement ${operator} (${EXPO.price}). Paiement reçu → dans Airtable « Accès offerts », repousser « Expire le » d'un an, mettre « Offre » sur « Famille Fondatrice Abidjan » si c'est une place de l'offre, et remplir « Référence paiement ». Sans paiement, l'accès se ferme tout seul.`,
     ]);
   });
 
   return {
     status: 'success',
     message: sent.ok
-      ? `C’est ouvert ! Ton essai gratuit dure jusqu’au ${until}. On vient de t’envoyer un email pour te connecter.`
-      : `C’est ouvert ! Ton essai gratuit dure jusqu’au ${until}. Connecte-toi avec ton adresse email.`,
+      ? say(
+          `C’est ouvert ! Ton essai gratuit dure jusqu’au ${until}. On vient de t’envoyer un email pour te connecter.`,
+          `C’est ouvert ! Votre essai gratuit dure jusqu’au ${until}. Nous venons de vous envoyer un email pour vous connecter.`,
+        )
+      : say(
+          `C’est ouvert ! Ton essai gratuit dure jusqu’au ${until}. Connecte-toi avec ton adresse email.`,
+          `C’est ouvert ! Votre essai gratuit dure jusqu’au ${until}. Connectez-vous avec votre adresse email.`,
+        ),
     email,
     until,
   };

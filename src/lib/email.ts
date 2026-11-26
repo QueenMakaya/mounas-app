@@ -8,7 +8,7 @@
  * reports `not_configured`.
  */
 
-import { whatsappLink } from '@/lib/config';
+import { EXPO, whatsappLink } from '@/lib/config';
 
 const DEFAULT_FROM = 'Les Mounas <contact@lesmounas.school>';
 
@@ -133,38 +133,56 @@ export async function sendGuideEmail(to: string): Promise<SendResult> {
 }
 
 /**
- * Welcome email for the free trial without a card (/mobile-money): how to log
- * in, until when, and that the Mobile Money details come on WhatsApp.
+ * Welcome email for the free trial without a card (/mobile-money and the
+ * /abidjan offer): how to log in, until when, and the yearly price paid by
+ * Mobile Money after the trial. « vous » when the form came from /abidjan.
  */
 export async function sendMobileMoneyWelcome(
   to: string,
-  { name, until, operator }: { name: string; until: string; operator: string },
+  { name, until, operator, vous = false }: { name: string; until: string; operator: string; vous?: boolean },
 ): Promise<SendResult> {
   const escape = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const say = (tu: string, v: string) => (vous ? v : tu);
   const loginUrl = `${SITE}/connexion`;
   const hello = name ? `Bonjour ${name} !` : 'Bonjour !';
+  const offer = `${EXPO.price} pour un an`;
+
+  const lines = {
+    open: say('Ton essai gratuit Les Mounas est ouvert', 'Votre essai gratuit Les Mounas est ouvert'),
+    how: say('Pour te connecter :', 'Pour vous connecter :'),
+    step1: say('Ouvre', 'Ouvrez'),
+    step2: say('Entre cette adresse :', 'Entrez cette adresse :'),
+    step3: say(
+      'Tu reçois un code à 6 chiffres par email (regarde aussi dans les indésirables)',
+      'Vous recevez un code à 6 chiffres par email (regardez aussi dans les indésirables)',
+    ),
+    step4: say("Entre le code, et c'est parti !", "Entrez le code, et c'est parti !"),
+    after: say(
+      `10 minutes par jour suffisent. Tu ne paies rien pendant l'essai. Pour continuer ensuite, l'offre spéciale est à ${offer} (soit ${EXPO.pricePerMonth} par mois), à payer après l'essai par ${operator} : Pam t'écrit sur WhatsApp avant la fin. Pas de carte bancaire, rien n'est prélevé sans toi.`,
+      `10 minutes par jour suffisent. Vous ne payez rien pendant l'essai. Pour continuer ensuite, l'offre spéciale est à ${offer} (soit ${EXPO.pricePerMonth} par mois), à régler après l'essai par ${operator} : Pam vous écrit sur WhatsApp avant la fin. Pas de carte bancaire, rien n'est prélevé sans vous.`,
+    ),
+    question: say('Une question ? Réponds à cet email ou écris-nous sur', 'Une question ? Répondez à cet email ou écrivez-nous sur'),
+  };
 
   const text =
-    `${hello}\n\nTon essai gratuit Les Mounas est ouvert jusqu'au ${until} 🎉\n\n` +
-    `Pour te connecter :\n1. Ouvre ${loginUrl}\n2. Entre cette adresse : ${to}\n` +
-    `3. Tu reçois un code à 6 chiffres par email (regarde aussi dans les indésirables)\n4. Entre le code, et c'est parti !\n\n` +
-    `10 minutes par jour suffisent. Avant la fin de l'essai, Pam t'écrit sur WhatsApp pour continuer avec ${operator}. ` +
-    `Pas de carte bancaire, rien n'est prélevé sans toi.\n\nUne question ? Réponds à cet email ou écris-nous sur WhatsApp : ${whatsappLink()}\n\nÀ très vite,\nPam et Les Mounas`;
+    `${hello}\n\n${lines.open} jusqu'au ${until} 🎉\n\n` +
+    `${lines.how}\n1. ${lines.step1} ${loginUrl}\n2. ${lines.step2} ${to}\n3. ${lines.step3}\n4. ${lines.step4}\n\n` +
+    `${lines.after}\n\n${lines.question} WhatsApp : ${whatsappLink()}\n\nÀ très vite,\nPam et Les Mounas`;
 
   const html = `<div style="font-family:Arial,sans-serif;font-size:15px;color:#1A1A1A;line-height:1.55;max-width:560px">
   <p>${escape(hello)}</p>
-  <p>Ton essai gratuit Les Mounas est ouvert <b>jusqu'au ${escape(until)}</b> 🎉</p>
-  <p><b>Pour te connecter :</b></p>
+  <p>${lines.open} <b>jusqu'au ${escape(until)}</b> 🎉</p>
+  <p><b>${lines.how}</b></p>
   <ol>
-    <li>Ouvre <a href="${loginUrl}">lesmounas.school/connexion</a></li>
-    <li>Entre cette adresse : <b>${escape(to)}</b></li>
-    <li>Tu reçois un code à 6 chiffres par email (regarde aussi dans les indésirables)</li>
-    <li>Entre le code, et c'est parti !</li>
+    <li>${lines.step1} <a href="${loginUrl}">lesmounas.school/connexion</a></li>
+    <li>${lines.step2} <b>${escape(to)}</b></li>
+    <li>${lines.step3}</li>
+    <li>${lines.step4}</li>
   </ol>
   <p><a href="${loginUrl}" style="display:inline-block;background:#5B1F8C;color:#FDF6EC;padding:12px 24px;border-radius:999px;font-weight:bold;text-decoration:none">Me connecter</a></p>
-  <p>10 minutes par jour suffisent. Avant la fin de l'essai, Pam t'écrit sur WhatsApp pour continuer avec ${escape(operator)}. Pas de carte bancaire : rien n'est prélevé sans toi.</p>
-  <p>Une question ? Réponds à cet email ou écris-nous sur <a href="${whatsappLink()}">WhatsApp</a>.</p>
+  <p>${escape(lines.after)}</p>
+  <p>${lines.question} <a href="${whatsappLink()}">WhatsApp</a>.</p>
   <p>À très vite,<br>Pam et Les Mounas</p>
 </div>`;
-  return sendEmail(to, 'Ton essai gratuit Les Mounas est ouvert 🎉', text, html);
+  return sendEmail(to, say('Ton essai gratuit Les Mounas est ouvert 🎉', 'Votre essai gratuit Les Mounas est ouvert 🎉'), text, html);
 }

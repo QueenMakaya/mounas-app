@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useActionState, useSyncExternalStore } from 'react';
 import { requestMobileMoneyTrial } from '@/app/mobile-money-actions';
-import { COLORS, MOBILE_MONEY, whatsappLink } from '@/lib/config';
+import { COLORS, EXPO, MOBILE_MONEY, whatsappLink } from '@/lib/config';
 import { initialMobileMoneyState } from '@/lib/form-state';
 
 const inputClass = 'w-full rounded-2xl px-4 py-3 text-base focus:outline-none focus:ring-2';
@@ -22,10 +22,42 @@ const noSubscribe = () => () => {};
 
 const AGES = ['0–2 ans', '3–4 ans', '5–6 ans', '7–8 ans', '9 ans et +'];
 
-/** The no-card trial form on /mobile-money. */
-export default function MobileMoneyTrial() {
+/** Words that change between « tu » (the site) and « vous » (/abidjan). */
+const TEXT = {
+  tu: {
+    loginWith: 'Connecte-toi avec',
+    codeHint: 'tu reçois un code à 6 chiffres par email (regarde aussi dans les indésirables).',
+    after: `Avant la fin de l’essai, Pam t’écrit sur WhatsApp pour payer l’année (${EXPO.price}) par Mobile Money.`,
+    name: 'Ton prénom et ton nom',
+    email: 'Ton adresse email',
+    emailPlaceholder: 'ton@email.com',
+    emailHint: 'C’est avec elle que tu te connectes : ton code d’entrée arrive par email.',
+    whatsapp: 'Ton numéro WhatsApp',
+    country: 'Ton pays',
+    operator: 'Pour payer après l’essai, tu préfères :',
+  },
+  vous: {
+    loginWith: 'Connectez-vous avec',
+    codeHint: 'vous recevez un code à 6 chiffres par email (regardez aussi dans les indésirables).',
+    after: `Avant la fin de l’essai, Pam vous écrit sur WhatsApp pour régler l’année (${EXPO.price}) par Mobile Money.`,
+    name: 'Votre prénom et votre nom',
+    email: 'Votre adresse email',
+    emailPlaceholder: 'votre@email.com',
+    emailHint: 'C’est avec elle que vous vous connectez : votre code d’entrée arrive par email.',
+    whatsapp: 'Votre numéro WhatsApp',
+    country: 'Votre pays',
+    operator: 'Pour régler après l’essai, vous préférez :',
+  },
+} as const;
+
+/**
+ * The no-card trial form: /mobile-money (« tu ») and the offer of /abidjan
+ * (« vous »), the page behind the QR code of the flyers and the roll-up.
+ */
+export default function MobileMoneyTrial({ formal = false, page = '/mobile-money' }: { formal?: boolean; page?: string }) {
   const [state, action, pending] = useActionState(requestMobileMoneyTrial, initialMobileMoneyState);
   const source = useSyncExternalStore(noSubscribe, visitSource, () => '');
+  const t = formal ? TEXT.vous : TEXT.tu;
 
   if (state.status === 'success' && state.email) {
     return (
@@ -37,8 +69,7 @@ export default function MobileMoneyTrial() {
           {state.message}
         </p>
         <p className="mt-3 text-base" style={{ color: 'rgba(26,26,26,0.75)' }}>
-          Connecte-toi avec <b>{state.email}</b> : tu reçois un code à 6 chiffres par email (regarde aussi dans les
-          indésirables).
+          {t.loginWith} <b>{state.email}</b> : {t.codeHint}
         </p>
         <Link
           href="/connexion?next=/app"
@@ -48,7 +79,7 @@ export default function MobileMoneyTrial() {
           Me connecter maintenant
         </Link>
         <p className="mt-4 text-sm" style={{ color: 'rgba(26,26,26,0.7)' }}>
-          Avant la fin de l’essai, Pam t’écrit sur WhatsApp pour continuer par Mobile Money.
+          {t.after}
         </p>
       </div>
     );
@@ -57,6 +88,8 @@ export default function MobileMoneyTrial() {
   return (
     <form action={action} className="mx-auto flex w-full max-w-md flex-col gap-4 rounded-[28px] bg-white p-6 shadow-sm">
       <input type="hidden" name="source" value={source} />
+      <input type="hidden" name="page" value={page} />
+      {formal && <input type="hidden" name="formal" value="1" />}
       {/* Left empty by people; robots fill it in. */}
       <div aria-hidden="true" className="hidden">
         <label>
@@ -67,14 +100,14 @@ export default function MobileMoneyTrial() {
 
       <div>
         <label htmlFor="mm-name" className={labelClass} style={{ color: COLORS.ink }}>
-          Ton prénom et ton nom
+          {t.name}
         </label>
         <input id="mm-name" name="name" required autoComplete="name" className={inputClass} style={inputStyle} />
       </div>
 
       <div>
         <label htmlFor="mm-email" className={labelClass} style={{ color: COLORS.ink }}>
-          Ton adresse email
+          {t.email}
         </label>
         <input
           id="mm-email"
@@ -84,18 +117,18 @@ export default function MobileMoneyTrial() {
           autoComplete="email"
           autoCapitalize="none"
           spellCheck={false}
-          placeholder="ton@email.com"
+          placeholder={t.emailPlaceholder}
           className={inputClass}
           style={inputStyle}
         />
         <p className="mt-1 text-left text-xs" style={{ color: 'rgba(26,26,26,0.65)' }}>
-          C’est avec elle que tu te connectes : ton code d’entrée arrive par email.
+          {t.emailHint}
         </p>
       </div>
 
       <div>
         <label htmlFor="mm-whatsapp" className={labelClass} style={{ color: COLORS.ink }}>
-          Ton numéro WhatsApp
+          {t.whatsapp}
         </label>
         <input
           id="mm-whatsapp"
@@ -112,7 +145,7 @@ export default function MobileMoneyTrial() {
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="mm-country" className={labelClass} style={{ color: COLORS.ink }}>
-            Ton pays
+            {t.country}
           </label>
           <select id="mm-country" name="country" required defaultValue="" className={inputClass} style={inputStyle}>
             <option value="" disabled>
@@ -142,7 +175,7 @@ export default function MobileMoneyTrial() {
 
       <fieldset>
         <legend className={labelClass} style={{ color: COLORS.ink }}>
-          Pour payer ensuite, tu préfères :
+          {t.operator}
         </legend>
         <div className="flex flex-wrap gap-2">
           {MOBILE_MONEY.operators.map((op, i) => (
