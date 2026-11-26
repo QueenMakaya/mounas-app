@@ -12,6 +12,19 @@ la redire juste après, c'est la dernière prise qui compte.
 
 ---
 
+## 0. À refaire en priorité : ÉCHO et CHORALE (26 nov.)
+
+Dans le mot ÉCHO, « ch » se dit **k** (é-ko), pas « ch ». Le clip actuel (`mots/echo.mp3`) et la syllabe « cho » (`syllabes/cho.mp3`) disent « ch ». Le mot est caché dans l'app (Statut « À produire » dans Airtable) tant que ce n'est pas refait.
+
+À enregistrer :
+
+1. **ÉCHO** : « écho » (é-ko), puis la syllabe **« ko »** pour la syllabe « cho » de ce mot.
+2. **CHORALE** : même piège (« ko-ral »), à vérifier à l'écoute de `mots/chorale.mp3`.
+
+Une fois refait : remettre le Statut d'ÉCHO sur « Prêt » dans Airtable.
+
+---
+
 ## 1. Leçon du Y : fait (18 nov.)
 
 ## 2. Les échecs de Mounaville : reste 8 textes (1 min)
