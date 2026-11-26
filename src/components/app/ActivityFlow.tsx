@@ -7,6 +7,7 @@ import type { Activity } from '@/lib/airtable';
 import { levelLabel } from '@/lib/levels';
 import { currentStreak, isCompletedToday, learnedWords, localDate, markCompleted } from '@/lib/progress';
 import { useSpeech } from '@/lib/useSpeech';
+import { syllableSaid } from '@/lib/voice-clips';
 import { SOUNDS, wordSounds, type Sound } from '@/lib/phonics';
 import { playChime } from '@/lib/chime';
 import SyllableWord, { SYLLABLE_COLORS, syllableParts } from '@/components/app/SyllableWord';
@@ -1244,7 +1245,7 @@ function SyllableClap({ step, activity: a, speak, onSuccess }: { step: StepDef; 
   const said = Number(guess);
 
   const clap = (i: number) => {
-    speak(parts[i], 0.7);
+    speak(syllableSaid(a.frenchWord, parts[i]), 0.7);
     if (claps.includes(i)) return;
     setClaps([...claps, i]);
     if (claps.length + 1 >= total) onSuccess();

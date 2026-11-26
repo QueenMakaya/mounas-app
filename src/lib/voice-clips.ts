@@ -206,3 +206,18 @@ export function clipsFor(text: string, sound?: string): string[] | undefined {
   const parts = clipKey(text).split(' ').map(clipFor);
   return parts.every(Boolean) ? (parts as string[]) : undefined;
 }
+
+/**
+ * A syllable whose spelling hides its sound: the « cho » of ÉCHO and CHORALE
+ * is said « ko », not « cho » as in CHOCOLAT. Keyed by the word, then the
+ * syllable as written in Airtable.
+ */
+const SYLLABLE_SAID: Record<string, Record<string, string>> = {
+  écho: { cho: 'ko' },
+  chorale: { cho: 'ko' },
+};
+
+/** What to read aloud for `syllable` when it is clapped inside `word`. */
+export function syllableSaid(word: string, syllable: string): string {
+  return SYLLABLE_SAID[clipKey(word)]?.[clipKey(syllable)] ?? syllable;
+}

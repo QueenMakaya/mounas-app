@@ -20,6 +20,9 @@ Dans le mot ÉCHO, « ch » se dit **k** (é-ko), pas « ch ». Le clip actuel (
 
 1. **ÉCHO** : « écho » (é-ko), puis la syllabe **« ko »** pour la syllabe « cho » de ce mot.
 2. **CHORALE** : même piège (« ko-ral »), à vérifier à l'écoute de `mots/chorale.mp3`.
+3. **« Nouveau record ! »** (calcul) : seul texte fixe de l'app sans enregistrement.
+
+La syllabe « cho » d'ÉCHO et de CHORALE joue maintenant ton « ko » (`syllableSaid`, `src/lib/voice-clips.ts`) : seul le mot entier est à refaire.
 
 Une fois refait : remettre le Statut d'ÉCHO sur « Prêt » dans Airtable.
 
