@@ -93,12 +93,12 @@ export function whatsappLink(message?: string): string {
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
 }
 
-// ── Abidjan (/abidjan, first shown at the Africa Expo) ──
+// ── Abidjan (/abidjan, first shown at the Abidjan Week-end Expo) ──
 // The launch offer: one year, paid once, for the first families who write on
 // WhatsApp. Everything the page and the printed material promise lives here.
 export const EXPO = {
   /** Shown at the top of the page during an event; empty both once it is over and the page stays valid. */
-  event: 'Africa Expo Abidjan' as string,
+  event: 'Abidjan Week-end Expo' as string,
   dates: '28 et 29 novembre' as string,
   /** Places in the « Familles Fondatrices » offer. */
   places: 20,
