@@ -9,7 +9,7 @@
 | 1 | Échecs (fin) + le son « oin » | 9 | 1 min |
 | 2 | Missions | 80 énoncés + 80 variantes | 15 min |
 | 3 | Phrases d'exemple | 181 | 10 min |
-| 4 | Comptines | 155 comptines, 717 lignes | 40 min |
+| 4 | Comptines | 156 comptines, 722 lignes | 40 min |
 
 ---
 
@@ -701,7 +701,7 @@ Une phrase à la fois. Le mot en gras est seulement un repère : ne le dis pas.
 
 ---
 
-## Partie 4 · Les comptines (155)
+## Partie 4 · Les comptines (156)
 
 L'app les lit **ligne par ligne** : 1 s de silence entre deux lignes, 3 s entre deux comptines. Fais 3 fichiers : A à F, G à O, P à Z. Ne dis pas les titres.
 
@@ -1895,6 +1895,14 @@ Tu galopes dans le vent,
 Tes rayures, une, deux, trois,  
 Il n'y a qu'un zèbre comme toi !  
 
+
+**156. ARAIGNÉE** (ajoutée le 23 nov.)
+
+A-rai-gnée, a-rai-gnée,  
+Tu tisses ta toile toute la journée,  
+Un fil par-ci, un fil par-là,  
+Comme Anansi, tu ne t'arrêtes pas !  
+(faire grimper ses doigts comme une araignée)
 
 ---
 

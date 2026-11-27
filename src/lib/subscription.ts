@@ -12,7 +12,8 @@
  * Access = ANY subscription of ANY customer with that email is `active` or
  * `trialing`, whatever the price, so the founding members keep access.
  * Emails listed in ACCESS_EMAILS, or ticked in the Airtable « Accès offerts »
- * table, always have access (testing, gifted access).
+ * table, have access too (testing, gifted access, families who paid by
+ * Mobile Money), until the row's « Expire le » date when it has one.
  */
 
 import { airtableToken } from '@/lib/airtable-token';
@@ -153,11 +154,23 @@ function isAllowlisted(email: string): boolean {
 }
 
 /**
- * Gifted access managed in Airtable: the « Accès offerts » table (same base as
- * the families), one row per email, « Actif » ticked. Adding a row gives
- * access at the next login, with no redeploy. Any failure counts as « no ».
+ * Gifted or paid-outside-Stripe access managed in Airtable: the « Accès
+ * offerts » table (same base as the families), one row per email, « Actif »
+ * ticked. Adding a row gives access at the next login, with no redeploy.
+ * « Expire le » (optional) is the last day of access: empty means no limit,
+ * and a past date refuses the login without anyone unticking « Actif »
+ * (3 months offered, one year paid by Mobile Money). Any failure counts as « no ».
  */
 const DEFAULT_GIFTS_TABLE = 'tbl0xr6jCtLuGrbQA'; // Accès offerts
+const GIFT_EXPIRY_FIELD = 'Expire le';
+
+/** The last day still counts, wherever the family lives: UTC-12 is the latest "today". */
+function giftStillValid(lastDay: unknown, now = Date.now()): boolean {
+  if (typeof lastDay !== 'string' || !/^\d{4}-\d{2}-\d{2}/.test(lastDay)) return true;
+  const today = new Date(now - 12 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  return lastDay.slice(0, 10) >= today;
+}
+
 async function isGifted(email: string): Promise<boolean> {
   const token = airtableToken();
   const baseId = process.env.AIRTABLE_BASE_ID;
@@ -166,16 +179,21 @@ async function isGifted(email: string): Promise<boolean> {
   const safe = email.trim().toLowerCase().replace(/["\\]/g, '');
   const formula = `AND({Actif}, LOWER(TRIM({Email})) = "${safe}")`;
   try {
+    // The expiry is checked here, not in the formula: a formula naming a field
+    // that is missing fails the whole request, and would lock everyone out.
     const res = await fetch(
-      `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(table)}?maxRecords=1&filterByFormula=${encodeURIComponent(formula)}`,
+      `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(table)}?maxRecords=10&filterByFormula=${encodeURIComponent(formula)}`,
       { headers: { Authorization: `Bearer ${token}` }, cache: 'no-store' },
     );
     if (!res.ok) {
       console.error(`[subscription] Airtable gifts responded ${res.status}: ${await res.text().catch(() => '')}`);
       return false;
     }
-    const data = (await res.json()) as { records?: unknown[] };
-    return (data.records?.length ?? 0) > 0;
+    const data = (await res.json()) as { records?: { fields?: Record<string, unknown> }[] };
+    const rows = data.records ?? [];
+    const valid = rows.some((r) => giftStillValid(r.fields?.[GIFT_EXPIRY_FIELD]));
+    if (rows.length > 0 && !valid) console.info('[subscription] gifted access found, but past its « Expire le » date');
+    return valid;
   } catch (err) {
     console.error('[subscription] Airtable gifts request failed:', err);
     return false;

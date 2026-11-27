@@ -13,3 +13,8 @@ export type FormState = {
 };
 
 export const initialFormState: FormState = { status: 'idle', message: '' };
+
+/** The Mobile Money trial form: on success, the email and the last day of the trial. */
+export type MobileMoneyState = FormState & { email?: string; until?: string };
+
+export const initialMobileMoneyState: MobileMoneyState = { status: 'idle', message: '' };

@@ -60,7 +60,10 @@ export default function FindWord({ activity: a, library, canSpeak, speak, onSucc
               type="button"
               onClick={() => pick(w, i)}
               style={{ fontFamily: 'var(--font-read)' }}
-              className={`relative min-h-16 rounded-2xl bg-white px-3 py-3 text-3xl font-bold text-ink shadow-[0_4px_0_rgba(26,26,26,0.15)] ring-1 ring-ink/10 active:translate-y-1 active:shadow-none ${
+              className={`relative min-h-16 min-w-0 rounded-2xl bg-white px-2 py-3 font-bold leading-tight [overflow-wrap:anywhere] sm:px-3 sm:text-3xl ${
+                // Two columns on a phone: a long word is written smaller so it stays in its card.
+                w.length > 10 ? 'text-lg' : w.length > 7 ? 'text-2xl' : 'text-3xl'
+              } text-ink shadow-[0_4px_0_rgba(26,26,26,0.15)] ring-1 ring-ink/10 active:translate-y-1 active:shadow-none ${
                 tries.shake(i) ? 'animate-shake ring-2 ring-mred' : ''
               } ${right ? 'animate-pop ring-4 ring-[#2D9B6F]' : ''} ${found && !right ? 'opacity-30' : ''}`}
             >

@@ -1372,7 +1372,6 @@ function ReadItAlone({
   mode,
   onModeChange,
 }: Pick<BodyProps, 'step' | 'activity' | 'attempt' | 'setAttempt' | 'speak' | 'canSpeak' | 'revealed' | 'onReveal' | 'mode' | 'onModeChange'>) {
-  const [tiles, setTiles] = useState(false);
   const listen = mode === 'ecoute';
   return (
     <>
@@ -1390,29 +1389,16 @@ function ReadItAlone({
           onModeChange={onModeChange}
           extra={
             listen && (
-              <div className="mt-5">
-                {tiles ? (
-                  <div className="animate-rise rounded-3xl bg-white/70 p-4 ring-1 ring-ink/5">
-                    <BuildTiles
-                      activity={a}
-                      canSpeak={canSpeak}
-                      speak={speak}
-                      onDone={() => {
-                        setAttempt('alone');
-                        onReveal();
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setTiles(true)}
-                    className="min-h-11 rounded-full bg-white px-5 font-bold text-ink ring-1 ring-ink/15 active:scale-95"
-                  >
-                    🔤 Avec les étiquettes
-                  </button>
-                )}
-              </div>
+              <ListenTools
+                activity={a}
+                canSpeak={canSpeak}
+                speak={speak}
+                revealed={revealed}
+                onSpelled={() => {
+                  setAttempt('alone');
+                  onReveal();
+                }}
+              />
             )
           }
         />
@@ -1421,7 +1407,20 @@ function ReadItAlone({
             <p className="animate-rise mt-6 text-sm font-extrabold uppercase tracking-[0.14em] text-mred" style={{ animationDelay: '0.6s' }}>
               {listen ? '🧐 Alors, c’était bien écrit ?' : '👀 Lis-le tout seul !'}
             </p>
-            <div className="mx-auto mt-7 flex max-w-sm flex-col gap-2 sm:flex-row">
+            {/* Checking is not answering: the word is said, nothing is recorded yet. */}
+            {canSpeak && (
+              <div className="mt-4 flex flex-col items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => speak(a.frenchWord, 0.8)}
+                  className="inline-flex min-h-12 items-center gap-2 rounded-full bg-white px-5 font-extrabold text-ink ring-1 ring-ink/15 active:scale-95"
+                >
+                  🔈 {listen ? 'Réécouter le mot' : 'On vérifie : écouter le mot'}
+                </button>
+                {!listen && <p className="text-sm font-bold text-ink-soft">Ton enfant lit d’abord, puis on écoute pour vérifier.</p>}
+              </div>
+            )}
+            <div className="mx-auto mt-5 flex max-w-sm flex-col gap-2 sm:flex-row">
               <button
                 type="button"
                 onClick={() => setAttempt('alone')}
@@ -1443,28 +1442,44 @@ function ReadItAlone({
           </>
         ) : (
           <div className="animate-rise">
-            {attempt === 'alone' && (
-              <p className="mt-4 font-display text-xl font-bold text-[#2D9B6F]" aria-live="polite">
-                {listen ? 'Bravo, tu l’as écrit tout seul ! 🌟' : 'Bravo, tu l’as lu tout seul ! 🌟'}
-              </p>
-            )}
+            <p
+              className={`mt-4 font-display text-xl font-bold ${attempt === 'alone' ? 'text-[#2D9B6F]' : 'text-[#1D6FA4]'}`}
+              aria-live="polite"
+            >
+              {attempt === 'alone'
+                ? listen
+                  ? 'Bravo, tu l’as écrit tout seul ! 🌟'
+                  : 'Bravo, tu l’as lu tout seul ! 🌟'
+                : listen
+                  ? '🤝 On regarde ensemble : écoute le mot et compare lettre par lettre.'
+                  : '🤝 On le lit ensemble : écoute le mot, puis redis-le.'}
+            </p>
             {a.pronunciation && <p className="mt-3 text-lg italic text-mpurple">{a.pronunciation}</p>}
             <div className="mt-4 flex justify-center">
               <SpeakButton text={a.frenchWord} label="Écouter le mot" tone={attempt === 'alone' ? 'soft' : 'solid'} />
             </div>
+            {/* A wrong tap must not stick: the parent can answer again. */}
+            <button
+              type="button"
+              onClick={() => setAttempt(null)}
+              className="mt-4 min-h-11 rounded-full px-4 text-sm font-bold text-ink-soft underline underline-offset-4 hover:text-ink"
+            >
+              ↩ Changer ma réponse
+            </button>
           </div>
         )}
       </Stage>
       <ParentTip>
         {listen ? (
           <>
-            Ton enfant connaît déjà ce mot : cette fois, il l’<strong>écoute</strong> et l’épelle avec les sons (« sss », « ooo »…), à voix haute,
-            avec les étiquettes ou sur une feuille. Ensuite, il retourne les cartes pour vérifier tout seul.
+            Ton enfant connaît déjà ce mot : cette fois, il l’<strong>écoute</strong> et l’écrit avec le doigt sur l’ardoise, en disant les sons
+            (« sss », « ooo »…), ou il l’épelle avec les étiquettes. Quand il vérifie, son mot reste affiché juste sous les cartes pour comparer.
           </>
         ) : (
           <>
             Laisse ton enfant toucher les cartes. Une fois le mot découvert, <strong>ne le dis pas</strong> : il essaie de le lire tout seul.
-            S’il bloque, les indices aident, ou lisez-le ensemble : les syllabes et les sons viennent juste après.
+            Ensuite, « On vérifie » dit le mot, et tu choisis : lu tout seul, ou on le lit ensemble (tu peux changer ta réponse).
+            S’il bloque, les indices aident : les syllabes et les sons viennent juste après.
           </>
         )}
       </ParentTip>
@@ -1475,6 +1490,92 @@ function ReadItAlone({
         </aside>
       )}
     </>
+  );
+}
+
+/**
+ * « J'écoute »: what the child spells the heard word with. The slate (write
+ * with a finger, the default) or the sound tiles. The slate stays on screen
+ * once the cards are turned, right under them, so the child compares his own
+ * word with the model instead of keeping a sheet of paper next to the phone.
+ */
+function ListenTools({
+  activity: a,
+  canSpeak,
+  speak,
+  revealed,
+  onSpelled,
+}: {
+  activity: Activity;
+  canSpeak: boolean;
+  speak: BodyProps['speak'];
+  revealed: boolean;
+  /** The word was rebuilt with the tiles: the cards turn. */
+  onSpelled: () => void;
+}) {
+  const canvas = useRef<DrawingCanvasHandle>(null);
+  const [tool, setTool] = useState<'ardoise' | 'etiquettes'>('ardoise');
+  const [strokes, setStrokes] = useState(0);
+  // Checked without writing on the slate (tiles, or real paper): nothing to compare.
+  if (revealed && strokes === 0) return null;
+  const slate = revealed || tool === 'ardoise';
+  return (
+    <div className="mt-5">
+      {revealed ? (
+        <p className="mb-2 text-sm font-extrabold uppercase tracking-[0.14em] text-ink-soft">✍️ Ton mot : compare avec les cartes</p>
+      ) : (
+        <div role="radiogroup" aria-label="Comment écrire le mot" className="mx-auto mb-3 flex w-fit rounded-full bg-white p-1 ring-1 ring-ink/10">
+          {(
+            [
+              ['ardoise', '✍️ J’écris ici'],
+              ['etiquettes', '🔤 Les étiquettes'],
+            ] as const
+          ).map(([value, label]) => (
+            <button
+              key={value}
+              type="button"
+              role="radio"
+              aria-checked={tool === value}
+              onClick={() => setTool(value)}
+              className={`min-h-11 rounded-full px-4 text-sm font-extrabold transition-colors ${tool === value ? 'bg-ink text-cream shadow-sm' : 'text-ink-soft hover:text-ink'}`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+      {/* Kept mounted (only hidden) so the writing survives a look at the tiles. */}
+      <div className={slate ? '' : 'hidden'}>
+        <div className={`overflow-hidden rounded-3xl bg-white ring-1 ring-ink/10 ${revealed ? 'pointer-events-none' : ''}`}>
+          <DrawingCanvas ref={canvas} height={170} paper="seyes" lineGap={14} size={7} onChange={setStrokes} />
+        </div>
+        {!revealed && (
+          <div className="mt-2 flex justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => canvas.current?.undo()}
+              disabled={strokes === 0}
+              className="min-h-11 rounded-full bg-white px-4 font-bold text-ink ring-1 ring-ink/15 disabled:opacity-40"
+            >
+              ↶ Annuler
+            </button>
+            <button
+              type="button"
+              onClick={() => canvas.current?.clear()}
+              disabled={strokes === 0}
+              className="min-h-11 rounded-full bg-white px-4 font-bold text-ink ring-1 ring-ink/15 disabled:opacity-40"
+            >
+              🗑️ Effacer
+            </button>
+          </div>
+        )}
+      </div>
+      {!revealed && tool === 'etiquettes' && (
+        <div className="animate-rise rounded-3xl bg-white/70 p-4 ring-1 ring-ink/5">
+          <BuildTiles activity={a} canSpeak={canSpeak} speak={speak} onDone={onSpelled} />
+        </div>
+      )}
+    </div>
   );
 }
 
