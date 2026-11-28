@@ -39,6 +39,17 @@ function paywall(req: NextRequest): NextResponse {
 export async function proxy(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
 
+  // 0. /Abidjan, /ABIDJAN… as people type the printed address. An exact,
+  // case-sensitive check: next.config redirects ignore case and would loop.
+  if (!pathname.startsWith('/app')) {
+    if (pathname !== '/abidjan' && pathname.toLowerCase() === '/abidjan') {
+      const url = req.nextUrl.clone();
+      url.pathname = '/abidjan';
+      return NextResponse.redirect(url);
+    }
+    return NextResponse.next();
+  }
+
   // 1. Arriving from Stripe Checkout.
   const checkoutId = pathname === '/app/bienvenue' ? searchParams.get('session_id') : null;
   if (checkoutId) {
@@ -98,5 +109,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/app/:path*'],
+  matcher: ['/app/:path*', '/abidjan', '/Abidjan', '/ABIDJAN'],
 };
